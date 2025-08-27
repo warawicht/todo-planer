@@ -4,19 +4,18 @@
 
 The To-Do List and Time Planner is a full-stack web application that allows users to manage their tasks and schedule their time effectively. The application will feature task management with due dates, time blocking, calendar views, and productivity tracking.
 
-### 1.1 Technology Stack
-- **Frontend**: Next.js (React framework with SSR/SSG capabilities)
-- **Backend**: NestJS (Node.js framework with TypeScript support)
-- **Database**: SQLite (development), PostgreSQL/MySQL (production)
-- **Authentication**: JWT-based authentication
-- **State Management**: React Context API with potential integration of Redux/Zustand
-- **Styling**: Tailwind CSS or Material UI
-
 ## 2. Frontend Architecture (Next.js)
 
-### 2.1 Component Architecture
+### 2.1 Technology Stack
+- **Framework**: Next.js (React framework with SSR/SSG capabilities)
+- **State Management**: React Context API with potential integration of Redux/Zustand
+- **Styling**: Tailwind CSS or Material UI
+- **Authentication**: JWT-based authentication
+- **API Client**: Axios or Fetch API
 
-#### 2.1.1 Component Hierarchy
+### 2.2 Component Architecture
+
+#### 2.2.1 Component Hierarchy
 ```
 App
 ├── Layout
@@ -37,7 +36,7 @@ App
     └── Statistics
 ```
 
-#### 2.1.2 Core Components
+#### 2.2.2 Core Components
 
 | Component | Description | Props |
 |----------|-------------|-------|
@@ -47,28 +46,34 @@ App
 | TimeBlock | Visual representation of time blocks | block: TimeBlockObject, onEdit: Function |
 | Header | Navigation and user controls | user: UserObject |
 
-### 2.2 State Management
+### 2.3 State Management
 - Local component state for form inputs and UI interactions
 - Global state for user data, tasks, and settings using React Context API
 - Potential integration with Redux or Zustand for more complex state management
 
-### 2.3 Routing & Navigation
+### 2.4 Routing & Navigation
 - `/` - Dashboard with overview of tasks and schedule
 - `/tasks` - List view of all tasks
 - `/calendar` - Calendar view of tasks and time blocks
 - `/planner` - Time blocking interface
 - `/settings` - User preferences and account settings
 
-### 2.4 API Integration Layer
+### 2.5 API Integration Layer
 - Axios or Fetch API for HTTP requests
 - Custom hooks for data fetching (e.g., useTasks, useUser)
 - Error handling and loading states
 
 ## 3. Backend Architecture (NestJS)
 
-### 3.1 API Endpoints
+### 3.1 Technology Stack
+- **Framework**: NestJS (Node.js framework with TypeScript support)
+- **Database**: SQLite (development), PostgreSQL/MySQL (production)
+- **Authentication**: JWT-based authentication
+- **ORM**: TypeORM or Prisma
 
-#### 3.1.1 Authentication
+### 3.2 API Endpoints
+
+#### 3.2.1 Authentication
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/auth/register` | POST | User registration |
@@ -76,7 +81,7 @@ App
 | `/auth/profile` | GET | Get user profile |
 | `/auth/profile` | PUT | Update user profile |
 
-#### 3.1.2 Tasks
+#### 3.2.2 Tasks
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/tasks` | GET | Get all tasks for user |
@@ -85,7 +90,7 @@ App
 | `/tasks/:id` | PUT | Update task |
 | `/tasks/:id` | DELETE | Delete task |
 
-#### 3.1.3 Time Blocks
+#### 3.2.3 Time Blocks
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/time-blocks` | GET | Get all time blocks for user |
@@ -94,9 +99,9 @@ App
 | `/time-blocks/:id` | PUT | Update time block |
 | `/time-blocks/:id` | DELETE | Delete time block |
 
-### 3.2 Data Models
+### 3.3 Data Models
 
-#### 3.2.1 User Model
+#### 3.3.1 User Model
 ```typescript
 interface User {
   id: number;
@@ -109,7 +114,7 @@ interface User {
 }
 ```
 
-#### 3.2.2 Task Model
+#### 3.3.2 Task Model
 ```typescript
 interface Task {
   id: number;
@@ -124,7 +129,7 @@ interface Task {
 }
 ```
 
-#### 3.2.3 TimeBlock Model
+#### 3.3.3 TimeBlock Model
 ```typescript
 interface TimeBlock {
   id: number;
@@ -138,27 +143,27 @@ interface TimeBlock {
 }
 ```
 
-### 3.3 Business Logic Layer
+### 3.4 Business Logic Layer
 
-#### 3.3.1 Task Service
+#### 3.4.1 Task Service
 - CRUD operations for tasks
 - Task filtering and sorting
 - Due date validation
 - Priority management
 
-#### 3.3.2 Time Block Service
+#### 3.4.2 Time Block Service
 - CRUD operations for time blocks
 - Time conflict detection
 - Scheduling algorithms
 - Calendar integration
 
-#### 3.3.3 User Service
+#### 3.4.3 User Service
 - User registration and authentication
 - Profile management
 - Password encryption
 - Session management
 
-### 3.4 Middleware & Interceptors
+### 3.5 Middleware & Interceptors
 - Authentication middleware for protected routes
 - Logging interceptor for request/response tracking
 - Validation pipes for data integrity
@@ -167,7 +172,7 @@ interface TimeBlock {
 ## 4. Database Design
 
 ### 4.1 Entity Relationship Diagram
-```mermaid
+```
 erDiagram
     USER ||--o{ TASK : has
     USER ||--o{ TIME_BLOCK : has
@@ -223,7 +228,7 @@ erDiagram
 6. Frontend updates UI based on responses
 
 ### 5.2 Authentication Flow
-```mermaid
+```
 sequenceDiagram
     participant U as User
     participant F as Frontend
