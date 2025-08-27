@@ -64,7 +64,7 @@ The application follows a modern, scalable architecture with clear separation of
 - Caching layer for improved performance
 - Backup and disaster recovery mechanisms
 
-## 2. Frontend Architecture (Next.js)
+## 1. Frontend Architecture (Next.js)
 
 ### 2.1 Technology Stack
 - **Framework**: Next.js (React framework with SSR/SSG capabilities)
@@ -91,9 +91,9 @@ The application follows a modern, scalable architecture with clear separation of
 - **Partial Prerendering**: Combining static and dynamic rendering for optimal performance
 - **Turbopack**: Fast compilation and hot module replacement during development
 
-### 2.2 Component Architecture
+### 1.2 Component Architecture
 
-#### 2.2.1 Component Hierarchy
+#### 1.2.1 Component Hierarchy
 ```
 App
 ├── Layout
@@ -163,7 +163,7 @@ App
         └── TaskCompletionStats
 ```
 
-#### 2.2.2 Core Components Detailed
+#### 1.2.2 Core Components Detailed
 
 | Component | Description | Props | State Management |
 |----------|-------------|-------|------------------|
@@ -179,20 +179,20 @@ App
 | NotificationBell | Notification indicator showing unread count | notifications: NotificationArray, onOpen: Function | Unread count, dropdown open state |
 | NotificationItem | Individual notification display with actions | notification: NotificationObject, onDismiss: Function, onAction: Function | Read status, expanded state |
 
-### 2.3 State Management
+### 1.3 State Management
 
-#### 2.3.1 Local State
+#### 1.3.1 Local State
 - Form inputs and validation using React hooks
 - UI interactions like hover states, loading indicators
 - Component-specific data that does not need global access
 
-#### 2.3.2 Global State
+#### 1.3.2 Global State
 - User authentication and profile information
 - Task list and filtering options
 - Calendar view settings and preferences
 - Time block scheduling data
 
-#### 2.3.3 State Management Strategy
+#### 1.3.3 State Management Strategy
 - **React Context API** for simple global state needs like theme preferences and user information
 - **Redux Toolkit** for complex state management including task lists, filtering options, and real-time updates
 - **Custom hooks** for encapsulating state logic and reusable state patterns
@@ -202,9 +202,9 @@ App
 - **URL state** for preserving filter and sorting preferences in the URL
 - **Cache management** for optimistic updates and offline functionality
 
-### 2.4 Routing & Navigation
+### 1.4 Routing & Navigation
 
-#### 2.4.1 Route Structure
+#### 1.4.1 Route Structure
 - `/` - Dashboard with overview of tasks and schedule
 - `/tasks` - List view of all tasks with filtering and sorting
 - `/tasks/:id` - Individual task details view
@@ -223,7 +223,7 @@ App
 - `/settings/billing` - Subscription and billing management
 - `/search` - Global search across tasks and projects
 
-##### 2.4.1.1 Notification Settings Page
+##### 1.4.1.1 Notification Settings Page
 - **Channel preferences** - Enable/disable email, push, and in-app notifications
 - **Reminder timing** - Configure when to receive reminders for tasks and time blocks
 - **Priority filters** - Select which priority levels trigger notifications
@@ -231,15 +231,15 @@ App
 - **Sound settings** - Customize notification sounds
 - **Notification history** - View recent notifications and their status
 
-#### 2.4.2 Navigation Patterns
+#### 1.4.2 Navigation Patterns
 - Responsive sidebar navigation for desktop
 - Mobile-friendly bottom navigation or hamburger menu
 - Breadcrumb navigation for deep page hierarchies
 - Contextual navigation based on user actions
 
-### 2.5 API Integration Layer
+### 1.5 API Integration Layer
 
-#### 2.5.1 HTTP Client Configuration
+#### 1.5.1 HTTP Client Configuration
 - Axios instance with base URL and default headers
 - Request interceptors for authentication token injection
 - Response interceptors for error handling and data transformation
@@ -248,7 +248,7 @@ App
 - Timeout configuration for preventing hanging requests
 - Base URL configuration for different environments
 
-#### 2.5.2 Custom Hooks
+#### 1.5.2 Custom Hooks
 - `useTasks()` - Fetch, create, update, and delete tasks with filtering and sorting
 - `useTimeBlocks()` - Manage time block scheduling with conflict detection
 - `useUser()` - Handle user profile and authentication
@@ -262,7 +262,7 @@ App
 - `useAlerts()` - Handle real-time alerts and system notifications
 - `useProductivityMetrics()` - Retrieve productivity data and trends
 
-#### 2.5.3 Data Management
+#### 1.5.3 Data Management
 - Loading states with skeleton loaders and progress indicators
 - Error handling with user-friendly messages and retry options
 - Caching strategies for improved performance with SWR or React Query
@@ -271,51 +271,83 @@ App
 - Data normalization for efficient state management
 - Background data synchronization for offline support
 
-### 2.6 Performance Optimization
+### 1.6 Performance Optimization
 
-#### 2.6.1 Code Splitting and Bundle Optimization
+#### 1.6.1 Code Splitting and Bundle Optimization
 - **Dynamic imports** for route-based code splitting
 - **Component-level code splitting** for heavy components
 - **Bundle analysis** with webpack-bundle-analyzer
 - **Tree shaking** for eliminating unused code
 - **Lazy loading** for non-critical resources
 - **Preloading and prefetching** for critical resources
+- **Bundle splitting** for vendor and application code separation
+- **Module federation** for micro-frontend architecture
+- **Differential loading** for modern and legacy browser support
+- **Import on visibility** for deferred component loading
 
-#### 2.6.2 Rendering Optimization
+#### 1.6.2 Rendering Optimization
 - **React.memo** for preventing unnecessary re-renders
 - **useMemo and useCallback** for expensive computations
 - **Virtualized lists** for rendering large datasets
 - **Windowing techniques** for efficient list rendering
 - **Skeleton screens** for better perceived performance
 - **Progressive hydration** for faster initial loads
+- **Concurrent Mode** for interruptible rendering
+- **Selective hydration** for prioritized component loading
+- **Server Components** for reduced client-side JavaScript
+- **Component caching** for frequently rendered components
 
-#### 2.6.3 Asset Optimization
+#### 1.6.3 Asset Optimization
 - **Image optimization** with Next.js Image component
 - **Font optimization** with automatic font loading
 - **SVG sprite optimization** for icons
 - **Critical CSS** inlining for above-the-fold content
 - **Asset compression** with gzip and Brotli
 - **Responsive images** with srcset and sizes attributes
+- **Image CDN** for dynamic image optimization
+- **Lazy image loading** with intersection observer
+- **WebP and AVIF formats** for modern browser support
+- **Progressive image loading** with low-quality placeholders
 
-#### 2.6.4 Caching Strategies
+#### 1.6.4 Caching Strategies
 - **Browser caching** with proper cache headers
 - **Service worker caching** for offline support
 - **SWR or React Query** for client-side data caching
 - **HTTP caching** for API responses
 - **CDN integration** for static asset distribution
 - **Cache invalidation** strategies for data consistency
+- **Cache warming** for frequently accessed data
+- **Edge caching** with CDN edge nodes
+- **Cache partitioning** for distributed cache systems
+- **Cache TTL optimization** for different data types
 
-#### 2.6.5 Monitoring and Analytics
+#### 1.6.5 High-Concurrency Client-Side Optimization
+- **Request deduplication** for identical API calls
+- **Request batching** for combining multiple API requests
+- **Connection pooling** for HTTP/2 multiplexing
+- **WebSocket connection reuse** for real-time updates
+- **Client-side rate limiting** to prevent server overload
+- **Backpressure handling** for managing high-frequency updates
+- **Debouncing and throttling** for user input optimization
+- **Predictive prefetching** for anticipated user actions
+- **Resource prioritization** with resource hints
+- **Critical resource preloading** for essential assets
+
+#### 1.6.6 Monitoring and Analytics
 - **Performance monitoring** with Web Vitals
 - **Error tracking** with Sentry or similar services
 - **User behavior analytics** with Google Analytics or Mixpanel
 - **Real User Monitoring** (RUM) for performance insights
 - **Synthetic monitoring** for uptime and performance
 - **A/B testing** for feature optimization
+- **Core Web Vitals tracking** for SEO performance
+- **Custom performance metrics** for business-specific KPIs
+- **Performance budget enforcement** in CI/CD pipelines
+- **User experience analytics** with session replay tools
 
-### 2.7 Accessibility and Internationalization
+### 1.7 Accessibility and Internationalization
 
-#### 2.7.1 Accessibility (a11y)
+#### 1.7.1 Accessibility (a11y)
 - **WCAG 2.1 compliance** for accessibility standards
 - **ARIA attributes** for screen reader support
 - **Keyboard navigation** for all interactive elements
@@ -323,7 +355,7 @@ App
 - **Focus management** for modal dialogs and overlays
 - **Semantic HTML** for proper document structure
 
-#### 2.7.2 Internationalization (i18n)
+#### 1.7.2 Internationalization (i18n)
 - **Multi-language support** with automatic detection
 - **RTL language support** for right-to-left languages
 - **Date and number formatting** for different locales
@@ -331,9 +363,9 @@ App
 - **Translation management** with external services
 - **Localized routing** for language-specific URLs
 
-## 3. Backend Architecture (NestJS)
+## 1. Backend Architecture (NestJS)
 
-### 3.1 Technology Stack
+### 2.1 Technology Stack
 - **Framework**: NestJS (Node.js framework with TypeScript support)
 - **Database**: SQLite (development), PostgreSQL/MySQL (production)
 - **Authentication**: JWT-based authentication with refresh token strategy
@@ -344,9 +376,9 @@ App
 - **Logging**: Winston for structured logging
 - **Testing**: Jest for unit and integration testing
 
-### 3.2 API Endpoints
+### 1.2 API Endpoints
 
-#### 3.3.1 Authentication
+#### 1.2.1 Authentication
 | Endpoint | Method | Description | Authentication |
 |----------|--------|-------------|--------------|
 | `/auth/register` | POST | User registration with email verification | Public |
@@ -359,7 +391,7 @@ App
 | `/auth/profile` | PUT | Update user profile | JWT |
 | `/auth/change-password` | PUT | Change password | JWT |
 
-#### 3.3.2 Tasks
+#### 1.2.2 Tasks
 | Endpoint | Method | Description | Authentication |
 |----------|--------|-------------|--------------|
 | `/tasks` | GET | Get all tasks for user with filtering and pagination | JWT |
@@ -372,7 +404,7 @@ App
 | `/tasks/:id/subtasks` | GET | Get subtasks for a task | JWT |
 | `/tasks/:id/subtasks` | POST | Create subtask for a task | JWT |
 
-#### 3.3.3 Time Blocks
+#### 1.2.3 Time Blocks
 | Endpoint | Method | Description | Authentication |
 |----------|--------|-------------|--------------|
 | `/time-blocks` | GET | Get all time blocks for user with date filtering | JWT |
@@ -384,7 +416,7 @@ App
 | `/time-blocks/:id/link-task` | PUT | Link time block to specific task | JWT |
 | `/time-blocks/bulk` | POST | Bulk create/update time blocks | JWT |
 
-#### 3.3.4 Notifications
+#### 1.2.4 Notifications
 | Endpoint | Method | Description | Authentication |
 |----------|--------|-------------|--------------|
 | `/notifications` | GET | Get all notifications for user with filtering | JWT |
@@ -395,7 +427,7 @@ App
 | `/notifications/bulk` | DELETE | Dismiss multiple notifications | JWT |
 | `/notifications/unread-count` | GET | Get count of unread notifications | JWT |
 
-#### 3.3.5 Reminders
+#### 1.2.5 Reminders
 | Endpoint | Method | Description | Authentication |
 |----------|--------|-------------|--------------|
 | `/reminders` | GET | Get all reminders for user with filtering | JWT |
@@ -407,9 +439,9 @@ App
 | `/reminders/bulk` | PUT | Bulk update reminders | JWT |
 | `/reminders/bulk` | DELETE | Bulk delete reminders | JWT |
 
-### 3.4 Data Models
+### 1.3 Data Models
 
-#### 3.4.1 User Model
+#### 1.3.1 User Model
 ``typescript
 interface User {
   id: number;
@@ -452,7 +484,7 @@ interface UserPreferences {
 }
 ```
 
-#### 3.4.2 Task Model
+#### 1.3.2 Task Model
 ``typescript
 interface Task {
   id: number;
@@ -480,7 +512,7 @@ interface Task {
 }
 ```
 
-#### 3.4.3 TimeBlock Model
+#### 1.3.3 TimeBlock Model
 ``typescript
 interface TimeBlock {
   id: number;
@@ -506,7 +538,7 @@ interface RecurrencePattern {
 }
 ```
 
-#### 3.4.4 Additional Models
+#### 1.3.4 Additional Models
 
 ##### Project Model
 ``typescript
@@ -574,9 +606,9 @@ interface Reminder {
 }
 ```
 
-### 3.5 Business Logic Layer
+### 1.4 Business Logic Layer
 
-#### 3.5.1 Task Service
+#### 1.4.1 Task Service
 - CRUD operations for tasks with validation
 - Task filtering and sorting by multiple criteria
 - Due date validation and reminder scheduling
@@ -586,7 +618,7 @@ interface Reminder {
 - Task import/export functionality
 - Batch operations for multiple tasks
 
-#### 3.5.2 Time Block Service
+#### 1.4.2 Time Block Service
 - CRUD operations for time blocks with validation
 - Time conflict detection and resolution suggestions
 - Scheduling algorithms for optimal time allocation
@@ -595,7 +627,7 @@ interface Reminder {
 - Duration optimization based on task complexity
 - Integration with external calendar services (Google Calendar, Outlook)
 
-#### 3.5.3 User Service
+#### 1.4.3 User Service
 - User registration with email verification
 - Profile management with avatar support
 - Password encryption with bcrypt
@@ -605,7 +637,7 @@ interface Reminder {
 - User preferences and customization
 - Activity logging and audit trails
 
-#### 3.5.4 Notification Service
+#### 1.4.4 Notification Service
 - **Email notifications** for task reminders and important updates
 - **Push notifications** for time block alerts and real-time updates
 - **In-app notifications** for all user interactions and system messages
@@ -617,7 +649,7 @@ interface Reminder {
 - **System alerts** for maintenance, updates, and important announcements
 - **Custom notification rules** based on user preferences and task priorities
 
-### 3.5.5 Dashboard Service
+### 1.4.5 Dashboard Service
 - **Task summary aggregation** with counts by status, priority, and due date
 - **Schedule overview** with today's and upcoming time blocks
 - **Productivity metrics** with trend analysis and goal tracking
@@ -627,7 +659,7 @@ interface Reminder {
 - **Customizable widgets** allowing users to personalize their dashboard layout
 - **Real-time updates** with WebSocket connections for live data refresh
 
-### 3.5.6 Alert and Reminder System
+### 1.4.6 Alert and Reminder System
 - **Task-based reminders** with configurable timing (at time, 5 min before, 1 hour before, 1 day before)
 - **Recurring task reminders** for daily, weekly, and monthly repeating tasks
 - **Time block alerts** with start and end time notifications
@@ -639,33 +671,49 @@ interface Reminder {
 - **Multi-channel delivery** (email, push, in-app) for critical alerts
 - **Reminder history tracking** with user interaction logging
 
-### 3.6 Middleware & Interceptors
+### 1.5 Middleware & Interceptors
 
-#### 3.6.1 Authentication Middleware
+#### 1.5.1 High-Performance Authentication Middleware
 - JWT token verification for protected routes
 - Role-based access control (RBAC)
 - Session validation and refresh token handling
 - Rate limiting for authentication endpoints
+- Token caching for reduced validation overhead
+- Asynchronous token validation for non-blocking operations
+- Preemptive token refresh for seamless user experience
+- Distributed session management for horizontal scaling
 
-#### 3.6.2 Logging Interceptors
+#### 1.5.2 High-Performance Logging Interceptors
 - Request/response logging with correlation IDs
 - Performance monitoring and metrics collection
 - Audit trails for sensitive operations
 - Structured logging for debugging
+- Asynchronous logging to prevent I/O blocking
+- Log batching for reduced I/O operations
+- Log level filtering for production optimization
+- Distributed tracing integration for request flow tracking
 
-#### 3.6.3 Validation Pipes
+#### 1.5.3 Optimized Validation Pipes
 - Input validation using class-validator
 - Data sanitization to prevent injection attacks
 - File upload validation and size limits
 - Custom validation rules for business logic
+- Schema caching for improved validation performance
+- Parallel validation for complex objects
+- Early exit validation for failed requests
+- Validation result caching for repeated requests
 
-#### 3.6.4 Error Handling
+#### 1.5.4 Efficient Error Handling
 - Global exception filter for consistent error responses
 - Custom error codes and messages
 - Error logging and monitoring integration
 - Graceful degradation for non-critical failures
+- Error response caching for common error scenarios
+- Asynchronous error reporting to prevent blocking
+- Error metrics aggregation for performance insights
+- Circuit breaker pattern for external service failures
 
-#### 3.6.5 Security Middleware
+#### 1.5.5 High-Performance Security Middleware
 - **CORS configuration** for cross-origin requests with environment-specific settings
 - **Helmet.js** for HTTP header security including CSP, HSTS, and XSS protection
 - **Rate limiting** to prevent abuse with configurable limits per endpoint
@@ -676,68 +724,119 @@ interface Reminder {
 - **DDoS protection** with request throttling and IP blocking
 - **API key management** for third-party integrations
 - **Audit logging** for security-sensitive operations
+- **Request fingerprinting** for anomaly detection
+- **Adaptive security** based on user behavior patterns
+- **Zero-trust validation** for all incoming requests
 
-### 3.7 Scalability and Performance Optimization
+### 1.6 Scalability and Performance Optimization
 
-#### 3.7.1 Caching Strategies
+#### 1.6.1 High-Performance Caching Strategies
 - **Redis caching** for frequently accessed data like user preferences and task summaries
 - **HTTP caching** with proper cache headers for static assets and API responses
 - **Database query caching** for complex reporting queries
 - **Application-level caching** with in-memory caches for hot data
 - **CDN integration** for global content distribution
+- **Cache Clustering**: Redis cluster for distributed caching
+- **Cache Tiering**: Multiple cache layers with different TTLs
+- **Cache Preloading**: Warm caches with frequently accessed data
+- **Cache Penetration Protection**: Bloom filters for non-existent data
+- **Cache Avalanche Prevention**: Staggered cache expiration
+- **Write-Behind Caching**: Asynchronous cache updates for performance
+- **Cache Versioning**: Cache key versioning for seamless updates
 
-#### 3.7.2 Database Optimization
+#### 1.6.2 Database Optimization for High Concurrency
 - **Connection pooling** for efficient database connection management
 - **Read replicas** for scaling read operations in production
 - **Database sharding** for horizontal scaling of large datasets
 - **Query optimization** with indexing and execution plan analysis
 - **Batch operations** for reducing database round trips
+- **Connection Multiplexing**: PgBouncer for connection pooling
+- **Partitioning**: Table partitioning for large datasets
+- **Materialized Views**: Pre-computed views for complex queries
+- **Query Parallelization**: Parallel query execution for analytics
+- **Lock Contention Reduction**: Minimize lock duration and scope
+- **MVCC (Multi-Version Concurrency Control)**: Snapshot isolation for read scalability
+- **Optimistic Locking**: Version-based conflict detection for updates
+- **Row-Level Locking**: Fine-grained locking to reduce contention
 
-#### 3.7.3 Load Balancing and Scaling
+#### 1.6.3 Load Balancing and Horizontal Scaling
 - **Horizontal scaling** with multiple server instances
 - **Load balancing** with NGINX or cloud load balancers
 - **Auto-scaling** based on CPU and memory usage metrics
 - **Microservices architecture** for independent scaling of components
 - **Container orchestration** with Kubernetes for efficient resource utilization
+- **Service Mesh**: Istio for traffic management and observability
+- **Geographic Distribution**: Multi-region deployment for reduced latency
+- **Blue-Green Deployments**: Zero-downtime deployment strategy
+- **Canary Releases**: Gradual rollout for risk mitigation
+- **Edge Computing**: Process requests at edge locations to reduce latency
+- **Serverless Functions**: Event-driven functions for sporadic workloads
+- **Spot Instance Utilization**: Cost-effective compute with graceful degradation
 
-#### 3.7.4 Asynchronous Processing
+#### 1.6.4 Asynchronous Processing for High Throughput
 - **Message queues** with Redis or RabbitMQ for background jobs
 - **Event-driven architecture** for real-time notifications
 - **Webhook processing** for third-party integrations
 - **Batch processing** for data-intensive operations
 - **Task scheduling** with cron-like functionality
+- **Priority Queues**: Task prioritization for critical operations
+- **Dead Letter Queues**: Failed message handling and retry logic
+- **Idempotent Processing**: Safe message reprocessing
+- **Rate Limiting**: Control message processing rate
+- **Message Deduplication**: Prevent duplicate message processing
+- **Backpressure Handling**: Manage system load during high traffic
+- **Event Sourcing**: Event store for audit trails and replay capability
+- **Stream Processing**: Real-time data processing with Apache Kafka
 
-#### 3.7.5 Monitoring and Performance Metrics
+#### 1.6.5 Monitoring and Performance Metrics for High TPS
 - **APM tools** for application performance monitoring
 - **Database performance** monitoring with query analysis
 - **API response time** tracking and optimization
 - **Error rate monitoring** with alerting systems
 - **Resource utilization** tracking for capacity planning
+- **Distributed Tracing**: OpenTelemetry for request flow tracking
+- **Real-time Metrics**: Prometheus and Grafana for live monitoring
+- **Performance Profiling**: Continuous profiling for bottleneck identification
+- **Alerting Thresholds**: Automated alerts for performance degradation
+- **Load Testing Framework**: K6 or Artillery for simulating high traffic
+- **Performance Baseline**: Establish performance benchmarks for all operations
+- **Synthetic Monitoring**: Regular synthetic tests for performance regression
+- **Capacity Planning**: Predictive scaling based on traffic patterns
 
-### 3.8 API Design and Documentation
+### 1.7 API Design and Documentation
 
-#### 3.8.1 RESTful API Principles
+#### 1.7.1 RESTful API Principles for High Performance
 - **Resource-based URLs** for intuitive API design
 - **Standard HTTP methods** for CRUD operations
 - **Consistent response formats** with proper status codes
 - **Pagination** for large dataset retrieval
 - **Filtering and sorting** capabilities for flexible data access
+- **Field Selection** for reducing payload size (GraphQL-style)
+- **Response Compression** with Gzip/Brotli for bandwidth optimization
+- **Conditional Requests** with ETags for efficient caching
+- **Batch Operations** for reducing API round trips
 
-#### 3.8.2 API Versioning
+#### 1.7.2 API Versioning
 - **URL versioning** for backward compatibility
 - **Header-based versioning** for client-specific versions
 - **Deprecation policies** for smooth transitions
 - **Migration guides** for API consumers
+- **Version Negotiation** for graceful version transitions
+- **Sunset Headers** for version deprecation announcements
 
-#### 3.8.3 Documentation
+#### 1.7.3 High-Performance API Documentation
 - **Swagger/OpenAPI** for interactive API documentation
 - **Code examples** for different programming languages
 - **SDK generation** for popular platforms
 - **Changelog** for API updates and changes
+- **Performance Guidelines** for optimal API usage
+- **Rate Limiting Documentation** for client-side planning
+- **Error Handling Patterns** for robust client implementations
+- **Best Practices Guide** for efficient API consumption
 
-### 3.9 Microservices Architecture
+### 1.8 Microservices Architecture
 
-#### 3.9.1 Service Decomposition
+#### 1.8.1 Service Decomposition
 - **User Service** - User management, authentication, and profile handling
 - **Task Service** - Task creation, management, and retrieval operations
 - **Scheduling Service** - Time blocking, calendar integration, and scheduling algorithms
@@ -747,7 +846,7 @@ interface Reminder {
 - **Search Service** - Full-text search capabilities across tasks and projects
 - **Integration Service** - Third-party service integrations (Google Calendar, Outlook, etc.)
 
-#### 3.9.2 Inter-Service Communication
+#### 1.8.2 Inter-Service Communication
 - **Synchronous communication** with REST APIs for immediate responses
 - **Asynchronous communication** with message queues for background processing
 - **Service discovery** with Consul or Kubernetes service discovery
@@ -755,39 +854,39 @@ interface Reminder {
 - **Circuit breaker pattern** for fault tolerance
 - **Retry mechanisms** with exponential backoff
 
-#### 3.9.3 Data Management in Microservices
+#### 1.8.3 Data Management in Microservices
 - **Database per service** pattern for data isolation
 - **Saga pattern** for distributed transactions
 - **Event sourcing** for audit trails and data consistency
 - **CQRS** for read and write operation optimization
 - **Data sharing strategies** with shared databases or API calls
 
-### 3.10 Event-Driven Architecture
+### 1.9 Event-Driven Architecture
 
-#### 3.10.1 Event Types
+#### 1.9.1 Event Types
 - **Domain Events** - Task created, updated, or deleted
 - **Integration Events** - Calendar sync completed, file uploaded
 - **System Events** - User registered, password changed
 - **Notification Events** - Reminder due, deadline approaching
 - **Audit Events** - Security-related actions, data access
 
-#### 3.10.2 Event Processing
+#### 1.9.2 Event Processing
 - **Event producers** in each service for emitting events
 - **Event consumers** for processing events asynchronously
 - **Event store** for persisting events and replay capability
 - **Dead letter queues** for handling failed event processing
 - **Event versioning** for backward compatibility
 
-#### 3.10.3 Messaging Infrastructure
+#### 1.9.3 Messaging Infrastructure
 - **Message brokers** like RabbitMQ or Apache Kafka
 - **Pub/Sub patterns** for event distribution
 - **Message serialization** with JSON or Protocol Buffers
 - **Message ordering** guarantees where required
 - **Message deduplication** to prevent duplicate processing
 
-### 3.11 Detailed API Specifications
+### 1.10 Detailed API Specifications
 
-### 3.11.1 Authentication API
+### 1.10.1 Authentication API
 
 #### Register User
 ```
@@ -1290,9 +1389,9 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 - **API Gateway Controls**: Fine-grained access controls at the API gateway
 - **Data Flow Monitoring**: Continuous monitoring of data movement between services
 
-## 4. Database Design
+## 2. Database Design
 
-### 4.1 Entity Relationship Diagram
+### 2.1 Entity Relationship Diagram
 ```
 erDiagram
     USER ||--o{ TASK : has
@@ -1380,9 +1479,9 @@ erDiagram
     }
 ```
 
-### 4.2 Database Schema Details
+### 2.2 Database Schema Details
 
-#### 4.2.1 Users Table
+#### 2.2.1 Users Table
 - **id** (Primary Key): Unique identifier for each user
 - **email** (Unique): User's email address for login and communication
 - **password**: Hashed password for authentication
@@ -1460,7 +1559,7 @@ erDiagram
 - **createdAt**: Timestamp when task was created
 - **updatedAt**: Timestamp when task was last updated
 
-#### 4.2.4 TimeBlocks Table
+#### 2.2.4 TimeBlocks Table
 - **id** (Primary Key): Unique identifier for each time block
 - **title**: Time block title
 - **description**: Detailed description of what will be done during this time block
@@ -1475,7 +1574,7 @@ erDiagram
 - **createdAt**: Timestamp when time block was created
 - **updatedAt**: Timestamp when time block was last updated
 
-#### 4.2.5 Tags Table
+#### 2.2.5 Tags Table
 - **id** (Primary Key): Unique identifier for each tag
 - **name**: Tag name
 - **color**: Color code for UI visualization
@@ -1483,13 +1582,13 @@ erDiagram
 - **createdAt**: Timestamp when tag was created
 - **updatedAt**: Timestamp when tag was last updated
 
-#### 4.2.6 TaskTags Table (Junction Table)
+#### 2.2.6 TaskTags Table (Junction Table)
 - **taskId** (Foreign Key, Primary Key): Reference to task
 - **tagId** (Foreign Key, Primary Key): Reference to tag
 
-### 4.3 Database Indexes
+### 2.3 Database Indexes
 
-#### 4.3.1 Primary Indexes
+#### 2.3.1 Primary Indexes
 - **Users**: Primary key index on id, Unique index on email for fast login lookups
 - **Tasks**: Primary key index on id, Indexes on userId, projectId, status, and dueDate for efficient querying
 - **TimeBlocks**: Primary key index on id, Indexes on userId, taskId, and startTime for scheduling queries
@@ -1497,20 +1596,20 @@ erDiagram
 - **Tags**: Primary key index on id, Index on userId and name for tag management
 - **TaskTags**: Composite primary key on taskId and tagId, Composite index on taskId and tagId for relationship queries
 
-#### 4.3.2 Secondary Indexes
+#### 2.3.2 Secondary Indexes
 - **Users**: Index on lastLoginAt for activity reports
 - **Tasks**: Composite index on userId and dueDate for dashboard queries
 - **TimeBlocks**: Composite index on userId and date range for calendar views
 - **Projects**: Index on isArchived for filtering active projects
 - **Tags**: Index on name for global tag search
 
-#### 4.3.3 Specialized Indexes
+#### 2.3.3 Specialized Indexes
 - **Full-text search indexes** for task descriptions and titles
 - **Partial indexes** for filtering common query patterns
 - **Expression indexes** for computed values
 - **GIN indexes** for JSON field queries in preferences
 
-### 4.4 Database Optimization Strategies
+### 2.4 Database Optimization Strategies
 
 #### 4.4.1 Query Optimization
 - **EXPLAIN ANALYZE** for query performance analysis
@@ -1519,40 +1618,216 @@ erDiagram
 - **Materialized views** for complex reporting queries
 - **Common Table Expressions** (CTEs) for readable complex queries
 - **Window functions** for analytical queries
+- **Query Parallelization**: Parallel execution for complex analytical queries
+- **Query Plan Caching**: Reuse optimized query plans
+- **Statistics Sampling**: Efficient statistics collection for query planner
+- **Query Hints**: Database-specific hints for query optimization
+- **Join Optimization**: Efficient join algorithms and strategies
+- **Subquery Optimization**: Convert subqueries to joins where beneficial
+- **Function Optimization**: Minimize function calls in WHERE clauses
 
-#### 4.4.2 Connection Management
+#### 2.4.2 Connection Management
 - **Connection pooling** with PgBouncer or similar tools
 - **Connection lifecycle management** to prevent leaks
 - **Query timeout configuration** to prevent long-running queries
 - **Statement cancellation** for responsive user experience
+- **Connection Multiplexing**: Reduce database connection overhead
+- **Asynchronous Connections**: Non-blocking database operations
+- **Connection Validation**: Health checks for connection pools
+- **Leak Detection**: Automatic detection of connection leaks
+- **Connection Pool Sizing**: Optimal pool sizing based on workload analysis
+- **Idle Connection Timeout**: Automatic cleanup of idle connections
+- **Connection Retry Logic**: Robust retry mechanisms for transient failures
+- **Connection Metrics**: Monitoring connection usage and performance
 
-#### 4.4.3 Scaling Strategies
+#### 2.4.3 Scaling Strategies
 - **Read replicas** for scaling read operations in production
 - **Sharding strategies** for horizontal partitioning
 - **Database clustering** for high availability
 - **Load balancing** for distributing database requests
+- **Master-Master Replication**: Active-active database setup
+- **Geographic Replication**: Multi-region database deployment
+- **Automatic Failover**: Seamless database failover mechanisms
+- **Read-Write Splitting**: Intelligent routing of database queries
+- **Database Proxy**: Connection pooling and query routing with proxies
+- **Multi-Master Replication**: Write scaling with conflict resolution
+- **Federated Database Systems**: Distributed database architectures
+- **Elastic Scaling**: Dynamic scaling based on workload demands
 
-#### 4.4.4 Caching Layers
+#### 2.4.4 Caching Layers
 - **Redis caching** for frequently accessed data
 - **In-memory caching** for hot data
 - **CDN integration** for static content
 - **Browser caching** strategies
+- **Cache Clustering**: Distributed cache for high availability
+- **Cache Tiering**: Multiple cache layers with different characteristics
+- **Cache Warming**: Pre-populate caches during low-traffic periods
+- **Cache Invalidation**: Event-driven cache consistency management
+- **Cache-Aside Pattern**: Lazy loading with cache miss handling
+- **Write-Behind Caching**: Asynchronous cache updates for performance
+- **Cache Penetration Protection**: Bloom filters for non-existent data
+- **Cache Avalanche Prevention**: Staggered cache expiration
 
-#### 4.4.5 Data Partitioning
+#### 2.4.5 Data Partitioning
 - **Date-based partitioning** for time series data
 - **Range partitioning** for numeric data
 - **List partitioning** for categorical data
 - **Hash partitioning** for even distribution
+- **Composite Partitioning**: Combination of partitioning strategies
+- **Partition Pruning**: Eliminate irrelevant partitions from queries
+- **Partition Maintenance**: Automated partition management
+- **Cross-Partition Queries**: Efficient querying across partitions
+- **Partition-wise Joins**: Optimize joins on partitioned tables
+- **Sub-partitioning**: Hierarchical partitioning for complex data
+- **Partition Locking**: Minimize lock contention with partition-level locks
+- **Partition Monitoring**: Track partition performance and usage
 
-#### 4.4.6 Archiving and Maintenance
+#### 2.4.6 High-Concurrency Optimization
+- **Lock Contention Reduction**: Minimize lock duration and scope
+- **MVCC (Multi-Version Concurrency Control)**: Snapshot isolation for read scalability
+- **Optimistic Locking**: Version-based conflict detection for updates
+- **Row-Level Locking**: Fine-grained locking to reduce contention
+- **Lock Timeout Configuration**: Prevent long-waiting lock acquisitions
+- **Deadlock Detection**: Automatic deadlock detection and resolution
+- **Connection Throttling**: Limit concurrent database connections
+- **Query Prioritization**: Priority-based query execution
+- **Resource Governor**: Resource allocation based on query importance
+- **Workload Separation**: Separate read and write workloads
+- **Connection Multiplexing**: PgBouncer for connection pooling
+- **Asynchronous Query Processing**: Non-blocking database operations
+
+#### 2.4.7 Archiving and Maintenance
 - **Data archiving** for old completed tasks
 - **Automated vacuuming** for PostgreSQL maintenance
 - **Index rebuilding** for performance optimization
 - **Statistics updates** for query planner accuracy
+- **Automated Backups**: Scheduled backups with point-in-time recovery
+- **Performance Baseline**: Regular performance benchmarking
+- **Schema Evolution**: Zero-downtime schema changes
+- **Capacity Planning**: Predictive scaling based on growth patterns
+- **Automated Maintenance Windows**: Scheduled maintenance with minimal impact
+- **Database Health Checks**: Regular monitoring of database performance
+- **Query Performance Audits**: Periodic review of slow queries
+- **Index Usage Analysis**: Monitor and optimize index effectiveness
 
-## 5. Data Flow Between Layers
+## 6. High-Performance Architecture for Scalable TPS
 
-### 5.1 Frontend to Backend Communication
+### 6.1 Performance Targets and Metrics
+- **Target TPS**: 10,000+ requests per second for read operations, 1,000+ for write operations
+- **Response Time Goals**: 95th percentile < 200ms for API responses
+- **Concurrent Users**: Support for 100,000+ concurrent active users
+- **Database Connections**: Efficient connection pooling with 500+ concurrent connections
+- **Cache Hit Rate**: 90%+ cache hit rate for frequently accessed data
+- **System Availability**: 99.99% uptime with automatic failover
+- **Error Rate**: < 0.1% error rate for critical operations
+- **Resource Utilization**: CPU < 70%, Memory < 80% under normal load
+
+### 6.2 Horizontal Scaling Strategy
+- **Stateless Services**: Design all services to be stateless for easy horizontal scaling
+- **Load Balancer Distribution**: NGINX or cloud load balancers for traffic distribution
+- **Auto-scaling Groups**: Kubernetes horizontal pod autoscaler based on CPU and memory
+- **Geographic Distribution**: Multi-region deployment for reduced latency
+- **Content Delivery Network**: CDN for static assets and global distribution
+- **Database Sharding**: User-based sharding for horizontal database scaling
+- **Microservices Decomposition**: Decompose monolithic services into specialized microservices
+- **Service Mesh**: Istio for traffic management, security, and observability
+- **Container Orchestration**: Kubernetes for container management and orchestration
+
+### 6.3 Caching Strategy for High TPS
+- **Multi-Level Caching**: In-memory, Redis, and CDN caching layers
+- **Cache Warming**: Pre-populate caches during low-traffic periods
+- **Cache Invalidation**: Event-driven cache invalidation for data consistency
+- **Write-Through Caching**: Immediate cache updates for critical data
+- **Cache Partitioning**: Distribute cache across multiple nodes to avoid bottlenecks
+- **Cache-Aside Pattern**: Lazy loading of data into cache on cache misses
+- **Cache Clustering**: Redis cluster for distributed caching with failover
+- **Cache Tiering**: Multiple cache layers with different TTLs for optimal performance
+- **Cache Preloading**: Warm caches with frequently accessed data during startup
+- **Edge Caching**: CDN edge nodes for geographic proximity caching
+
+### 6.4 Database Optimization for High Concurrency
+- **Connection Pooling**: PgBouncer for efficient database connection management
+- **Read Replicas**: Multiple read replicas for scaling read operations
+- **Query Optimization**: Index optimization and query plan analysis
+- **Database Sharding**: Horizontal partitioning by user ID for scalability
+- **Connection Multiplexing**: Reduce database connection overhead
+- **Asynchronous Queries**: Non-blocking database operations for better throughput
+- **Connection Pooling**: PgBouncer with optimal pool sizing for connection reuse
+- **Partitioning**: Table partitioning for large datasets to improve query performance
+- **Materialized Views**: Pre-computed views for complex analytical queries
+- **Query Parallelization**: Parallel execution for complex analytical queries
+- **Database Clustering**: PostgreSQL cluster for high availability and load distribution
+- **Read-Write Splitting**: Intelligent routing of queries to appropriate database instances
+- **Database Connection Multiplexing**: PgBouncer for connection pooling and load distribution
+
+### 6.5 Asynchronous Processing for Performance
+- **Message Queues**: Redis or RabbitMQ for background job processing
+- **Event-Driven Architecture**: Decouple services through event publishing
+- **Batch Processing**: Group operations for efficient processing
+- **Task Prioritization**: Priority queues for critical operations
+- **Dead Letter Queues**: Handle failed message processing
+- **Idempotent Operations**: Ensure message processing can be safely retried
+- **Priority Queues**: Task prioritization for critical operations with different SLAs
+- **Dead Letter Queues**: Failed message handling and retry logic with exponential backoff
+- **Idempotent Processing**: Safe message reprocessing to prevent duplicate operations
+- **Rate Limiting**: Control message processing rate to prevent system overload
+- **Message Deduplication**: Prevent duplicate message processing for consistency
+- **Event Sourcing**: Event store for audit trails and replay capability
+
+### 6.6 API Optimization Techniques
+- **Response Compression**: Gzip/Brotli compression for API responses
+- **Request Batching**: Combine multiple requests into single batch operations
+- **Pagination Optimization**: Cursor-based pagination for large datasets
+- **Field Selection**: GraphQL-style field selection to reduce payload size
+- **Conditional Requests**: ETags and If-Modified-Since for cache validation
+- **API Versioning**: Header-based versioning to reduce URL parsing overhead
+- **Response Caching**: HTTP caching with proper cache headers for static responses
+- **Request Throttling**: Rate limiting to prevent API abuse and ensure fair usage
+- **Payload Optimization**: Minimize response size with efficient serialization
+- **Connection Reuse**: HTTP/2 and keep-alive connections for reduced overhead
+- **Edge Computing**: Process requests at edge locations to reduce latency
+
+### 6.7 Memory and Resource Management
+- **Memory Pooling**: Reuse objects to reduce garbage collection pressure
+- **Resource Pooling**: Connection and thread pooling for efficient resource use
+- **Lazy Loading**: Load resources only when needed
+- **Memory Profiling**: Regular profiling to identify memory leaks
+- **Resource Limits**: Set limits to prevent resource exhaustion
+- **Efficient Data Structures**: Use appropriate data structures for performance
+- **Garbage Collection Tuning**: JVM tuning for optimal garbage collection behavior
+- **Memory Leak Detection**: Automated tools for identifying memory leaks
+- **Resource Monitoring**: Real-time monitoring of CPU, memory, and I/O usage
+- **Resource Isolation**: Container resource limits to prevent noisy neighbor problems
+
+### 6.8 Load Testing and Performance Monitoring
+- **Load Testing Framework**: K6 or Artillery for simulating high traffic scenarios
+- **Performance Baseline**: Establish performance benchmarks for all critical operations
+- **Continuous Performance Testing**: Integrate performance tests into CI/CD pipeline
+- **Real User Monitoring**: Monitor actual user performance with RUM tools
+- **Synthetic Monitoring**: Regular synthetic tests for performance regression detection
+- **Performance Profiling**: Continuous profiling for bottleneck identification
+- **Alerting Thresholds**: Automated alerts for performance degradation
+- **Capacity Planning**: Predictive scaling based on traffic patterns and growth
+
+### 6.9 Network Optimization
+- **Content Delivery Network**: Global CDN for static assets and reduced latency
+- **HTTP/2 Implementation**: Multiplexed connections for improved performance
+- **TCP Optimization**: Tuned TCP settings for high-throughput connections
+- **DNS Optimization**: Fast DNS resolution with caching and multiple providers
+- **Geographic Routing**: Route users to nearest data center for reduced latency
+- **Bandwidth Management**: Traffic shaping for optimal resource utilization
+
+### 6.10 Infrastructure Optimization
+- **Container Optimization**: Minimal base images and multi-stage builds
+- **Resource Sizing**: Right-sizing containers based on actual usage patterns
+- **Autoscaling Policies**: Dynamic scaling based on custom metrics and predictive algorithms
+- **Spot Instance Utilization**: Cost-effective compute with graceful degradation
+- **Serverless Components**: Event-driven functions for sporadic workloads
+- **Edge Computing**: Process data closer to users for reduced latency
+
+## 4. Data Flow Between Layers
+
+### 4.1 Frontend to Backend Communication
 1. User interacts with UI components
 2. Frontend makes API calls to backend services
 3. Backend validates requests using pipes and guards
@@ -1564,7 +1839,7 @@ erDiagram
 9. Controllers format responses and send to frontend
 10. Frontend updates UI based on responses
 
-### 5.2 Authentication Flow
+### 4.2 Authentication Flow
 ```
 sequenceDiagram
     participant U as User
@@ -1585,7 +1860,7 @@ sequenceDiagram
     F->>U: Store tokens in secure storage, redirect to dashboard
 ```
 
-### 5.3 Task Creation Flow
+### 4.3 Task Creation Flow
 ```
 sequenceDiagram
     participant U as User
@@ -1606,7 +1881,7 @@ sequenceDiagram
     F->>U: Display success message, update task list
 ```
 
-### 5.4 Time Block Scheduling Flow
+### 4.4 Time Block Scheduling Flow
 ```
 sequenceDiagram
     participant U as User
@@ -1626,13 +1901,13 @@ sequenceDiagram
     F->>U: Display updated schedule
 ```
 
-### 5.5 Real-time Updates
+### 4.5 Real-time Updates
 - WebSocket connections for real-time task updates
 - Server-sent events for notifications
 - Polling as fallback mechanism
 - Conflict resolution for concurrent edits
 
-#### 5.5.1 Notification Updates
+#### 4.5.1 Notification Updates
 - WebSocket connections for real-time notification delivery
 - Server-sent events for push notifications
 - Notification badge updates in real-time
@@ -1640,33 +1915,33 @@ sequenceDiagram
 - Banner notifications for desktop users
 - Mobile push notifications via Firebase or similar services
 
-### 5.6 Data Synchronization
+### 4.6 Data Synchronization
 - Offline-first approach for mobile support
 - Conflict detection and resolution strategies
 - Data versioning for sync reconciliation
 - Progressive data loading for performance
 
-## Testable Architecture Patterns
+## 5. Testable Architecture Patterns
 
-### Dependency Injection and Inversion of Control
+### 5.1 Dependency Injection and Inversion of Control
 - **NestJS DI Container**: Leverage NestJS built-in dependency injection for loose coupling
 - **Interface-based Contracts**: Define clear interfaces for all services and repositories
 - **Mockable Dependencies**: Design components to accept dependencies through constructors
 - **Configuration Injection**: Externalize configuration through dependency injection
 
-### Separation of Concerns
+### 5.2 Separation of Concerns
 - **Layered Architecture**: Clear separation between presentation, business logic, and data access layers
 - **Single Responsibility Principle**: Each component has one reason to change
 - **Pure Functions**: Business logic functions without side effects for easy testing
 - **Stateless Services**: Minimize shared state to reduce test complexity
 
-### Testability Patterns
+### 5.3 Testability Patterns
 - **Ports and Adapters**: Define ports for external dependencies and adapters for implementations
 - **Repository Pattern**: Abstract data access behind repository interfaces
 - **Service Layer**: Encapsulate business logic in testable service classes
 - **Facade Pattern**: Simplify complex subsystems with facades for easier testing
 
-### Design for Testability
+### 5.4 Design for Testability
 - **Constructor Injection**: All dependencies injected through constructors
 - **Configurable Time Providers**: Abstract time-related operations for deterministic testing
 - **External Service Abstractions**: Wrap external APIs in testable interfaces
@@ -2001,7 +2276,7 @@ sequenceDiagram
 
 ## 10. Testing Patterns and Anti-Patterns
 
-### 8.1 Testing Patterns
+### 10.1 Testing Patterns
 - **Arrange-Act-Assert**: Clear test structure with setup, execution, and verification phases
 - **Given-When-Then**: Behavior-driven testing approach for clear test scenarios
 - **Test Data Builder**: Fluent interface for creating test data with default values
@@ -2011,7 +2286,7 @@ sequenceDiagram
 - **Contract Tests**: Verify interface contracts between components
 - **Snapshot Tests**: Capture and verify component output automatically
 
-### 8.2 Testing Anti-Patterns
+### 10.2 Testing Anti-Patterns
 - **Test Code Duplication**: Repeating setup code instead of using test utilities
 - **Over-Mocking**: Mocking everything instead of testing real interactions
 - **Brittle Tests**: Tests that break easily with minor implementation changes
@@ -2023,29 +2298,63 @@ sequenceDiagram
 
 ## 11. Test-Driven Development Practices
 
-### 10.1 TDD Workflow
+### 11.1 TDD Workflow
 - **Red-Green-Refactor**: Write failing test, implement solution, refactor for quality
 - **Baby Steps**: Implement functionality in small, incremental steps
 - **Outside-In Development**: Start with acceptance tests, work down to unit tests
 - **Mockist vs Classicist**: Choose mocking approach based on architectural preferences
 
-### 10.2 TDD Benefits
+### 11.2 TDD Benefits
 - **Design Quality**: Better design through testability requirements
 - **Documentation**: Tests serve as living documentation
 - **Regression Prevention**: Immediate feedback on breaking changes
 - **Confidence**: High confidence in code changes and refactoring
 
-### 10.3 TDD Challenges
+### 11.3 TDD Challenges
 - **Learning Curve**: Initial investment in learning TDD practices
 - **Test Maintenance**: Ongoing effort to maintain test suites
 - **Speed of Development**: Initial slower pace with long-term benefits
 - **Legacy Code**: Challenges in applying TDD to existing codebases
 
-## 12. Conclusion
+## 12. Load Testing and Performance Validation
+
+### 12.1 Load Testing Framework
+- **Performance Testing Tools**: K6, Artillery, or Gatling for load testing
+- **Test Environment**: Dedicated performance testing environment mirroring production
+- **Test Scenarios**: Realistic user behavior simulations
+- **Data Preparation**: Representative test data sets for accurate testing
+- **Monitoring Integration**: Performance metrics collection during tests
+- **Automated Testing**: CI/CD integration for regular performance validation
+
+### 12.2 Performance Validation Process
+- **Baseline Testing**: Establish performance baselines for all critical operations
+- **Stress Testing**: Identify system breaking points under extreme load
+- **Soak Testing**: Long-term stability testing under sustained load
+- **Spike Testing**: Burst load testing to validate system resilience
+- **Concurrency Testing**: Validate system behavior with multiple concurrent users
+- **Resource Utilization**: Monitor CPU, memory, disk, and network usage
+
+### 12.3 Performance Metrics and SLAs
+- **Response Time Goals**: 95th percentile < 200ms for API responses
+- **Throughput Targets**: 10,000+ requests per second for read operations
+- **Error Rate**: < 0.1% error rate for critical operations
+- **Availability**: 99.99% uptime with automatic failover
+- **Resource Utilization**: CPU < 70%, Memory < 80% under normal load
+- **Database Performance**: Efficient connection pooling with 500+ concurrent connections
+
+### 12.4 Performance Optimization Feedback Loop
+- **Continuous Monitoring**: Real-time performance metrics collection
+- **Performance Regression Detection**: Automated alerts for performance degradation
+- **Root Cause Analysis**: Detailed performance issue investigation
+- **Optimization Implementation**: Targeted performance improvements
+- **Validation Testing**: Verification of optimization effectiveness
+- **Performance Reporting**: Regular performance status reporting
+
+## 13. Conclusion
 
 The To-Do List and Time Planner application architecture has been designed as a modern, scalable, and maintainable solution that leverages the strengths of Next.js for the frontend and NestJS for the backend. The design incorporates industry best practices for performance, security, and user experience while providing a solid foundation for future growth and feature expansion.
 
-### 12.1 Key Design Decisions
+### 13.1 Key Design Decisions
 
 1. **Technology Stack**: The choice of Next.js and NestJS provides a unified TypeScript development experience across the entire stack, reducing context switching and improving developer productivity.
 
@@ -2057,7 +2366,7 @@ The To-Do List and Time Planner application architecture has been designed as a 
 
 5. **Security**: Multi-layered security approach with authentication, authorization, and data protection mechanisms.
 
-### 12.2 Future Considerations
+### 13.2 Future Considerations
 
 1. **Mobile Application**: The API-first approach facilitates future mobile app development for iOS and Android platforms.
 
