@@ -1,6 +1,10 @@
 import { DataSource } from 'typeorm';
 import { User } from '../users/user.entity';
 import { RefreshToken } from '../auth/refresh-token.entity';
+import { Task } from '../tasks/entities/task.entity';
+import { Project } from '../projects/entities/project.entity';
+import { Tag } from '../tags/entities/tag.entity';
+import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,7 +15,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'todo_planer',
   synchronize: false,
   logging: false,
-  entities: [User, RefreshToken],
+  entities: [User, RefreshToken, Task, Project, Tag, TimeBlock],
   migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
   subscribers: [],
 });

@@ -1,6 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { RefreshToken } from '../auth/refresh-token.entity';
+import { Task } from '../tasks/entities/task.entity';
+import { Project } from '../projects/entities/project.entity';
+import { Tag } from '../tags/entities/tag.entity';
+import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 
 @Entity('users')
 export class User {
@@ -53,4 +57,16 @@ export class User {
 
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
   refreshTokens: RefreshToken[];
+  
+  @OneToMany(() => Task, task => task.user)
+  tasks: Task[];
+  
+  @OneToMany(() => Project, project => project.user)
+  projects: Project[];
+  
+  @OneToMany(() => Tag, tag => tag.user)
+  tags: Tag[];
+  
+  @OneToMany(() => TimeBlock, timeBlock => timeBlock.user)
+  timeBlocks: TimeBlock[];
 }

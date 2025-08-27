@@ -6,8 +6,16 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './projects/projects.module';
+import { TagsModule } from './tags/tags.module';
+import { TimeBlocksModule } from './time-blocks/time-blocks.module';
 import { User } from './users/user.entity';
 import { RefreshToken } from './auth/refresh-token.entity';
+import { Task } from './tasks/entities/task.entity';
+import { Project } from './projects/entities/project.entity';
+import { Tag } from './tags/entities/tag.entity';
+import { TimeBlock } from './time-blocks/entities/time-block.entity';
 
 @Module({
   imports: [
@@ -18,12 +26,16 @@ import { RefreshToken } from './auth/refresh-token.entity';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'todo_planer',
-      entities: [User, RefreshToken],
+      entities: [User, RefreshToken, Task, Project, Tag, TimeBlock],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
     UsersModule,
     HealthModule,
+    TasksModule,
+    ProjectsModule,
+    TagsModule,
+    TimeBlocksModule,
   ],
   controllers: [AppController],
   providers: [
