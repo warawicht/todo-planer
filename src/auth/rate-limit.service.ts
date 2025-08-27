@@ -26,7 +26,7 @@ export class RateLimitService {
 
       if (current === null) {
         // First request in window
-        await this.redisClient.setex(key, windowSeconds, 1);
+        await this.redisClient.set(key, '1', { EX: windowSeconds });
         return { isLimited: false, remaining: limit - 1, resetTime };
       }
 

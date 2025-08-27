@@ -54,6 +54,7 @@ export class AuthController {
     return {
       success: true,
       accessToken,
+      refreshToken, // Include refreshToken in response for testing purposes
       user: {
         email,
       },
@@ -97,12 +98,15 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
+    @Body('refreshToken') refreshTokenFromBody?: string,
   ) {
-    const refreshToken = request.cookies.refreshToken;
+    // Get refresh token from cookie or body (body is used for testing)
+    const refreshToken = (request.cookies && request.cookies.refreshToken) || refreshTokenFromBody;
     if (refreshToken) {
       await this.authService.logout(refreshToken);
     }

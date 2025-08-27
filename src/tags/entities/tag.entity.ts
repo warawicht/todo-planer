@@ -29,7 +29,7 @@ export class Tag {
   @Column()
   userId: string;
 
-  @ManyToMany(() => Task, task => task.tags, { cascade: true })
+  @ManyToMany(() => Task, task => task.tags)
   tasks: Task[];
 
   @BeforeInsert()

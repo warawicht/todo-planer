@@ -7,7 +7,7 @@ jest.mock('redis', () => ({
   createClient: jest.fn().mockImplementation(() => ({
     connect: jest.fn().mockResolvedValue(undefined),
     get: jest.fn().mockResolvedValue(null),
-    setex: jest.fn().mockResolvedValue('OK'),
+    set: jest.fn().mockResolvedValue('OK'),
     incr: jest.fn().mockResolvedValue(1),
     del: jest.fn().mockResolvedValue(1),
     ttl: jest.fn().mockResolvedValue(60),
@@ -35,7 +35,7 @@ describe('RateLimitService', () => {
     it('should allow requests under the limit', async () => {
       // Mock the Redis client to return null (first request)
       mockRedisClient.get.mockResolvedValueOnce(null);
-      mockRedisClient.setex.mockResolvedValueOnce('OK');
+      mockRedisClient.set.mockResolvedValueOnce('OK');
       
       const result = await service.isRateLimited('test-key-1', 5, 60);
       expect(result.isLimited).toBe(false);

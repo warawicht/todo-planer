@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request, UsePipes, ValidationPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -10,11 +10,13 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Request() req, @Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(req.user.id, createTaskDto);
   }
 
   @Get()
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async findAll(
     @Request() req,
     @Query('status') status?: string,
@@ -45,6 +47,7 @@ export class TasksController {
   }
 
   @Put(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async update(@Request() req, @Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.tasksService.update(req.user.id, id, updateTaskDto);
   }

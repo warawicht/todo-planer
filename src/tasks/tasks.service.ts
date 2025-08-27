@@ -85,9 +85,9 @@ export class TasksService {
       
       // Handle completedAt timestamp
       if (updateTaskDto.status === 'completed') {
-        updateTaskDto.completedAt = new Date();
+        updateTaskDto.completedAt = new Date().toISOString();
       } else if (existingTask.status === 'completed') {
-        updateTaskDto.completedAt = null;
+        updateTaskDto.completedAt = undefined;
       }
     }
     

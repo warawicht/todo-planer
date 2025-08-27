@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TimeBlock } from './entities/time-block.entity';
@@ -20,7 +20,11 @@ export class TimeBlocksService {
   }
 
   async findOne(id: string): Promise<TimeBlock> {
-    return this.timeBlocksRepository.findOne({ where: { id } });
+    const timeBlock = await this.timeBlocksRepository.findOne({ where: { id } });
+    if (!timeBlock) {
+      throw new NotFoundException('Time block not found');
+    }
+    return timeBlock;
   }
 
   async update(id: string, timeBlock: Partial<TimeBlock>): Promise<TimeBlock> {

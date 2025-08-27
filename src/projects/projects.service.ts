@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
@@ -20,7 +20,11 @@ export class ProjectsService {
   }
 
   async findOne(id: string): Promise<Project> {
-    return this.projectsRepository.findOne({ where: { id } });
+    const project = await this.projectsRepository.findOne({ where: { id } });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    return project;
   }
 
   async update(id: string, project: Partial<Project>): Promise<Project> {

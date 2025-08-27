@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
 describe('Task Management (e2e)', () => {
@@ -22,22 +22,31 @@ describe('Task Management (e2e)', () => {
   });
 
   it('should register a new user for testing', () => {
+    // Use a unique email for each test run to avoid conflicts
+    const uniqueEmail = `tasktest_${Date.now()}@example.com`;
     return request(app.getHttpServer())
       .post('/auth/register')
       .send({
-        email: 'tasktest@example.com',
+        email: uniqueEmail,
         password: 'Test123!@#Password',
         firstName: 'Task',
         lastName: 'Tester',
       })
-      .expect(201);
+      .expect(201)
+      .expect((res) => {
+        expect(res.body.user.email).toBe(uniqueEmail);
+        // Store the email for later use in other tests
+        (global as any).testUserEmail = uniqueEmail;
+      });
   });
 
   it('should login with valid credentials', () => {
+    // Use the same email as registration
+    const testEmail = (global as any).testUserEmail || 'tasktest@example.com';
     return request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'tasktest@example.com',
+        email: testEmail,
         password: 'Test123!@#Password',
       })
       .expect(200)
@@ -111,6 +120,19 @@ describe('Task Management (e2e)', () => {
         expect(res.body.description).toBe('This is a test task'); // Should remain unchanged
         expect(res.body.priority).toBe(2);
         expect(res.body.status).toBe('pending'); // Should remain unchanged
+      });
+  });
+
+  it('should update task status to in-progress', () => {
+    return request(app.getHttpServer())
+      .put(`/tasks/${taskId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        status: 'in-progress',
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.status).toBe('in-progress');
       });
   });
 

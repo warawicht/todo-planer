@@ -2,11 +2,16 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { RateLimitService } from './rate-limit.service';
 
+// Extend the Request interface to include our User type
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
   constructor(private readonly rateLimitService: RateLimitService) {}
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const ip = req.ip || req.connection.remoteAddress;
     const endpoint = req.originalUrl;
     const method = req.method;
@@ -28,7 +33,7 @@ export class RateLimitMiddleware implements NestMiddleware {
 
     // Also create a key for user-based rate limiting if user is authenticated
     if (req.user) {
-      const userKey = `user:${req.user.sub}:${endpoint}:${method}`;
+      const userKey = `user:${req.user.id}:${endpoint}:${method}`;
       // Higher limit for authenticated users (20 requests per minute)
       const userLimit = await this.rateLimitService.isRateLimited(userKey, 20, 60);
       
