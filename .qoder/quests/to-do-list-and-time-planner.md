@@ -2483,92 +2483,1107 @@ These features are not currently planned but may be considered for future releas
 ### 14.2 Core User Stories
 
 #### 14.2.1 Authentication and User Management
+
+##### User Story 1: Register for an account
 - **As a** new user, **I want to** register for an account **so that** I can start using the application
+
+**Acceptance Criteria:**
+- User can register with email and password
+- Email validation is performed (valid email format)
+- Password strength requirements are enforced (minimum 8 characters, mix of letters, numbers, and special characters)
+- Duplicate email addresses are rejected
+- User receives a verification email after registration
+- User cannot log in until email is verified
+- Successful registration redirects user to dashboard
+
+**Definition of Done:**
+- Registration form is implemented with proper validation
+- Backend API for user registration is created
+- Email verification system is functional
+- Unit tests for registration flow are written and passing
+- Integration tests for registration API are passing
+- UI is responsive and accessible
+- Security measures (input sanitization, rate limiting) are implemented
+
+**Requirement Mapping:**
+- R-Auth-001: User registration functionality
+- R-Sec-001: Input validation and sanitization
+- R-Sec-002: Password strength requirements
+- R-Sec-003: Email verification process
+
+##### User Story 2: Log in to account
 - **As a** registered user, **I want to** log in to my account **so that** I can access my tasks and schedule
+
+**Acceptance Criteria:**
+- User can log in with email and password
+- Invalid credentials show appropriate error messages
+- Successful login redirects user to dashboard
+- Session is maintained across pages
+- JWT tokens are properly set for authentication
+- "Remember me" functionality persists login for 30 days
+- Account lockout after 5 failed attempts
+
+**Definition of Done:**
+- Login form is implemented with proper validation
+- Backend API for user authentication is created
+- JWT token generation and validation is implemented
+- Session management is functional
+- Unit tests for login flow are written and passing
+- Security measures (rate limiting, account lockout) are implemented
+- UI is responsive and accessible
+
+**Requirement Mapping:**
+- R-Auth-002: User login functionality
+- R-Sec-004: Session management
+- R-Sec-005: Account lockout mechanism
+- R-Sec-006: JWT token implementation
+
+##### User Story 3: Reset password
 - **As a** user, **I want to** reset my password **so that** I can regain access if I forget it
+
+**Acceptance Criteria:**
+- User can request password reset by entering email
+- Password reset email is sent to user's email address
+- Password reset link is valid for 24 hours
+- User can set new password with strength requirements
+- User is logged in after successful password reset
+- Old sessions are invalidated after password reset
+
+**Definition of Done:**
+- Password reset request form is implemented
+- Backend API for password reset is created
+- Email template for password reset is designed and implemented
+- Password reset token generation and validation is implemented
+- Unit tests for password reset flow are written and passing
+- Security measures (token expiration, session invalidation) are implemented
+
+**Requirement Mapping:**
+- R-Auth-003: Password reset functionality
+- R-Sec-007: Secure password reset process
+- R-Sec-008: Token expiration and validation
+
+##### User Story 4: Update profile information
 - **As a** user, **I want to** update my profile information **so that** my account reflects my current details
+
+**Acceptance Criteria:**
+- User can update first name, last name, and timezone
+- Email address can be updated with verification process
+- Avatar can be uploaded and updated
+- Changes are saved immediately upon submission
+- User receives confirmation of successful update
+- Input validation prevents invalid data
+
+**Definition of Done:**
+- Profile edit form is implemented with proper validation
+- Backend API for profile updates is created
+- File upload functionality for avatars is implemented
+- Unit tests for profile update flow are written and passing
+- UI is responsive and accessible
+- Data validation and sanitization are implemented
+
+**Requirement Mapping:**
+- R-Auth-004: Profile management functionality
+- R-Sec-009: File upload security
+- R-UI-001: Responsive profile interface
+
+##### User Story 5: Securely log out of account
 - **As a** user, **I want to** securely log out of my account **so that** my data is protected on shared devices
 
+**Acceptance Criteria:**
+- Logout button is accessible from navigation menu
+- All active sessions are terminated on logout
+- JWT tokens are invalidated
+- User is redirected to login page
+- No sensitive data remains in browser storage
+- Confirmation message is displayed upon successful logout
+
+**Definition of Done:**
+- Logout functionality is implemented in frontend
+- Backend API for logout is created
+- Token invalidation mechanism is implemented
+- Session cleanup is functional
+- Unit tests for logout flow are written and passing
+- Security measures (token invalidation, data cleanup) are implemented
+
+**Requirement Mapping:**
+- R-Auth-005: Secure logout functionality
+- R-Sec-010: Token invalidation
+- R-Sec-011: Session cleanup
+
 #### 14.2.2 Task Management
+
+##### User Story 1: Create a new task
 - **As a** user, **I want to** create a new task with a title and description **so that** I can capture what needs to be done
+
+**Acceptance Criteria:**
+- User can create a task with title (required) and description (optional)
+- Title must be between 1-200 characters
+- Description can be up to 2000 characters
+- Task is saved to database with creation timestamp
+- User receives confirmation of successful creation
+- New task appears in task list immediately
+- Task defaults to "To Do" status
+
+**Definition of Done:**
+- Task creation form is implemented with proper validation
+- Backend API for task creation is created
+- Database schema for tasks is implemented
+- Unit tests for task creation are written and passing
+- Integration tests for task API are passing
+- UI is responsive and accessible
+- Error handling for invalid inputs is implemented
+
+**Requirement Mapping:**
+- R-Task-001: Task creation functionality
+- R-DB-001: Task database schema
+- R-UI-002: Task creation interface
+
+##### User Story 2: Set due dates and priorities
 - **As a** user, **I want to** set due dates and priorities for tasks **so that** I can focus on what's important and urgent
+
+**Acceptance Criteria:**
+- User can set due date with date picker
+- User can select priority level (Low, Medium, High, Urgent)
+- Due date can be in the past, present, or future
+- Priority levels are visually distinct (color coding)
+- Tasks can be sorted by due date and priority
+- Overdue tasks are highlighted visually
+- User receives warnings for approaching due dates
+
+**Definition of Done:**
+- Due date and priority selection components are implemented
+- Backend API for task updates is created
+- Sorting and filtering logic is implemented
+- Unit tests for date and priority features are written and passing
+- UI reflects priority levels with appropriate styling
+- Validation for date inputs is implemented
+
+**Requirement Mapping:**
+- R-Task-002: Due date and priority functionality
+- R-UI-003: Visual priority indicators
+- R-Notif-001: Due date warnings
+
+##### User Story 3: Categorize tasks into projects
 - **As a** user, **I want to** categorize tasks into projects **so that** I can organize my work effectively
+
+**Acceptance Criteria:**
+- User can create new projects
+- User can assign tasks to existing projects
+- Tasks can be filtered by project
+- Project list is displayed in sidebar
+- User can edit project details
+- User can delete projects (with confirmation)
+- Tasks are reassigned when project is deleted
+
+**Definition of Done:**
+- Project management interface is implemented
+- Backend API for project operations is created
+- Database schema for projects is implemented
+- Unit tests for project features are written and passing
+- Integration between tasks and projects is functional
+- UI allows easy project assignment
+
+**Requirement Mapping:**
+- R-Task-003: Project categorization
+- R-DB-002: Project database schema
+- R-UI-004: Project management interface
+
+##### User Story 4: Mark tasks as complete
 - **As a** user, **I want to** mark tasks as complete **so that** I can track my progress
+
+**Acceptance Criteria:**
+- User can mark task as complete with checkbox or button
+- Completed tasks move to "Completed" section
+- Completion timestamp is recorded
+- Progress indicators update automatically
+- User can unmark completed tasks
+- Statistics reflect completed tasks
+
+**Definition of Done:**
+- Task completion UI is implemented
+- Backend API for task status updates is created
+- Progress tracking logic is implemented
+- Unit tests for completion features are written and passing
+- UI provides clear visual feedback for completed tasks
+- Statistics calculation is accurate
+
+**Requirement Mapping:**
+- R-Task-004: Task completion functionality
+- R-Stat-001: Progress tracking
+- R-UI-005: Task completion interface
+
+##### User Story 5: Edit existing tasks
 - **As a** user, **I want to** edit existing tasks **so that** I can update information as needed
+
+**Acceptance Criteria:**
+- User can edit all task fields (title, description, due date, priority, project)
+- Changes are saved when user clicks "Save"
+- User can cancel editing without saving changes
+- Last modified timestamp is updated
+- Concurrent editing conflicts are handled
+- Validation is performed on updated fields
+
+**Definition of Done:**
+- Task editing form is implemented
+- Backend API for task updates is created
+- Conflict resolution mechanism is implemented
+- Unit tests for editing features are written and passing
+- UI provides clear editing workflow
+- Validation and error handling are implemented
+
+**Requirement Mapping:**
+- R-Task-005: Task editing functionality
+- R-Sec-012: Concurrent editing protection
+- R-UI-006: Task editing interface
+
+##### User Story 6: Delete tasks
 - **As a** user, **I want to** delete tasks I no longer need **so that** my task list stays relevant
+
+**Acceptance Criteria:**
+- User can delete tasks with confirmation dialog
+- Deleted tasks are moved to trash/recycle bin
+- User can restore deleted tasks
+- User can permanently delete tasks
+- Related subtasks are also deleted
+- User receives confirmation of deletion
+
+**Definition of Done:**
+- Task deletion UI is implemented with confirmation
+- Backend API for task deletion is created
+- Soft delete mechanism is implemented
+- Unit tests for deletion features are written and passing
+- Restore functionality is implemented
+- Data integrity is maintained
+
+**Requirement Mapping:**
+- R-Task-006: Task deletion functionality
+- R-DB-003: Soft delete implementation
+- R-UI-007: Task deletion interface
+
+##### User Story 7: Add subtasks
 - **As a** user, **I want to** add subtasks to complex tasks **so that** I can break down large projects
+
+**Acceptance Criteria:**
+- User can add subtasks to any task
+- Subtasks can have their own due dates and priorities
+- Parent task progress reflects subtask completion
+- Subtasks can be reordered
+- Subtasks can be converted to regular tasks
+- User can collapse/expand subtasks
+
+**Definition of Done:**
+- Subtask management UI is implemented
+- Backend API for subtask operations is created
+- Progress calculation logic is implemented
+- Unit tests for subtask features are written and passing
+- UI allows easy subtask management
+- Data relationships are properly maintained
+
+**Requirement Mapping:**
+- R-Task-007: Subtask functionality
+- R-DB-004: Task hierarchy implementation
+- R-UI-008: Subtask interface
+
+##### User Story 8: Attach files to tasks
 - **As a** user, **I want to** attach files to tasks **so that** I can keep relevant documents organized
+
+**Acceptance Criteria:**
+- User can upload files up to 10MB each
+- Supported formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG
+- User can view attached files
+- User can download attached files
+- User can delete attached files
+- File storage is secure and scalable
+- Upload progress is displayed
+
+**Definition of Done:**
+- File upload UI is implemented
+- Backend API for file operations is created
+- Secure file storage system is implemented
+- Unit tests for file features are written and passing
+- UI provides clear file management
+- File type validation is implemented
+
+**Requirement Mapping:**
+- R-Task-008: File attachment functionality
+- R-Sec-013: Secure file storage
+- R-UI-009: File management interface
+
+##### User Story 9: Tag tasks
 - **As a** user, **I want to** tag tasks with custom labels **so that** I can filter and group them by context
+
+**Acceptance Criteria:**
+- User can create custom tags
+- User can assign multiple tags to tasks
+- Tags can be color-coded
+- User can filter tasks by tags
+- Tag cloud or list is displayed
+- User can edit tag names and colors
+- User can delete unused tags
+
+**Definition of Done:**
+- Tag management UI is implemented
+- Backend API for tag operations is created
+- Database schema for tags is implemented
+- Unit tests for tagging features are written and passing
+- UI allows easy tag assignment
+- Filtering by tags is functional
+
+**Requirement Mapping:**
+- R-Task-009: Tagging functionality
+- R-DB-005: Tag database schema
+- R-UI-010: Tag management interface
+
+##### User Story 10: Set estimated time
 - **As a** user, **I want to** set estimated time for tasks **so that** I can plan my schedule more effectively
 
+**Acceptance Criteria:**
+- User can set estimated time in minutes or hours
+- Estimated time is displayed with task
+- Total estimated time for projects is calculated
+- User can track actual time spent
+- Time tracking can be started/stopped
+- Estimated vs actual time comparison is displayed
+
+**Definition of Done:**
+- Time estimation UI is implemented
+- Backend API for time tracking is created
+- Time calculation logic is implemented
+- Unit tests for time features are written and passing
+- UI provides clear time visualization
+- Integration with time blocking is functional
+
+**Requirement Mapping:**
+- R-Task-010: Time estimation functionality
+- R-Time-001: Time tracking implementation
+- R-UI-011: Time management interface
+
 #### 14.2.3 Time Blocking
-- **As a** user, **I want to** create time blocks on my calendar **so that** I can allocate specific time for tasks
-- **As a** user, **I want to** link tasks to time blocks **so that** I can track time spent on specific activities
-- **As a** user, **I want to** visualize my schedule in day, week, and month views **so that** I can plan short and long-term activities
-- **As a** user, **I want to** receive conflict warnings when scheduling overlapping time blocks **so that** I can avoid overbooking myself
-- **As a** user, **I want to** drag and drop time blocks to reschedule them **so that** I can easily adjust my plans
-- **As a** user, **I want to** set recurring time blocks for regular activities **so that** I don't have to manually schedule them each week
-- **As a** user, **I want to** color-code time blocks **so that** I can visually distinguish between different types of activities
+
+1. **As a** user, **I want to** create time blocks on my calendar **so that** I can allocate specific time for tasks
+   - **Acceptance Criteria**:
+     - User can create time blocks with custom start/end times
+     - Time blocks can be color-coded for different activities
+     - System prevents overlapping time blocks
+     - User receives notification when trying to create conflicting time blocks
+     - Time blocks display in calendar view
+   - **Definition of Done**:
+     - Time block creation functionality implemented and tested
+     - UI components for time block creation completed
+     - Backend validation for time conflicts implemented
+     - Unit tests for time block service written
+     - Integration tests for time block API endpoints completed
+   - **Requirement Mapping**: TIME-BLOCK-001, TIME-BLOCK-002, TIME-VIEW-001
+
+2. **As a** user, **I want to** link tasks to time blocks **so that** I can track time spent on specific activities
+   - **Acceptance Criteria**:
+     - User can link existing tasks to time blocks
+     - System tracks time spent on linked tasks
+     - User can view time tracking reports
+     - Linked tasks display in time block details
+     - User can unlink tasks from time blocks
+   - **Definition of Done**:
+     - Task linking functionality implemented
+     - Time tracking mechanism completed
+     - Reporting features implemented
+     - UI for task linking completed
+     - Data relationships properly maintained
+   - **Requirement Mapping**: TIME-BLOCK-003, TIME-TRACK-001, REPORT-002
+
+3. **As a** user, **I want to** visualize my schedule in day, week, and month views **so that** I can plan short and long-term activities
+   - **Acceptance Criteria**:
+     - User can switch between day, week, and month calendar views
+     - Time blocks display correctly in each view
+     - Navigation between dates is intuitive
+     - View preferences are saved for each user
+     - Performance is optimized for each view type
+   - **Definition of Done**:
+     - Calendar view components implemented
+     - Date navigation functionality completed
+     - View persistence implemented
+     - Performance optimization completed
+     - Unit tests for each view written
+   - **Requirement Mapping**: TIME-VIEW-002, TIME-VIEW-003, UI-PREF-001
+
+4. **As a** user, **I want to** receive conflict warnings when scheduling overlapping time blocks **so that** I can avoid overbooking myself
+   - **Acceptance Criteria**:
+     - System detects overlapping time blocks
+     - User receives visual warning when creating conflicts
+     - Conflict details are displayed clearly
+     - User can resolve conflicts by adjusting times
+     - System prevents saving conflicting time blocks
+   - **Definition of Done**:
+     - Conflict detection algorithm implemented
+     - Warning UI components completed
+     - Conflict resolution workflow implemented
+     - Backend validation for conflicts completed
+     - Integration tests for conflict detection written
+   - **Requirement Mapping**: TIME-BLOCK-004, TIME-CONFLICT-001, UI-WARN-001
+
+5. **As a** user, **I want to** drag and drop time blocks to reschedule them **so that** I can easily adjust my plans
+   - **Acceptance Criteria**:
+     - User can drag time blocks to new time slots
+     - System validates new time slot for conflicts
+     - Visual feedback is provided during drag operation
+     - Changes are saved immediately after drop
+     - Undo functionality is available for drag operations
+   - **Definition of Done**:
+     - Drag and drop functionality implemented
+     - Conflict validation during drag completed
+     - Visual feedback system implemented
+     - Undo mechanism completed
+     - Performance testing for drag operations completed
+   - **Requirement Mapping**: TIME-BLOCK-005, UI-DRAG-001, TIME-EDIT-001
+
+6. **As a** user, **I want to** set recurring time blocks for regular activities **so that** I don't have to manually schedule them each week
+   - **Acceptance Criteria**:
+     - User can set daily, weekly, monthly, yearly recurrence
+     - User can specify recurrence end date or count
+     - System creates recurring time blocks automatically
+     - User can edit individual instances or entire series
+     - Recurring time blocks display with recurrence indicators
+   - **Definition of Done**:
+     - Recurrence configuration UI implemented
+     - Recurrence engine completed
+     - Series management functionality implemented
+     - Database schema for recurrence completed
+     - Integration tests for recurrence written
+   - **Requirement Mapping**: TIME-BLOCK-006, TIME-RECUR-001, TIME-MANAGE-001
+
+7. **As a** user, **I want to** color-code time blocks **so that** I can visually distinguish between different types of activities
+   - **Acceptance Criteria**:
+     - User can select from predefined color palette
+     - User can create custom colors
+     - Color choices are saved with time blocks
+     - Color coding displays consistently across all views
+     - User can filter time blocks by color
+   - **Definition of Done**:
+     - Color selection UI implemented
+     - Custom color functionality completed
+     - Color persistence implemented
+     - Cross-view consistency ensured
+     - Filtering by color implemented
+   - **Requirement Mapping**: TIME-BLOCK-007, UI-COLOR-001, TIME-FILTER-001
 
 #### 14.2.4 Productivity Tracking
-- **As a** user, **I want to** view statistics on completed tasks **so that** I can measure my productivity
-- **As a** user, **I want to** track time spent on tasks **so that** I can identify where my time goes
-- **As a** user, **I want to** see productivity trends over time **so that** I can improve my habits
-- **As a** user, **I want to** set productivity goals **so that** I can work toward specific targets
-- **As a** user, **I want to** receive insights on my productivity patterns **so that** I can optimize my schedule
+
+1. **As a** user, **I want to** view statistics on completed tasks **so that** I can measure my productivity
+   - **Acceptance Criteria**:
+     - User can view daily, weekly, and monthly task completion statistics
+     - Statistics include completion rate, overdue tasks, and average completion time
+     - Visual charts display productivity trends
+     - User can compare current performance to previous periods
+     - Statistics update in real-time as tasks are completed
+   - **Definition of Done**:
+     - Statistics calculation engine implemented
+     - Charting components completed
+     - Data visualization UI implemented
+     - Real-time updates functionality completed
+     - Unit tests for statistics calculations written
+   - **Requirement Mapping**: PRODUCTIVITY-001, STAT-VIEW-001, CHART-001
+
+2. **As a** user, **I want to** track time spent on tasks **so that** I can identify where my time goes
+   - **Acceptance Criteria**:
+     - User can start/stop time tracking for tasks
+     - System automatically tracks time when tasks are linked to time blocks
+     - Time tracking data is stored with timestamps
+     - User can view time tracking reports
+     - User can manually adjust tracked time if needed
+   - **Definition of Done**:
+     - Time tracking functionality implemented
+     - Automatic tracking integration completed
+     - Data storage schema implemented
+     - Reporting features completed
+     - Manual adjustment UI implemented
+   - **Requirement Mapping**: TIME-TRACK-002, TIME-AUTO-001, REPORT-003
+
+3. **As a** user, **I want to** see productivity trends over time **so that** I can improve my habits
+   - **Acceptance Criteria**:
+     - User can view productivity trends over days, weeks, and months
+     - Trends are displayed in charts and graphs
+     - User can filter trends by project, tag, or task type
+     - System highlights improvement or decline patterns
+     - User can export trend data
+   - **Definition of Done**:
+     - Trend analysis engine implemented
+     - Charting components completed
+     - Filtering functionality implemented
+     - Pattern detection algorithms completed
+     - Export functionality implemented
+   - **Requirement Mapping**: PRODUCTIVITY-002, TREND-001, CHART-002
+
+4. **As a** user, **I want to** set productivity goals **so that** I can work toward specific targets
+   - **Acceptance Criteria**:
+     - User can set daily, weekly, and monthly productivity goals
+     - System tracks progress toward goals
+     - User receives notifications when approaching goals
+     - User can adjust goals as needed
+     - Progress is displayed visually
+   - **Definition of Done**:
+     - Goal management UI implemented
+     - Progress tracking functionality completed
+     - Notification system integrated
+     - Goal adjustment workflow completed
+     - Visual progress indicators implemented
+   - **Requirement Mapping**: PRODUCTIVITY-003, GOAL-001, NOTIF-002
+
+5. **As a** user, **I want to** receive insights on my productivity patterns **so that** I can optimize my schedule
+   - **Acceptance Criteria**:
+     - System analyzes user productivity patterns
+     - Insights are generated based on completion times and time blocks
+     - User receives weekly productivity insights
+     - Insights include suggestions for improvement
+     - User can dismiss or save insights
+   - **Definition of Done**:
+     - Pattern analysis engine implemented
+     - Insight generation algorithms completed
+     - Weekly report system implemented
+     - Suggestion engine completed
+     - Insight management UI implemented
+   - **Requirement Mapping**: PRODUCTIVITY-004, INSIGHT-001, SUGGEST-001
 
 #### 14.2.5 Notifications and Reminders
-- **As a** user, **I want to** receive reminders before task due dates **so that** I don't miss important deadlines
-- **As a** user, **I want to** get notifications when time blocks are about to start **so that** I can prepare for activities
-- **As a** user, **I want to** customize notification preferences **so that** I'm not overwhelmed by alerts
-- **As a** user, **I want to** set up recurring reminders for habits **so that** I can build positive routines
-- **As a** user, **I want to** receive summary emails of upcoming tasks **so that** I can plan my day
+
+1. **As a** user, **I want to** receive reminders before task due dates **so that** I don't miss important deadlines
+   - **Acceptance Criteria**:
+     - User can set reminder times (at due date, 5 min before, 1 hour before, 1 day before)
+     - Reminders are sent via selected channels (email, push, in-app)
+     - User receives reminders for overdue tasks
+     - Reminders include task details and links
+     - User can snooze or dismiss reminders
+   - **Definition of Done**:
+     - Reminder configuration UI implemented
+     - Notification delivery system completed
+     - Overdue reminder functionality implemented
+     - Reminder templates created
+     - Snooze/dismiss functionality completed
+   - **Requirement Mapping**: NOTIF-003, REMIND-001, CHANNEL-001
+
+2. **As a** user, **I want to** get notifications when time blocks are about to start **so that** I can prepare for activities
+   - **Acceptance Criteria**:
+     - User receives notifications 5 minutes before time block starts
+     - Notifications include time block details
+     - User can disable time block notifications
+     - Notifications are sent via selected channels
+     - User can customize notification timing
+   - **Definition of Done**:
+     - Time block notification system implemented
+     - Notification templates created
+     - Channel selection functionality completed
+     - Timing customization UI implemented
+     - Integration tests for notifications written
+   - **Requirement Mapping**: NOTIF-004, TIME-NOTIF-001, CUSTOM-001
+
+3. **As a** user, **I want to** customize notification preferences **so that** I'm not overwhelmed by alerts
+   - **Acceptance Criteria**:
+     - User can enable/disable different notification types
+     - User can select preferred notification channels
+     - User can set quiet hours
+     - User can set priority filters for notifications
+     - Preferences are saved and applied immediately
+   - **Definition of Done**:
+     - Notification preferences UI implemented
+     - Channel management functionality completed
+     - Quiet hours system implemented
+     - Priority filtering completed
+     - Preference persistence implemented
+   - **Requirement Mapping**: NOTIF-005, PREF-001, QUIET-001
+
+4. **As a** user, **I want to** set up recurring reminders for habits **so that** I can build positive routines
+   - **Acceptance Criteria**:
+     - User can create recurring reminders with custom schedules
+     - System sends recurring reminders automatically
+     - User can track habit streaks
+     - User can view habit progress
+     - User can modify or delete recurring reminders
+   - **Definition of Done**:
+     - Recurring reminder system implemented
+     - Automated delivery mechanism completed
+     - Streak tracking functionality implemented
+     - Progress visualization completed
+     - Management UI implemented
+   - **Requirement Mapping**: NOTIF-006, HABIT-001, RECUR-001
+
+5. **As a** user, **I want to** receive summary emails of upcoming tasks **so that** I can plan my day
+   - **Acceptance Criteria**:
+     - User receives daily summary emails with upcoming tasks
+     - Summary includes tasks due today and tomorrow
+     - User can customize summary frequency
+     - Email includes links to tasks
+     - User can unsubscribe from summaries
+   - **Definition of Done**:
+     - Email generation system implemented
+     - Summary content engine completed
+     - Frequency customization UI implemented
+     - Email templates created
+     - Unsubscribe functionality implemented
+   - **Requirement Mapping**: NOTIF-007, SUMMARY-001, EMAIL-001
 
 #### 14.2.6 Collaboration Features
-- **As a** team member, **I want to** share tasks with colleagues **so that** we can collaborate on projects
-- **As a** team member, **I want to** assign tasks to others **so that** responsibilities are clearly defined
-- **As a** team member, **I want to** comment on shared tasks **so that** we can communicate context
-- **As a** team member, **I want to** see team members' availability **so that** I can schedule meetings effectively
-- **As a** team member, **I want to** receive notifications when assigned tasks are updated **so that** I stay informed of progress
+
+1. **As a** team member, **I want to** share tasks with colleagues **so that** we can collaborate on projects
+   - **Acceptance Criteria**:
+     - User can share tasks with specific team members
+     - Shared tasks appear in recipients' task lists
+     - User can set permission levels (view, edit, manage)
+     - Sharing invitations are sent via email
+     - User can revoke sharing permissions
+   - **Definition of Done**:
+     - Task sharing functionality implemented
+     - Permission management system completed
+     - Invitation system implemented
+     - Revocation workflow completed
+     - Integration tests for sharing written
+   - **Requirement Mapping**: COLLAB-001, SHARE-001, PERMISSION-001
+
+2. **As a** team member, **I want to** assign tasks to others **so that** responsibilities are clearly defined
+   - **Acceptance Criteria**:
+     - User can assign tasks to team members
+     - Assigned tasks appear in assignee's task list
+     - Assignee receives notification of assignment
+     - User can reassign tasks
+     - Assignment history is tracked
+   - **Definition of Done**:
+     - Task assignment functionality implemented
+     - Notification system integrated
+     - Reassignment workflow completed
+     - History tracking implemented
+     - Unit tests for assignment written
+   - **Requirement Mapping**: COLLAB-002, ASSIGN-001, NOTIF-008
+
+3. **As a** team member, **I want to** comment on shared tasks **so that** we can communicate context
+   - **Acceptance Criteria**:
+     - User can add comments to shared tasks
+     - Comments are visible to all task collaborators
+     - User receives notifications of new comments
+     - User can edit or delete their own comments
+     - Comments support basic formatting
+   - **Definition of Done**:
+     - Commenting system implemented
+     - Collaboration visibility completed
+     - Notification integration completed
+     - Comment management UI implemented
+     - Formatting support added
+   - **Requirement Mapping**: COLLAB-003, COMMENT-001, FORMAT-001
+
+4. **As a** team member, **I want to** see team members' availability **so that** I can schedule meetings effectively
+   - **Acceptance Criteria**:
+     - User can view team members' schedules
+     - Availability is displayed in calendar view
+     - User can see time blocks and busy times
+     - User can request time slots for meetings
+     - Team members can set availability preferences
+   - **Definition of Done**:
+     - Availability viewing system implemented
+     - Calendar integration completed
+     - Time slot request functionality implemented
+     - Preference management completed
+     - Performance optimization for calendar views
+   - **Requirement Mapping**: COLLAB-004, AVAIL-001, SCHED-001
+
+5. **As a** team member, **I want to** receive notifications when assigned tasks are updated **so that** I stay informed of progress
+   - **Acceptance Criteria**:
+     - User receives notifications for task updates
+     - Notifications include details of changes
+     - User can customize notification preferences
+     - Notifications are sent via selected channels
+     - User can view notification history
+   - **Definition of Done**:
+     - Task update notification system implemented
+     - Change detail tracking completed
+     - Preference customization UI implemented
+     - Multi-channel delivery implemented
+     - Notification history view completed
+   - **Requirement Mapping**: COLLAB-005, UPDATE-NOTIF-001, HIST-001
 
 #### 14.2.7 Search and Filtering
-- **As a** user, **I want to** search for tasks by keywords **so that** I can quickly find specific items
-- **As a** user, **I want to** filter tasks by project, priority, or due date **so that** I can focus on relevant items
-- **As a** user, **I want to** sort tasks by different criteria **so that** I can view them in my preferred order
-- **As a** user, **I want to** view overdue tasks separately **so that** I can catch up on missed items
+
+1. **As a** user, **I want to** search for tasks by keywords **so that** I can quickly find specific items
+   - **Acceptance Criteria**:
+     - User can search tasks by title, description, and tags
+     - Search results display in real-time as user types
+     - Search supports partial matching and fuzzy search
+     - Results are ranked by relevance
+     - User can clear search and reset view
+   - **Definition of Done**:
+     - Search functionality implemented
+     - Real-time search completed
+     - Fuzzy search algorithm implemented
+     - Ranking system completed
+     - Reset functionality implemented
+   - **Requirement Mapping**: SEARCH-001, REALTIME-001, FUZZY-001
+
+2. **As a** user, **I want to** filter tasks by project, priority, or due date **so that** I can focus on relevant items
+   - **Acceptance Criteria**:
+     - User can filter by single or multiple criteria
+     - Filters are applied immediately
+     - User can save frequently used filters
+     - Filter combinations work correctly
+     - User can clear individual or all filters
+   - **Definition of Done**:
+     - Filtering system implemented
+     - Multi-criteria filtering completed
+     - Saved filters functionality implemented
+     - Filter combination logic completed
+     - Clear filter functionality implemented
+   - **Requirement Mapping**: FILTER-001, MULTI-FILTER-001, SAVE-FILTER-001
+
+3. **As a** user, **I want to** sort tasks by different criteria **so that** I can view them in my preferred order
+   - **Acceptance Criteria**:
+     - User can sort by due date, priority, creation date, title
+     - Sorting works in ascending and descending order
+     - Sort preferences are saved
+     - User can reset to default sorting
+     - Sorting performance is optimized
+   - **Definition of Done**:
+     - Sorting functionality implemented
+     - Multi-criteria sorting completed
+     - Preference persistence implemented
+     - Reset functionality completed
+     - Performance optimization completed
+   - **Requirement Mapping**: SORT-001, MULTI-SORT-001, PREF-SORT-001
+
+4. **As a** user, **I want to** view overdue tasks separately **so that** I can catch up on missed items
+   - **Acceptance Criteria**:
+     - Overdue tasks are highlighted visually
+     - User can view dedicated overdue task list
+     - Overdue tasks appear at top of lists
+     - User receives notifications for overdue tasks
+     - User can filter to show only overdue tasks
+   - **Definition of Done**:
+     - Overdue highlighting implemented
+     - Dedicated view completed
+     - List prioritization implemented
+     - Notification system integrated
+     - Overdue filter implemented
+   - **Requirement Mapping**: OVERDUE-001, VIEW-001, HIGHLIGHT-001
 
 #### 14.2.8 Mobile and Offline Access
-- **As a** user on the go, **I want to** access my tasks from a mobile device **so that** I can manage my schedule anywhere
-- **As a** user with intermittent connectivity, **I want to** use the app offline **so that** I can continue working without internet
-- **As a** user, **I want to** have my changes sync when I reconnect **so that** my data stays consistent across devices
+
+1. **As a** user on the go, **I want to** access my tasks from a mobile device **so that** I can manage my schedule anywhere
+   - **Acceptance Criteria**:
+     - Application is responsive on mobile devices
+     - Touch-friendly interface with appropriate sizing
+     - Mobile-optimized navigation and menus
+     - Fast loading times on mobile networks
+     - Offline capability with local data storage
+   - **Definition of Done**:
+     - Mobile-responsive design implemented
+     - Touch interface optimized
+     - Mobile navigation completed
+     - Performance optimization for mobile
+     - Offline storage mechanism implemented
+   - **Requirement Mapping**: MOBILE-001, TOUCH-001, NAV-MOBILE-001
+
+2. **As a** user with intermittent connectivity, **I want to** use the app offline **so that** I can continue working without internet
+   - **Acceptance Criteria**:
+     - User can view tasks and time blocks offline
+     - User can create, edit, and delete items offline
+     - Changes are stored locally until connectivity is restored
+     - User is notified when working offline
+     - App gracefully handles offline state transitions
+   - **Definition of Done**:
+     - Offline data access implemented
+     - Local storage for changes completed
+     - Sync queue management implemented
+     - Offline notifications completed
+     - State transition handling implemented
+   - **Requirement Mapping**: OFFLINE-001, LOCAL-STORAGE-001, SYNC-001
+
+3. **As a** user, **I want to** have my changes sync when I reconnect **so that** my data stays consistent across devices
+   - **Acceptance Criteria**:
+     - Changes automatically sync when connectivity is restored
+     - Sync conflicts are detected and resolved
+     - User receives sync status notifications
+     - Data consistency is maintained across devices
+     - Sync performance is optimized
+   - **Definition of Done**:
+     - Auto-sync functionality implemented
+     - Conflict detection and resolution completed
+     - Status notification system implemented
+     - Data consistency mechanisms completed
+     - Sync performance optimization completed
+   - **Requirement Mapping**: SYNC-002, CONFLICT-001, CONSISTENCY-001
 
 #### 14.2.9 Settings and Customization
-- **As a** user, **I want to** customize the app's theme and appearance **so that** it matches my preferences
-- **As a** user, **I want to** set my preferred timezone **so that** times display correctly
-- **As a** user, **I want to** configure notification settings **so that** I receive alerts in my preferred way
-- **As a** user, **I want to** export my data **so that** I can back it up or move to another service
-- **As a** user, **I want to** integrate with my calendar service **so that** all my scheduling is in one place
+
+1. **As a** user, **I want to** customize the app's theme and appearance **so that** it matches my preferences
+   - **Acceptance Criteria**:
+     - User can select between light and dark themes
+     - User can customize accent colors
+     - Theme preferences are saved and applied immediately
+     - Default theme follows system preferences
+     - High contrast mode is available for accessibility
+   - **Definition of Done**:
+     - Theme selection UI implemented
+     - Color customization completed
+     - Preference persistence implemented
+     - System preference integration completed
+     - Accessibility options implemented
+   - **Requirement Mapping**: SETTINGS-001, THEME-001, ACCESS-001
+
+2. **As a** user, **I want to** set my preferred timezone **so that** times display correctly
+   - **Acceptance Criteria**:
+     - User can select timezone from dropdown list
+     - Time displays update immediately after timezone change
+     - Timezone setting affects all time displays
+     - Default timezone is detected from browser
+     - User can manually override detected timezone
+   - **Definition of Done**:
+     - Timezone selection UI implemented
+     - Time display update mechanism completed
+     - Global time formatting implemented
+     - Auto-detection functionality completed
+     - Manual override option implemented
+   - **Requirement Mapping**: SETTINGS-002, TIMEZONE-001, DISPLAY-001
+
+3. **As a** user, **I want to** configure notification settings **so that** I receive alerts in my preferred way
+   - **Acceptance Criteria**:
+     - User can enable/disable different notification types
+     - User can select notification channels (email, push, in-app)
+     - User can set quiet hours
+     - Notification preferences apply immediately
+     - User can test notification settings
+   - **Definition of Done**:
+     - Notification configuration UI implemented
+     - Channel selection functionality completed
+     - Quiet hours system implemented
+     - Real-time preference application completed
+     - Test notification feature implemented
+   - **Requirement Mapping**: SETTINGS-003, NOTIF-CONFIG-001, TEST-NOTIF-001
+
+4. **As a** user, **I want to** export my data **so that** I can back it up or move to another service
+   - **Acceptance Criteria**:
+     - User can export all data in JSON format
+     - User can select specific data types to export
+     - Export includes tasks, time blocks, projects, and tags
+     - Export file is properly formatted
+     - User receives confirmation of export completion
+   - **Definition of Done**:
+     - Data export functionality implemented
+     - Selective export options completed
+     - Data formatting implemented
+     - File generation completed
+     - Success notification implemented
+   - **Requirement Mapping**: SETTINGS-004, EXPORT-001, DATA-FORMAT-001
+
+5. **As a** user, **I want to** integrate with my calendar service **so that** all my scheduling is in one place
+   - **Acceptance Criteria**:
+     - User can connect Google Calendar, Outlook, and Apple Calendar
+     - Events from external calendars display in app
+     - User can sync tasks and time blocks to external calendars
+     - Sync frequency is configurable
+     - User can disconnect calendar integrations
+   - **Definition of Done**:
+     - Calendar integration system implemented
+     - External calendar display completed
+     - Two-way sync functionality implemented
+     - Sync configuration UI completed
+     - Disconnection functionality implemented
+   - **Requirement Mapping**: SETTINGS-005, CALENDAR-001, SYNC-EXTERN-001
 
 ### 14.3 Advanced User Stories
 
 #### 14.3.1 AI-Powered Features
-- **As a** user, **I want to** receive smart scheduling suggestions **so that** I can optimize my time allocation
-- **As a** user, **I want to** get productivity insights based on my patterns **so that** I can improve my habits
-- **As a** user, **I want to** have tasks automatically prioritized **so that** I focus on what matters most
-- **As a** user, **I want to** receive natural language processing for task creation **so that** I can quickly add items via text
+
+1. **As a** user, **I want to** receive smart scheduling suggestions **so that** I can optimize my time allocation
+   - **Acceptance Criteria**:
+     - System analyzes user productivity patterns
+     - Suggestions are based on historical data and preferences
+     - User can accept, reject, or modify suggestions
+     - Suggestions improve over time with machine learning
+     - User can disable AI suggestions
+   - **Definition of Done**:
+     - Pattern analysis engine implemented
+     - Suggestion algorithm completed
+     - User interaction workflow implemented
+     - ML model training completed
+     - Disable functionality implemented
+   - **Requirement Mapping**: AI-001, SCHED-SUG-001, ML-001
+
+2. **As a** user, **I want to** get productivity insights based on my patterns **so that** I can improve my habits
+   - **Acceptance Criteria**:
+     - System identifies productivity patterns
+     - Insights are generated weekly
+     - Insights include actionable recommendations
+     - User can view historical insights
+     - User can provide feedback on insights
+   - **Definition of Done**:
+     - Pattern identification engine implemented
+     - Weekly report generation completed
+     - Recommendation system implemented
+     - History view completed
+     - Feedback mechanism implemented
+   - **Requirement Mapping**: AI-002, INSIGHT-002, RECOMMEND-001
+
+3. **As a** user, **I want to** have tasks automatically prioritized **so that** I focus on what matters most
+   - **Acceptance Criteria**:
+     - System automatically prioritizes tasks based on criteria
+     - User can adjust automatic prioritization settings
+     - Priority suggestions are explainable
+     - User can override automatic priorities
+     - Prioritization improves with user feedback
+   - **Definition of Done**:
+     - Auto-prioritization algorithm implemented
+     - Settings UI completed
+     - Explanation system implemented
+     - Override functionality completed
+     - Feedback learning implemented
+   - **Requirement Mapping**: AI-003, AUTO-PRIOR-001, EXPLAIN-001
+
+4. **As a** user, **I want to** receive natural language processing for task creation **so that** I can quickly add items via text
+   - **Acceptance Criteria**:
+     - User can create tasks using natural language
+     - System extracts due dates, priorities, and projects
+     - User can review and edit extracted information
+     - NLP works for multiple languages
+     - User can disable NLP feature
+   - **Definition of Done**:
+     - NLP processing engine implemented
+     - Information extraction completed
+     - Review UI implemented
+     - Multi-language support completed
+     - Disable option implemented
+   - **Requirement Mapping**: AI-004, NLP-001, MULTI-LANG-001
 
 #### 14.3.2 Analytics and Reporting
-- **As a** user, **I want to** view detailed reports on time spent **so that** I can bill clients accurately
-- **As a** user, **I want to** see productivity trends over weeks and months **so that** I can identify patterns
-- **As a** user, **I want to** compare my productivity to goals **so that** I can measure success
-- **As a** user, **I want to** export reports in various formats **so that** I can share them with others
+
+1. **As a** user, **I want to** view detailed reports on time spent **so that** I can bill clients accurately
+   - **Acceptance Criteria**:
+     - User can view time spent per project/task
+     - Reports include start/end times and duration
+     - User can filter by date range
+     - Reports can be exported to CSV/PDF
+     - User can set billable rates for tasks
+   - **Definition of Done**:
+     - Time reporting engine implemented
+     - Detailed view completed
+     - Date filtering implemented
+     - Export functionality completed
+     - Billing rate system implemented
+   - **Requirement Mapping**: ANALYTICS-001, TIME-REPORT-001, EXPORT-002
+
+2. **As a** user, **I want to** see productivity trends over weeks and months **so that** I can identify patterns
+   - **Acceptance Criteria**:
+     - User can view trends over customizable periods
+     - Trends are displayed in charts and graphs
+     - User can compare current performance to past periods
+     - Trends highlight improvement or decline
+     - User can export trend data
+   - **Definition of Done**:
+     - Trend analysis engine implemented
+     - Charting components completed
+     - Comparison functionality implemented
+     - Highlighting system completed
+     - Export functionality implemented
+   - **Requirement Mapping**: ANALYTICS-002, TREND-002, CHART-003
+
+3. **As a** user, **I want to** compare my productivity to goals **so that** I can measure success
+   - **Acceptance Criteria**:
+     - User can set productivity goals
+     - System tracks progress toward goals
+     - Comparison is displayed visually
+     - User receives alerts for goal achievement
+     - Historical goal tracking is available
+   - **Definition of Done**:
+     - Goal management system implemented
+     - Progress tracking completed
+     - Visualization components implemented
+     - Alert system integrated
+     - History tracking implemented
+   - **Requirement Mapping**: ANALYTICS-003, GOAL-COMPARE-001, VISUAL-001
+
+4. **As a** user, **I want to** export reports in various formats **so that** I can share them with others
+   - **Acceptance Criteria**:
+     - User can export to PDF, CSV, and Excel formats
+     - Export includes all relevant data
+     - User can select date ranges for export
+     - Export maintains formatting and structure
+     - User receives confirmation of export completion
+   - **Definition of Done**:
+     - Multi-format export functionality implemented
+     - Data inclusion logic completed
+     - Date range selection implemented
+     - Formatting preservation completed
+     - Confirmation system implemented
+   - **Requirement Mapping**: ANALYTICS-004, EXPORT-MULTI-001, FORMAT-PRES-001
 
 #### 14.3.3 Team and Enterprise Features
-- **As a** team leader, **I want to** view team member workloads **so that** I can distribute tasks fairly
-- **As a** team leader, **I want to** generate team productivity reports **so that** I can assess performance
-- **As a** team member, **I want to** see shared team calendars **so that** I can coordinate with colleagues
-- **As an** administrator, **I want to** manage user permissions **so that** data access is controlled appropriately
-- **As an** administrator, **I want to** set up custom workflows **so that** our processes are standardized
+
+1. **As a** team leader, **I want to** view team member workloads **so that** I can distribute tasks fairly
+   - **Acceptance Criteria**:
+     - Leader can view team member task lists
+     - Workload is displayed visually
+     - Leader can see time allocations
+     - User can filter by date range
+     - Leader can assign tasks to team members
+   - **Definition of Done**:
+     - Workload visualization implemented
+     - Team view completed
+     - Time allocation display implemented
+     - Filtering functionality completed
+     - Task assignment workflow implemented
+   - **Requirement Mapping**: TEAM-001, WORKLOAD-001, ASSIGN-002
+
+2. **As a** team leader, **I want to** generate team productivity reports **so that** I can assess performance
+   - **Acceptance Criteria**:
+     - Leader can generate team reports
+     - Reports include individual and team metrics
+     - User can filter by date range
+     - Reports can be exported
+     - Reports show trends over time
+   - **Definition of Done**:
+     - Team reporting engine implemented
+     - Metrics calculation completed
+     - Date filtering implemented
+     - Export functionality completed
+     - Trend analysis implemented
+   - **Requirement Mapping**: TEAM-002, TEAM-REPORT-001, TREND-003
+
+3. **As a** team member, **I want to** see shared team calendars **so that** I can coordinate with colleagues
+   - **Acceptance Criteria**:
+     - User can view team member schedules
+     - Calendar shows availability and time blocks
+     - User can filter by team members
+     - Events are color-coded by user
+     - User can request meetings
+   - **Definition of Done**:
+     - Team calendar view implemented
+     - Availability display completed
+     - Filtering functionality implemented
+     - Color coding system completed
+     - Meeting request workflow implemented
+   - **Requirement Mapping**: TEAM-003, TEAM-CAL-001, MEET-REQ-001
+
+4. **As an** administrator, **I want to** manage user permissions **so that** data access is controlled appropriately
+   - **Acceptance Criteria**:
+     - Admin can set user roles and permissions
+     - Permissions control access to features and data
+     - Admin can view user activity logs
+     - User can be deactivated or deleted
+     - Permission changes take effect immediately
+   - **Definition of Done**:
+     - Permission management UI implemented
+     - Access control system completed
+     - Activity logging implemented
+     - User management workflow completed
+     - Real-time permission updates implemented
+   - **Requirement Mapping**: ENTERPRISE-001, PERMISSION-MGMT-001, ACTIVITY-001
+
+5. **As an** administrator, **I want to** set up custom workflows **so that** our processes are standardized
+   - **Acceptance Criteria**:
+     - Admin can define custom workflows
+     - Workflows can include approval steps
+     - User can view workflow status
+     - Notifications are sent for workflow actions
+     - Workflow history is tracked
+   - **Definition of Done**:
+     - Workflow definition UI implemented
+     - Approval system completed
+     - Status tracking implemented
+     - Notification system integrated
+     - History tracking completed
+   - **Requirement Mapping**: ENTERPRISE-002, WORKFLOW-001, APPROVAL-001
 
 ## 15. Conclusion
 
