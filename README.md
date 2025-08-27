@@ -23,12 +23,50 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository with a complete authentication system.
+
+## Authentication System
+
+This application includes a full-featured authentication system with:
+
+- User registration with email verification
+- Secure login with JWT authentication
+- Password reset functionality
+- Session management with refresh tokens
+- Rate limiting for authentication endpoints
+- Account lockout after failed attempts
+- Profile management
+- Admin account unlock capability
 
 ## Project setup
 
 ```bash
 $ pnpm install
+```
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=todo_planer
+
+# JWT
+JWT_SECRET=your_jwt_secret_key
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Email (for production)
+# EMAIL_HOST=smtp.example.com
+# EMAIL_PORT=587
+# EMAIL_USERNAME=your_email@example.com
+# EMAIL_PASSWORD=your_email_password
 ```
 
 ## Compile and run the project
@@ -56,6 +94,25 @@ $ pnpm run test:e2e
 # test coverage
 $ pnpm run test:cov
 ```
+
+## Authentication Tests
+
+The authentication system includes comprehensive tests:
+
+```bash
+# Run authentication unit tests
+$ pnpm run test src/auth
+
+# Run authentication integration tests
+$ pnpm run test:e2e test/auth-flow.e2e-spec.ts
+
+# Run all tests with coverage
+$ pnpm run test:cov
+```
+
+## API Documentation
+
+For detailed information about the authentication API endpoints, see [AUTHENTICATION_API_DOCS.md](AUTHENTICATION_API_DOCS.md).
 
 ## Deployment
 
