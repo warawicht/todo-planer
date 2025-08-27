@@ -3587,136 +3587,1668 @@ These features are not currently planned but may be considered for future releas
 
 ## 15. Action Flow Task List
 
-Based on the roadmap prioritization and user stories, the following task list provides a structured approach for implementation in logical phases:
+Based on the roadmap prioritization and user stories, the following task list provides a structured approach for implementation in logical phases with user story mapping, requirements, and test cases:
 
 ### Phase 1: Core Foundation (Must Have Features)
 
 #### 1. Authentication System
 - [ ] Implement user registration with email verification
+  - **User Story Mapping**: 14.2.1.1 Register for an account
+  - **Requirements**: R-Auth-001, R-Sec-001, R-Sec-002, R-Sec-003
+  - **Test Cases**:
+    - Valid registration with proper email and password
+    - Invalid email format rejection
+    - Password strength validation (minimum 8 characters, mix of letters, numbers, special characters)
+    - Duplicate email rejection
+    - Email verification workflow
+    - Registration confirmation redirect
+  - **Corner/Edge Cases**:
+    - Empty email field
+    - Empty password field
+    - Extremely long email (255+ characters)
+    - SQL injection attempts in email field
+    - Special characters in email
+    - Unicode characters in email
+    - Password with only letters
+    - Password with only numbers
+    - Password with only special characters
+    - Concurrent registration attempts with same email
+
 - [ ] Implement user login with JWT authentication
+  - **User Story Mapping**: 14.2.1.2 Log in to account
+  - **Requirements**: R-Auth-002, R-Sec-004, R-Sec-005, R-Sec-006
+  - **Test Cases**:
+    - Valid login with correct credentials
+    - Invalid credentials error handling
+    - Successful redirect to dashboard
+    - JWT token generation and validation
+    - "Remember me" functionality (30-day persistence)
+    - Account lockout after 5 failed attempts
+  - **Corner/Edge Cases**:
+    - Empty email field
+    - Empty password field
+    - Non-existent email
+    - Incorrect password
+    - Case sensitivity of email
+    - SQL injection attempts
+    - Excessive login attempts (5+ failed attempts)
+    - Expired JWT tokens
+    - Malformed JWT tokens
+    - Login during system maintenance
+
 - [ ] Implement password reset functionality
+  - **User Story Mapping**: 14.2.1.3 Reset password
+  - **Requirements**: R-Auth-003, R-Sec-007, R-Sec-008
+  - **Test Cases**:
+    - Password reset request with valid email
+    - Password reset email delivery
+    - 24-hour token expiration
+    - New password strength requirements
+    - Successful login after password reset
+    - Session invalidation after reset
+  - **Corner/Edge Cases**:
+    - Non-existent email in reset request
+    - Empty email field
+    - Malformed email in reset request
+    - Expired reset token usage
+    - Reused reset token
+    - Password same as previous
+    - Password with common patterns (123456, password)
+    - Multiple reset requests for same email
+    - Reset attempt with expired session
+
 - [ ] Implement secure logout mechanism
+  - **User Story Mapping**: 14.2.1.5 Securely log out of account
+  - **Requirements**: R-Auth-005, R-Sec-010, R-Sec-011
+  - **Test Cases**:
+    - Logout button functionality
+    - Session termination on logout
+    - JWT token invalidation
+    - Redirect to login page
+    - Browser storage cleanup
+    - Logout confirmation message
+  - **Corner/Edge Cases**:
+    - Logout with expired session
+    - Multiple simultaneous logout attempts
+    - Logout during API request
+    - Logout with network interruption
+    - Logout from multiple tabs
+    - Logout with invalid tokens
+    - Logout during system maintenance
+
 - [ ] Implement session management with refresh tokens
+  - **User Story Mapping**: 14.2.1.2 Log in to account
+  - **Requirements**: R-Sec-004, R-Sec-006
+  - **Test Cases**:
+    - Refresh token generation
+    - Token refresh workflow
+    - Expired token handling
+    - Concurrent session management
+    - Token storage security
+  - **Corner/Edge Cases**:
+    - Expired refresh token
+    - Invalid refresh token
+    - Refresh token theft
+    - Simultaneous token refresh
+    - Network failure during refresh
+    - Multiple devices token management
+    - Token refresh during maintenance
+
 - [ ] Add rate limiting for authentication endpoints
+  - **User Story Mapping**: Security enhancement for all authentication features
+  - **Requirements**: Security best practices
+  - **Test Cases**:
+    - Rate limit enforcement (e.g., 10 requests/minute)
+    - Rate limit exceeded response
+    - Rate limit reset after time window
+    - Different limits for different endpoints
+  - **Corner/Edge Cases**:
+    - Burst requests at limit threshold
+    - Distributed denial-of-service attempts
+    - Legitimate high-volume usage
+    - Rate limit bypass attempts
+    - Time synchronization issues
+    - Multiple IP addresses from same user    - Rate limit exceeded response
+    - Rate limit reset after time window
+    - Different limits for different endpoints
+  - **Corner/Edge Cases**:
+    - Burst requests at limit threshold
+    - Distributed denial-of-service attempts
+    - Legitimate high-volume usage
+    - Rate limit bypass attempts
+    - Time synchronization issues
+    - Multiple IP addresses from same user
+
 - [ ] Add account lockout after failed attempts
+  - **User Story Mapping**: 14.2.1.2 Log in to account
+  - **Requirements**: R-Sec-005
+  - **Test Cases**:
+    - Lockout after 5 failed attempts
+    - Lockout duration (e.g., 30 minutes)
+    - Unlock after time period
+    - Admin unlock capability
+    - Lockout notification
+  - **Corner/Edge Cases**:
+    - Failed attempts across multiple sessions
+    - Failed attempts with different IPs
+    - Lockout during time zone changes
+    - Concurrent lockout attempts
+    - System restart during lockout
+    - Manual unlock by admin
 
 #### 2. Database Setup
 - [ ] Design and implement Users table
+  - **User Story Mapping**: 14.2.1 Authentication and User Management
+  - **Requirements**: R-DB-001
+  - **Test Cases**:
+    - User record creation
+    - User record retrieval
+    - User record update
+    - User record deletion
+    - Data integrity constraints
+    - Index performance
+  - **Corner/Edge Cases**:
+    - NULL values in required fields
+    - Extremely long text fields
+    - Special characters in text fields
+    - Unicode characters
+    - Duplicate primary keys
+    - Foreign key constraint violations
+    - Database connection failures
+
 - [ ] Design and implement Tasks table
+  - **User Story Mapping**: 14.2.2 Task Management
+  - **Requirements**: R-DB-001, R-Task-001
+  - **Test Cases**:
+    - Task record creation
+    - Task record retrieval
+    - Task record update
+    - Task record deletion
+    - Relationship with Users table
+    - Index performance
+  - **Corner/Edge Cases**:
+    - NULL values in required fields
+    - Extremely long title/description
+    - Invalid date formats
+    - Future/past dates
+    - Negative priority values
+    - Invalid status values
+    - Database constraint violations
+
 - [ ] Design and implement Projects table
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-DB-002, R-Task-003
+  - **Test Cases**:
+    - Project record creation
+    - Project record retrieval
+    - Project record update
+    - Project record deletion
+    - Relationship with Tasks table
+    - Index performance
+  - **Corner/Edge Cases**:
+    - NULL values in required fields
+    - Extremely long project names
+    - Duplicate project names
+    - Invalid color codes
+    - Foreign key constraint violations
+    - Archived project access
+    - Database connection issues
+
 - [ ] Design and implement Tags table
+  - **User Story Mapping**: 14.2.2.9 Tag tasks
+  - **Requirements**: R-DB-005, R-Task-009
+  - **Test Cases**:
+    - Tag record creation
+    - Tag record retrieval
+    - Tag record update
+    - Tag record deletion
+    - Relationship with Tasks table
+    - Index performance
+  - **Corner/Edge Cases**:
+    - NULL values in required fields
+    - Extremely long tag names
+    - Duplicate tag names
+    - Invalid color codes
+    - Special characters in tag names
+    - Unicode characters
+    - Database constraint issues
+
 - [ ] Design and implement TimeBlocks table
+  - **User Story Mapping**: 14.2.3 Time Blocking
+  - **Requirements**: TIME-BLOCK-001, TIME-BLOCK-002
+  - **Test Cases**:
+    - TimeBlock record creation
+    - TimeBlock record retrieval
+    - TimeBlock record update
+    - TimeBlock record deletion
+    - Relationship with Tasks table
+    - Index performance
+  - **Corner/Edge Cases**:
+    - NULL values in required fields
+    - Invalid start/end times
+    - Start time after end time
+    - Extremely long durations
+    - Invalid color codes
+    - Recurrence pattern validation
+    - Database constraint violations
+
 - [ ] Implement database relationships and constraints
+  - **User Story Mapping**: All database-related user stories
+  - **Requirements**: Data integrity requirements
+  - **Test Cases**:
+    - Foreign key relationships
+    - Cascade delete behavior
+    - Unique constraint enforcement
+    - Check constraint validation
+    - Not null constraint enforcement
+  - **Corner/Edge Cases**:
+    - Circular references
+    - Cascade delete with large datasets
+    - Constraint violation during updates
+    - Concurrent constraint modifications
+    - Constraint changes during transactions
+    - Invalid relationship references
+
 - [ ] Add indexes for performance optimization
+  - **User Story Mapping**: Performance requirements for all features
+  - **Requirements**: Performance optimization
+  - **Test Cases**:
+    - Index creation
+    - Query performance improvement
+    - Index maintenance
+    - Composite index effectiveness
+  - **Corner/Edge Cases**:
+    - Index fragmentation
+    - Index bloat with large datasets
+    - Concurrent index modifications
+    - Index impact on write performance
+    - Missing index detection
+    - Redundant index identification
+
 - [ ] Implement database migration scripts
+  - **User Story Mapping**: Deployment and maintenance
+  - **Requirements**: Deployment requirements
+  - **Test Cases**:
+    - Migration script execution
+    - Schema version tracking
+    - Rollback capability
+    - Data migration
+    - Migration conflict resolution
+  - **Corner/Edge Cases**:
+    - Failed migration rollback
+    - Partial migration completion
+    - Migration during high load
+    - Migration with data inconsistencies
+    - Concurrent migration attempts
+    - Migration script syntax errors
 
 #### 3. Basic Task Management
 - [ ] Implement task creation API endpoint
+  - **User Story Mapping**: 14.2.2.1 Create a new task
+  - **Requirements**: R-Task-001, R-DB-001, R-UI-002
+  - **Test Cases**:
+    - Valid task creation with title and description
+    - Title length validation (1-200 characters)
+    - Description length validation (0-2000 characters)
+    - Timestamp creation
+    - Default status assignment ("To Do")
+    - API response format
+  - **Corner/Edge Cases**:
+    - Empty title
+    - Title exceeding 200 characters
+    - Description exceeding 2000 characters
+    - Special characters in title/description
+    - Unicode characters
+    - SQL injection attempts
+    - Missing required fields
+    - Concurrent task creation
+    - API rate limiting
+
 - [ ] Implement task retrieval API endpoint
+  - **User Story Mapping**: 14.2.2 Task Management
+  - **Requirements**: Task retrieval requirements
+  - **Test Cases**:
+    - Single task retrieval
+    - Multiple task retrieval
+    - Filtering by status
+    - Filtering by priority
+    - Filtering by due date
+    - Pagination support
+    - API response format
+  - **Corner/Edge Cases**:
+    - Non-existent task ID
+    - Invalid task ID format
+    - Large result sets
+    - Database connection failures
+    - Concurrent read requests
+    - Filter combinations
+    - Empty result sets
+    - API timeout scenarios
+
 - [ ] Implement task update API endpoint
+  - **User Story Mapping**: 14.2.2.5 Edit existing tasks
+  - **Requirements**: R-Task-005, R-Sec-012
+  - **Test Cases**:
+    - Task field updates
+    - Last modified timestamp update
+    - Concurrent edit conflict detection
+    - Field validation
+    - API response format
+  - **Corner/Edge Cases**:
+    - Non-existent task ID
+    - Invalid field values
+    - Concurrent edits
+    - Partial updates
+    - Large field values
+    - SQL injection attempts
+    - Database constraint violations
+    - Network interruption during update
+
 - [ ] Implement task deletion API endpoint
+  - **User Story Mapping**: 14.2.2.6 Delete tasks
+  - **Requirements**: R-Task-006, R-DB-003
+  - **Test Cases**:
+    - Task deletion with confirmation
+    - Soft delete implementation
+    - Restore functionality
+    - Related subtask handling
+    - API response format
+  - **Corner/Edge Cases**:
+    - Non-existent task ID
+    - Already deleted task
+    - Task with dependencies
+    - Concurrent deletion attempts
+    - Database constraint issues
+    - Network failure during deletion
+    - Permission-based deletion
+
 - [ ] Create task creation UI form
+  - **User Story Mapping**: 14.2.2.1 Create a new task
+  - **Requirements**: R-UI-002
+  - **Test Cases**:
+    - Form field validation
+    - User input handling
+    - Error message display
+    - Form submission
+    - Success feedback
+    - Responsive design
+  - **Corner/Edge Cases**:
+    - Empty form submission
+    - Excessive input lengths
+    - Special characters input
+    - Browser compatibility
+    - Network interruption
+    - Form state persistence
+    - Accessibility compliance
+
 - [ ] Create task listing UI component
+  - **User Story Mapping**: 14.2.2 Task Management
+  - **Requirements**: Task display requirements
+  - **Test Cases**:
+    - Task list rendering
+    - Task sorting
+    - Task filtering
+    - Pagination controls
+    - Responsive design
+    - Loading states
+  - **Corner/Edge Cases**:
+    - Empty task list
+    - Large task lists
+    - Network failure
+    - Slow API responses
+    - Mixed status tasks
+    - Browser resize handling
+    - Accessibility compliance
+
 - [ ] Create task editing UI form
+  - **User Story Mapping**: 14.2.2.5 Edit existing tasks
+  - **Requirements**: R-UI-006
+  - **Test Cases**:
+    - Pre-population of existing data
+    - Form field validation
+    - Save functionality
+    - Cancel functionality
+    - Error handling
+    - Responsive design
+  - **Corner/Edge Cases**:
+    - Editing non-existent task
+    - Concurrent edits
+    - Form validation errors
+    - Network interruption
+    - Large form data
+    - Browser compatibility
+    - Accessibility compliance
+
 - [ ] Implement due date and priority functionality
+  - **User Story Mapping**: 14.2.2.2 Set due dates and priorities
+  - **Requirements**: R-Task-002, R-UI-003, R-Notif-001
+  - **Test Cases**:
+    - Due date selection
+    - Priority level selection
+    - Date picker functionality
+    - Priority color coding
+    - Overdue task highlighting
+    - Due date warnings
+  - **Corner/Edge Cases**:
+    - Past due dates
+    - Future distant dates
+    - Invalid date formats
+    - Extreme priority values
+    - Time zone differences
+    - Date format localization
+    - Concurrent date updates
+
 - [ ] Implement task status management (To Do, In Progress, Completed)
+  - **User Story Mapping**: 14.2.2.4 Mark tasks as complete
+  - **Requirements**: R-Task-004, R-Stat-001, R-UI-005
+  - **Test Cases**:
+    - Status transition controls
+    - Completion timestamp recording
+    - Progress indicator updates
+    - Statistics calculation
+    - Visual feedback
+  - **Corner/Edge Cases**:
+    - Invalid status transitions
+    - Concurrent status updates
+    - Status rollback
+    - Bulk status updates
+    - Statistics accuracy
+    - Time zone impact on timestamps
 
 #### 4. Project Management
 - [ ] Implement project creation API endpoint
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003, R-DB-002, R-UI-004
+  - **Test Cases**:
+    - Project creation with name and description
+    - Color selection
+    - User association
+    - API response format
+    - Validation rules
+  - **Corner/Edge Cases**:
+    - Empty project name
+    - Duplicate project names
+    - Excessive name/description length
+    - Invalid color codes
+    - Special characters
+    - SQL injection attempts
+    - Concurrent creation
+
 - [ ] Implement project retrieval API endpoint
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003, R-DB-002
+  - **Test Cases**:
+    - Single project retrieval
+    - Multiple project retrieval
+    - User-specific filtering
+    - API response format
+    - Performance with large datasets
+  - **Corner/Edge Cases**:
+    - Non-existent project ID
+    - Invalid project ID
+    - Database connection issues
+    - Concurrent read requests
+    - Large result sets
+    - Filter edge cases
+
 - [ ] Implement project update API endpoint
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003, R-DB-002
+  - **Test Cases**:
+    - Project field updates
+    - Task reassignment
+    - Validation rules
+    - API response format
+    - Concurrent edit handling
+  - **Corner/Edge Cases**:
+    - Non-existent project ID
+    - Invalid field values
+    - Concurrent edits
+    - Circular dependencies
+    - Database constraint violations
+    - Network interruptions
+
 - [ ] Implement project deletion API endpoint
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003, R-DB-002
+  - **Test Cases**:
+    - Project deletion with confirmation
+    - Task reassignment logic
+    - API response format
+    - Cascade handling
+    - Permission validation
+  - **Corner/Edge Cases**:
+    - Non-existent project ID
+    - Project with many tasks
+    - Concurrent deletion attempts
+    - Database constraint issues
+    - Network failures
+    - Permission violations
+
 - [ ] Create project management UI
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-UI-004
+  - **Test Cases**:
+    - Project creation form
+    - Project listing display
+    - Project editing interface
+    - Project deletion workflow
+    - Responsive design
+    - User feedback
+  - **Corner/Edge Cases**:
+    - Empty project list
+    - Large project lists
+    - Network failures
+    - Browser compatibility
+    - Accessibility compliance
+    - Form validation errors
+
 - [ ] Implement task-to-project assignment
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003, R-DB-002
+  - **Test Cases**:
+    - Task assignment to project
+    - Task reassignment
+    - Assignment validation
+    - UI controls
+    - API integration
+  - **Corner/Edge Cases**:
+    - Assigning to non-existent project
+    - Assigning non-existent task
+    - Concurrent assignments
+    - Circular dependencies
+    - Database constraint issues
+    - Permission violations
+
 - [ ] Create project filtering for tasks
+  - **User Story Mapping**: 14.2.2.3 Categorize tasks into projects
+  - **Requirements**: R-Task-003
+  - **Test Cases**:
+    - Project filter dropdown
+    - Filter application
+    - Result accuracy
+    - Performance
+    - UI responsiveness
+  - **Corner/Edge Cases**:
+    - No projects available
+    - Many projects to filter
+    - Network delays
+    - Concurrent filter changes
+    - Mixed project assignments
+    - Filter reset functionality
 
 #### 5. Basic Time Blocking
 - [ ] Implement time block creation API endpoint
+  - **User Story Mapping**: 14.2.3.1 Create time blocks on calendar
+  - **Requirements**: TIME-BLOCK-001, TIME-BLOCK-002, TIME-VIEW-001
+  - **Test Cases**:
+    - Time block creation with start/end times
+    - Color coding support
+    - User association
+    - Conflict detection
+    - API response format
+  - **Corner/Edge Cases**:
+    - Invalid time ranges
+    - Overlapping time blocks
+    - Extreme time values
+    - Invalid color codes
+    - Missing required fields
+    - SQL injection attempts
+    - Concurrent creation
+
 - [ ] Implement time block retrieval API endpoint
+  - **User Story Mapping**: 14.2.3 Time Blocking
+  - **Requirements**: TIME-BLOCK-001, TIME-VIEW-001
+  - **Test Cases**:
+    - Single time block retrieval
+    - Multiple time block retrieval
+    - Date range filtering
+    - User-specific filtering
+    - API response format
+  - **Corner/Edge Cases**:
+    - Non-existent time block ID
+    - Invalid time block ID
+    - Database connection issues
+    - Large result sets
+    - Date range edge cases
+    - Time zone differences
+
 - [ ] Implement time block update API endpoint
+  - **User Story Mapping**: 14.2.3 Time Blocking
+  - **Requirements**: TIME-BLOCK-005, TIME-EDIT-001
+  - **Test Cases**:
+    - Time block field updates
+    - Time range modifications
+    - Conflict re-checking
+    - API response format
+    - Validation rules
+  - **Corner/Edge Cases**:
+    - Non-existent time block ID
+    - Invalid field values
+    - New conflicts after update
+    - Concurrent edits
+    - Database constraints
+    - Network interruptions
+
 - [ ] Implement time block deletion API endpoint
+  - **User Story Mapping**: 14.2.3 Time Blocking
+  - **Requirements**: TIME-BLOCK-001
+  - **Test Cases**:
+    - Time block deletion
+    - API response format
+    - Cascade handling
+    - Permission validation
+    - Confirmation workflow
+  - **Corner/Edge Cases**:
+    - Non-existent time block ID
+    - Concurrent deletions
+    - Database constraint issues
+    - Network failures
+    - Permission violations
+    - Linked task dependencies
+
 - [ ] Create time block calendar UI
+  - **User Story Mapping**: 14.2.3 Time Blocking
+  - **Requirements**: TIME-BLOCK-001, TIME-VIEW-001
+  - **Test Cases**:
+    - Calendar rendering
+    - Time block display
+    - Visual styling
+    - Responsive design
+    - User interaction
+    - Performance
+  - **Corner/Edge Cases**:
+    - Empty calendar
+    - Many time blocks
+    - Browser compatibility
+    - Network delays
+    - Time zone handling
+    - Accessibility compliance
+
 - [ ] Implement time block conflict detection
+  - **User Story Mapping**: 14.2.3.4 Receive conflict warnings
+  - **Requirements**: TIME-BLOCK-004, TIME-CONFLICT-001, UI-WARN-001
+  - **Test Cases**:
+    - Overlap detection
+    - Warning display
+    - Conflict details
+    - Resolution options
+    - API integration
+  - **Corner/Edge Cases**:
+    - Adjacent time blocks
+    - Identical time blocks
+    - Nested time blocks
+    - Multiple overlaps
+    - Time zone conflicts
+    - Database consistency
+
 - [ ] Implement task linking to time blocks
+  - **User Story Mapping**: 14.2.3.2 Link tasks to time blocks
+  - **Requirements**: TIME-BLOCK-003, TIME-TRACK-001, REPORT-002
+  - **Test Cases**:
+    - Task linking functionality
+    - Time tracking integration
+    - Reporting data
+    - UI controls
+    - API integration
+  - **Corner/Edge Cases**:
+    - Linking non-existent task
+    - Linking non-existent time block
+    - Multiple task links
+    - Concurrent linking
+    - Database constraints
+    - Permission issues
 
 ### Phase 2: Enhanced Features (Should Have Features)
 
 #### 6. Advanced Task Features
 - [ ] Implement subtask functionality
+  - **User Story Mapping**: 14.2.2.7 Add subtasks
+  - **Requirements**: R-Task-007, R-DB-004, R-UI-008
+  - **Test Cases**:
+    - Subtask creation under parent task
+    - Subtask due dates and priorities
+    - Parent task progress calculation
+    - Subtask reordering
+    - Subtask conversion to regular task
+    - Collapse/expand functionality
+  - **Corner/Edge Cases**:
+    - Circular parent-child relationships
+    - Deep nesting levels
+    - Subtask with same parent
+    - Concurrent subtask operations
+    - Subtask deletion impact on parent
+    - Bulk subtask operations
+    - Subtask with invalid dates
+
 - [ ] Implement file attachment system
+  - **User Story Mapping**: 14.2.2.8 Attach files to tasks
+  - **Requirements**: R-Task-008, R-Sec-013, R-UI-009
+  - **Test Cases**:
+    - File upload within size limits (10MB)
+    - Supported format validation (PDF, DOC, DOCX, XLS, XLSX, JPG, PNG)
+    - File viewing functionality
+    - File download functionality
+    - File deletion functionality
+    - Upload progress display
+  - **Corner/Edge Cases**:
+    - Files exceeding size limits
+    - Unsupported file formats
+    - Corrupted file uploads
+    - Network interruption during upload
+    - Concurrent file operations
+    - File name with special characters
+    - Multiple file uploads
+    - File storage limits
+
 - [ ] Implement tagging system
+  - **User Story Mapping**: 14.2.2.9 Tag tasks
+  - **Requirements**: R-Task-009, R-DB-005, R-UI-010
+  - **Test Cases**:
+    - Custom tag creation
+    - Multiple tag assignment to tasks
+    - Color-coded tag display
+    - Task filtering by tags
+    - Tag cloud/list display
+    - Tag editing functionality
+    - Unused tag deletion
+  - **Corner/Edge Cases**:
+    - Duplicate tag names
+    - Tags with special characters
+    - Excessive tag count per task
+    - Tags with same names but different colors
+    - Concurrent tag operations
+    - Tag deletion with assigned tasks
+    - Bulk tag operations
+
 - [ ] Implement estimated time tracking
+  - **User Story Mapping**: 14.2.2.10 Set estimated time
+  - **Requirements**: R-Task-010, R-Time-001, R-UI-011
+  - **Test Cases**:
+    - Estimated time input in minutes/hours
+    - Estimated time display with task
+    - Project total estimated time calculation
+    - Actual time tracking start/stop
+    - Time tracking reports
+    - Manual time adjustment
+  - **Corner/Edge Cases**:
+    - Negative time values
+    - Extremely large time values
+    - Non-numeric time input
+    - Concurrent time tracking
+    - Time tracking across time zones
+    - Paused time tracking
+    - Time tracking with system sleep
+
 - [ ] Implement task search functionality
+  - **User Story Mapping**: 14.2.7.1 Search for tasks by keywords
+  - **Requirements**: SEARCH-001, REALTIME-001, FUZZY-001
+  - **Test Cases**:
+    - Search by title, description, and tags
+    - Real-time search results
+    - Partial matching support
+    - Fuzzy search algorithm
+    - Relevance-based ranking
+    - Search reset functionality
+  - **Corner/Edge Cases**:
+    - Empty search query
+    - Special characters in search
+    - Unicode characters
+    - Extremely long search queries
+    - SQL injection attempts
+    - Case sensitivity handling
+    - Search with no results
+    - Concurrent searches
+
 - [ ] Implement task filtering and sorting
+  - **User Story Mapping**: 14.2.7.2 Filter tasks; 14.2.7.3 Sort tasks
+  - **Requirements**: FILTER-001, MULTI-FILTER-001, SORT-001, MULTI-SORT-001
+  - **Test Cases**:
+    - Single criteria filtering
+    - Multiple criteria filtering
+    - Immediate filter application
+    - Saved filter functionality
+    - Filter combination logic
+    - Sorting by multiple criteria
+    - Ascending/descending order
+    - Sort preference saving
+  - **Corner/Edge Cases**:
+    - Conflicting filters
+    - Empty filter results
+    - Extreme filter combinations
+    - Sorting with null values
+    - Concurrent filter/sort operations
+    - Filter persistence across sessions
+    - Mixed data types sorting
+
 - [ ] Implement overdue task highlighting
+  - **User Story Mapping**: 14.2.7.4 View overdue tasks separately
+  - **Requirements**: OVERDUE-001, VIEW-001, HIGHLIGHT-001
+  - **Test Cases**:
+    - Visual highlighting of overdue tasks
+    - Dedicated overdue task list
+    - Top-of-list prioritization
+    - Overdue notification system
+    - Overdue-only filter
+  - **Corner/Edge Cases**:
+    - Time zone impact on overdue status
+    - Tasks becoming overdue during session
+    - Bulk task status changes
+    - Overdue tasks across date boundaries
+    - System time changes
+    - Concurrent overdue status updates
 
 #### 7. Calendar Views
 - [ ] Implement day view calendar
+  - **User Story Mapping**: 14.2.3.3 Visualize schedule in day view
+  - **Requirements**: TIME-VIEW-002, TIME-VIEW-003
+  - **Test Cases**:
+    - Day view rendering
+    - Time block display
+    - Hourly time slots
+    - Current time indicator
+    - Navigation to next/previous day
+    - Performance with many events
+  - **Corner/Edge Cases**:
+    - Day with no time blocks
+    - Day with many overlapping blocks
+    - Time zone transitions
+    - Browser resize handling
+    - Network delays
+    - Accessibility compliance
+
 - [ ] Implement week view calendar
+  - **User Story Mapping**: 14.2.3.3 Visualize schedule in week view
+  - **Requirements**: TIME-VIEW-002, TIME-VIEW-003
+  - **Test Cases**:
+    - Week view rendering
+    - Daily columns display
+    - Time block positioning
+    - Week navigation
+    - Current day highlighting
+    - Performance optimization
+  - **Corner/Edge Cases**:
+    - Week with no events
+    - Week with many events
+    - Cross-week time blocks
+    - Time zone differences
+    - Browser compatibility
+    - Slow rendering
+
 - [ ] Implement month view calendar
+  - **User Story Mapping**: 14.2.3.3 Visualize schedule in month view
+  - **Requirements**: TIME-VIEW-002, TIME-VIEW-003
+  - **Test Cases**:
+    - Month view rendering
+    - Daily cell display
+    - Event indicators
+    - Month navigation
+    - Current date highlighting
+    - Performance with large datasets
+  - **Corner/Edge Cases**:
+    - Month with no events
+    - Month with many events
+    - Month boundary events
+    - Time zone handling
+    - Browser performance
+    - Accessibility compliance
+
 - [ ] Implement date navigation controls
+  - **User Story Mapping**: 14.2.3.3 Visualize schedule
+  - **Requirements**: TIME-VIEW-002
+  - **Test Cases**:
+    - Previous/next navigation
+    - Today button functionality
+    - Date picker integration
+    - View-specific navigation
+    - Keyboard shortcuts
+    - Responsive design
+  - **Corner/Edge Cases**:
+    - Rapid navigation clicks
+    - Navigation during data load
+    - Edge date ranges
+    - Time zone transitions
+    - Browser compatibility
+    - Keyboard accessibility
+
 - [ ] Implement view preference saving
+  - **User Story Mapping**: 14.2.3.3 Visualize schedule
+  - **Requirements**: UI-PREF-001
+  - **Test Cases**:
+    - Default view setting
+    - Preference persistence
+    - Cross-session consistency
+    - Multiple user preferences
+    - Preference update functionality
+  - **Corner/Edge Cases**:
+    - Preference storage failures
+    - Concurrent preference updates
+    - Browser storage limits
+    - Cross-device preferences
+    - Preference corruption
+    - Default fallback handling
+
 - [ ] Optimize calendar performance
+  - **User Story Mapping**: Performance requirements
+  - **Requirements**: Performance optimization
+  - **Test Cases**:
+    - Rendering time measurements
+    - Memory usage optimization
+    - Virtual scrolling implementation
+    - Lazy loading techniques
+    - Caching strategies
+    - Mobile performance
+  - **Corner/Edge Cases**:
+    - Large dataset rendering
+    - Low-memory devices
+    - Slow network conditions
+    - Concurrent calendar operations
+    - Browser performance differences
+    - Time zone calculations
 
 #### 8. Notification System
 - [ ] Implement reminder configuration
+  - **User Story Mapping**: 14.2.5.1 Receive reminders before task due dates
+  - **Requirements**: NOTIF-003, REMIND-001, CHANNEL-001
+  - **Test Cases**:
+    - Reminder time selection (at due date, 5 min, 1 hour, 1 day)
+    - Channel selection (email, push, in-app)
+    - Overdue reminder handling
+    - Reminder detail inclusion
+    - Snooze/dismiss functionality
+  - **Corner/Edge Cases**:
+    - Past due date reminders
+    - Multiple reminders for same task
+    - Time zone impact on reminders
+    - System time changes
+    - Concurrent reminder settings
+    - Invalid reminder times
+
 - [ ] Implement notification delivery system
+  - **User Story Mapping**: 14.2.5 Notifications and Reminders
+  - **Requirements**: NOTIF-003, NOTIF-004
+  - **Test Cases**:
+    - Email delivery
+    - Push notification delivery
+    - In-app notification display
+    - Delivery timing accuracy
+    - Retry mechanisms
+    - Delivery confirmation
+  - **Corner/Edge Cases**:
+    - Delivery failures
+    - Network interruptions
+    - High volume notifications
+    - Duplicate notifications
+    - Delivery during maintenance
+    - Invalid delivery addresses
+
 - [ ] Implement email notification templates
+  - **User Story Mapping**: 14.2.5 Notifications and Reminders
+  - **Requirements**: NOTIF-003, EMAIL-001
+  - **Test Cases**:
+    - Template rendering
+    - Dynamic content insertion
+    - Formatting consistency
+    - Link functionality
+    - Branding elements
+    - Mobile responsiveness
+  - **Corner/Edge Cases**:
+    - Template rendering errors
+    - Large content volumes
+    - Special character handling
+    - Image loading failures
+    - Email client compatibility
+    - Localization issues
+
 - [ ] Implement in-app notification display
+  - **User Story Mapping**: 14.2.5 Notifications and Reminders
+  - **Requirements**: NOTIF-003, NOTIF-004
+  - **Test Cases**:
+    - Notification panel display
+    - Notification list rendering
+    - Unread count management
+    - Notification actions
+    - Real-time updates
+    - Dismissal functionality
+  - **Corner/Edge Cases**:
+    - High notification volume
+    - Mixed notification types
+    - Network delays
+    - Panel overflow
+    - Concurrent notifications
+    - Accessibility compliance
+
 - [ ] Implement notification preferences UI
+  - **User Story Mapping**: 14.2.5.3 Customize notification preferences
+  - **Requirements**: NOTIF-005, PREF-001
+  - **Test Cases**:
+    - Type enable/disable controls
+    - Channel selection options
+    - Quiet hours configuration
+    - Priority filter settings
+    - Preference persistence
+    - Immediate application
+  - **Corner/Edge Cases**:
+    - Conflicting preferences
+    - Preference storage failures
+    - Concurrent preference changes
+    - Edge case time ranges
+    - Default preference handling
+    - Browser compatibility
+
 - [ ] Implement quiet hours functionality
+  - **User Story Mapping**: 14.2.5.3 Customize notification preferences
+  - **Requirements**: NOTIF-005, QUIET-001
+  - **Test Cases**:
+    - Quiet hours configuration
+    - Notification suppression
+    - Time-based activation
+    - Override options
+    - User feedback
+    - Cross-timezone handling
+  - **Corner/Edge Cases**:
+    - Time zone transitions
+    - System time changes
+    - Overlapping quiet periods
+    - Edge case times
+    - Concurrent setting changes
+    - Override abuse
 
 #### 9. Productivity Tracking
 - [ ] Implement statistics calculation engine
+  - **User Story Mapping**: 14.2.4.1 View statistics on completed tasks
+  - **Requirements**: PRODUCTIVITY-001, STAT-VIEW-001
+  - **Test Cases**:
+    - Daily completion statistics
+    - Weekly completion statistics
+    - Monthly completion statistics
+    - Completion rate calculation
+    - Overdue task counting
+    - Average completion time
+    - Real-time updates
+  - **Corner/Edge Cases**:
+    - Edge date boundaries
+    - Large data volumes
+    - Time zone differences
+    - Concurrent updates
+    - Data consistency
+    - Calculation accuracy
+
 - [ ] Implement time tracking functionality
+  - **User Story Mapping**: 14.2.4.2 Track time spent on tasks
+  - **Requirements**: TIME-TRACK-002, TIME-AUTO-001
+  - **Test Cases**:
+    - Manual time tracking start/stop
+    - Automatic time tracking
+    - Timestamp storage
+    - Time tracking reports
+    - Manual adjustment
+  - **Corner/Edge Cases**:
+    - Tracking across time zones
+    - System sleep/hibernation
+    - Network interruptions
+    - Concurrent tracking
+    - Tracking limits
+    - Data corruption
+
 - [ ] Create productivity dashboard UI
+  - **User Story Mapping**: 14.2.4 Productivity Tracking
+  - **Requirements**: PRODUCTIVITY-001, CHART-001
+  - **Test Cases**:
+    - Dashboard layout
+    - Widget placement
+    - Data visualization
+    - Real-time updates
+    - Responsive design
+    - User customization
+  - **Corner/Edge Cases**:
+    - Empty data states
+    - Large data volumes
+    - Network failures
+    - Browser compatibility
+    - Accessibility compliance
+    - Performance issues
+
 - [ ] Implement trend analysis
+  - **User Story Mapping**: 14.2.4.3 See productivity trends over time
+  - **Requirements**: PRODUCTIVITY-002, TREND-001
+  - **Test Cases**:
+    - Day/week/month trends
+    - Chart/graph display
+    - Project/tag filtering
+    - Pattern highlighting
+    - Trend data export
+  - **Corner/Edge Cases**:
+    - Insufficient data
+    - Extreme data variations
+    - Time zone impacts
+    - Concurrent analysis
+    - Large date ranges
+    - Data gaps
+
 - [ ] Create data visualization components
+  - **User Story Mapping**: 14.2.4 Productivity Tracking
+  - **Requirements**: PRODUCTIVITY-001, CHART-001, CHART-002
+  - **Test Cases**:
+    - Chart rendering
+    - Interactive elements
+    - Data accuracy
+    - Performance optimization
+    - Responsive design
+    - Export functionality
+  - **Corner/Edge Cases**:
+    - Large datasets
+    - Empty datasets
+    - Browser compatibility
+    - Network delays
+    - Accessibility compliance
+    - Color contrast
 
 #### 10. Settings and Customization
 - [ ] Implement theme customization (light/dark mode)
+  - **User Story Mapping**: 14.2.9.1 Customize app theme and appearance
+  - **Requirements**: SETTINGS-001, THEME-001, ACCESS-001
+  - **Test Cases**:
+    - Light theme selection
+    - Dark theme selection
+    - Accent color customization
+    - Preference persistence
+    - System preference integration
+    - High contrast mode
+  - **Corner/Edge Cases**:
+    - Theme storage failures
+    - Concurrent theme changes
+    - Browser compatibility
+    - Accessibility compliance
+    - Performance impact
+    - Default fallback
+
 - [ ] Implement timezone configuration
+  - **User Story Mapping**: 14.2.9.2 Set preferred timezone
+  - **Requirements**: SETTINGS-002, TIMEZONE-001
+  - **Test Cases**:
+    - Timezone dropdown selection
+    - Time display updates
+    - Global time formatting
+    - Browser detection
+    - Manual override
+  - **Corner/Edge Cases**:
+    - Invalid timezone selection
+    - Time zone transitions
+    - System time changes
+    - Concurrent updates
+    - Edge case timezones
+    - Default handling
+
 - [ ] Implement notification settings
+  - **User Story Mapping**: 14.2.9.3 Configure notification settings
+  - **Requirements**: SETTINGS-003, NOTIF-CONFIG-001
+  - **Test Cases**:
+    - Notification type controls
+    - Channel selection
+    - Quiet hours setup
+    - Preference application
+    - Test notification
+  - **Corner/Edge Cases**:
+    - Conflicting settings
+    - Edge case times
+    - Storage failures
+    - Concurrent changes
+    - Default handling
+    - Test delivery failures
+
 - [ ] Implement data export functionality
+  - **User Story Mapping**: 14.2.9.4 Export data
+  - **Requirements**: SETTINGS-004, EXPORT-001
+  - **Test Cases**:
+    - JSON format export
+    - Data type selection
+    - Complete data inclusion
+    - File formatting
+    - Export confirmation
+  - **Corner/Edge Cases**:
+    - Large data exports
+    - Export interruptions
+    - Storage limitations
+    - Format validation
+    - Concurrent exports
+    - Data corruption
+
 - [ ] Implement user profile management
+  - **User Story Mapping**: 14.2.1.4 Update profile information
+  - **Requirements**: R-Auth-004, R-Sec-009
+  - **Test Cases**:
+    - Name updates
+    - Timezone updates
+    - Avatar upload
+    - Change persistence
+    - Input validation
+    - Confirmation messages
+  - **Corner/Edge Cases**:
+    - Invalid input data
+    - Large avatar files
+    - Unsupported formats
+    - Network interruptions
+    - Concurrent updates
+    - Storage failures
 
 ### Phase 3: Collaboration Features (Could Have Features)
 
 #### 11. Team Collaboration
 - [ ] Implement task sharing functionality
+  - **User Story Mapping**: 14.2.6.1 Share tasks with colleagues
+  - **Requirements**: COLLAB-001, SHARE-001
+  - **Test Cases**:
+    - Task sharing with team members
+    - Shared task visibility
+    - Permission level setting
+    - Invitation email delivery
+    - Permission revocation
+  - **Corner/Edge Cases**:
+    - Non-existent users
+    - Duplicate sharing
+    - Permission conflicts
+    - Network failures
+    - Concurrent sharing
+    - Storage limitations
+
 - [ ] Implement task assignment system
+  - **User Story Mapping**: 14.2.6.2 Assign tasks to others
+  - **Requirements**: COLLAB-002, ASSIGN-001
+  - **Test Cases**:
+    - Task assignment to team members
+    - Assignee task list update
+    - Assignment notification
+    - Task reassignment
+    - Assignment history
+  - **Corner/Edge Cases**:
+    - Non-existent assignees
+    - Self-assignment
+    - Multiple assignments
+    - Concurrent assignments
+    - Network failures
+    - Permission issues
+
 - [ ] Implement commenting system
+  - **User Story Mapping**: 14.2.6.3 Comment on shared tasks
+  - **Requirements**: COLLAB-003, COMMENT-001
+  - **Test Cases**:
+    - Comment addition to tasks
+    - Collaborator visibility
+    - Comment notifications
+    - Edit/delete functionality
+    - Basic formatting support
+  - **Corner/Edge Cases**:
+    - Empty comments
+    - Large comment text
+    - Formatting abuse
+    - Concurrent comments
+    - Network interruptions
+    - Permission violations
+
 - [ ] Implement team calendar views
+  - **User Story Mapping**: 14.2.6.4 See team members' availability
+  - **Requirements**: COLLAB-004, AVAIL-001
+  - **Test Cases**:
+    - Team member schedule viewing
+    - Availability display
+    - Time block/busy time display
+    - Meeting request functionality
+    - Preference management
+  - **Corner/Edge Cases**:
+    - Large teams
+    - Conflicting schedules
+    - Time zone differences
+    - Network delays
+    - Permission issues
+    - Performance issues
+
 - [ ] Implement availability tracking
+  - **User Story Mapping**: 14.2.6.4 See team members' availability
+  - **Requirements**: COLLAB-004, SCHED-001
+  - **Test Cases**:
+    - Availability preference setting
+    - Schedule display
+    - Real-time updates
+    - Conflict detection
+    - Integration with calendars
+  - **Corner/Edge Cases**:
+    - Time zone transitions
+    - Schedule conflicts
+    - Network interruptions
+    - Concurrent updates
+    - Permission issues
+    - Data consistency
+
 - [ ] Implement collaboration notifications
+  - **User Story Mapping**: 14.2.6.5 Receive notifications for assigned task updates
+  - **Requirements**: COLLAB-005, UPDATE-NOTIF-001
+  - **Test Cases**:
+    - Task update notifications
+    - Change detail inclusion
+    - Preference customization
+    - Multi-channel delivery
+    - Notification history
+  - **Corner/Edge Cases**:
+    - High notification volume
+    - Network failures
+    - Delivery failures
+    - Concurrent updates
+    - Preference conflicts
+    - Storage limitations
 
 #### 12. Advanced Analytics
 - [ ] Implement detailed time reporting
+  - **User Story Mapping**: 14.3.2.1 View detailed reports on time spent
+  - **Requirements**: ANALYTICS-001, TIME-REPORT-001
+  - **Test Cases**:
+    - Project/task time reporting
+    - Start/end time inclusion
+    - Date range filtering
+    - CSV/PDF export
+    - Billable rate setting
+  - **Corner/Edge Cases**:
+    - Large date ranges
+    - Missing time data
+    - Export failures
+    - Invalid billable rates
+    - Concurrent reports
+    - Performance issues
+
 - [ ] Implement productivity insights
+  - **User Story Mapping**: 14.3.1.2 Get productivity insights
+  - **Requirements**: AI-002, INSIGHT-002
+  - **Test Cases**:
+    - Pattern identification
+    - Weekly insight generation
+    - Actionable recommendations
+    - Historical insight viewing
+    - User feedback
+  - **Corner/Edge Cases**:
+    - Insufficient data
+    - Pattern conflicts
+    - Feedback handling
+    - Concurrent analysis
+    - Performance issues
+    - Accuracy validation
+
 - [ ] Implement goal tracking system
+  - **User Story Mapping**: 14.2.4.4 Set productivity goals
+  - **Requirements**: PRODUCTIVITY-003, GOAL-001
+  - **Test Cases**:
+    - Daily/weekly/monthly goals
+    - Progress tracking
+    - Goal achievement alerts
+    - Goal adjustment
+    - Visual progress display
+  - **Corner/Edge Cases**:
+    - Unrealistic goals
+    - Goal conflicts
+    - Time zone impacts
+    - Concurrent updates
+    - Alert spam
+    - Data accuracy
+
 - [ ] Implement report generation
+  - **User Story Mapping**: 14.3.2 Analytics and Reporting
+  - **Requirements**: ANALYTICS-001, ANALYTICS-002
+  - **Test Cases**:
+    - Report template creation
+    - Data aggregation
+    - Visualization generation
+    - Export functionality
+    - Scheduling options
+  - **Corner/Edge Cases**:
+    - Large data sets
+    - Export failures
+    - Template errors
+    - Concurrent generation
+    - Performance issues
+    - Data consistency
+
 - [ ] Implement data export in multiple formats
+  - **User Story Mapping**: 14.3.2.4 Export reports in various formats
+  - **Requirements**: ANALYTICS-004, EXPORT-MULTI-001
+  - **Test Cases**:
+    - PDF export
+    - CSV export
+    - Excel export
+    - Date range selection
+    - Formatting preservation
+    - Export confirmation
+  - **Corner/Edge Cases**:
+    - Large exports
+    - Format compatibility
+    - Export interruptions
+    - Storage limitations
+    - Concurrent exports
+    - Validation errors
 
 ### Phase 4: Advanced Features (Future Considerations)
 
 #### 13. AI-Powered Features
 - [ ] Implement scheduling suggestion engine
+  - **User Story Mapping**: 14.3.1.1 Receive smart scheduling suggestions
+  - **Requirements**: AI-001, SCHED-SUG-001
+  - **Test Cases**:
+    - Pattern analysis
+    - Suggestion generation
+    - User interaction
+    - ML model training
+    - Disable functionality
+  - **Corner/Edge Cases**:
+    - Insufficient data
+    - Suggestion conflicts
+    - Model accuracy
+    - User rejection
+    - Performance impact
+    - Privacy concerns
+
 - [ ] Implement productivity pattern analysis
+  - **User Story Mapping**: 14.3.1.2 Get productivity insights
+  - **Requirements**: AI-002, INSIGHT-002
+  - **Test Cases**:
+    - Pattern identification
+    - Weekly report generation
+    - Recommendation system
+    - History viewing
+    - Feedback mechanism
+  - **Corner/Edge Cases**:
+    - Data anomalies
+    - Pattern conflicts
+    - Feedback handling
+    - Accuracy validation
+    - Performance issues
+    - Privacy concerns
+
 - [ ] Implement automatic task prioritization
+  - **User Story Mapping**: 14.3.1.3 Have tasks automatically prioritized
+  - **Requirements**: AI-003, AUTO-PRIOR-001
+  - **Test Cases**:
+    - Auto-prioritization algorithm
+    - Settings UI
+    - Explanation system
+    - Override functionality
+    - Feedback learning
+  - **Corner/Edge Cases**:
+    - Priority conflicts
+    - User overrides
+    - Accuracy validation
+    - Performance impact
+    - Learning curve
+    - Edge cases
+
 - [ ] Implement natural language processing for tasks
+  - **User Story Mapping**: 14.3.1.4 Receive natural language processing
+  - **Requirements**: AI-004, NLP-001
+  - **Test Cases**:
+    - NLP task creation
+    - Information extraction
+    - Review UI
+    - Multi-language support
+    - Disable option
+  - **Corner/Edge Cases**:
+    - Ambiguous language
+    - Language detection
+    - Extraction errors
+    - Performance impact
+    - Accuracy validation
+    - Edge cases
 
 #### 14. Mobile and Offline Support
 - [ ] Implement responsive mobile design
+  - **User Story Mapping**: 14.2.8.1 Access tasks from mobile device
+  - **Requirements**: MOBILE-001, TOUCH-001
+  - **Test Cases**:
+    - Mobile responsiveness
+    - Touch interface
+    - Mobile navigation
+    - Fast loading
+    - Offline storage
+  - **Corner/Edge Cases**:
+    - Various screen sizes
+    - Touch gesture conflicts
+    - Network variability
+    - Browser differences
+    - Performance issues
+    - Accessibility
+
 - [ ] Implement offline data storage
+  - **User Story Mapping**: 14.2.8.2 Use app offline
+  - **Requirements**: OFFLINE-001, LOCAL-STORAGE-001
+  - **Test Cases**:
+    - Offline task viewing
+    - Offline creation/editing
+    - Local storage
+    - Offline notifications
+    - State transitions
+  - **Corner/Edge Cases**:
+    - Storage limitations
+    - Data corruption
+    - Conflict resolution
+    - Performance impact
+    - Browser differences
+    - Sync failures
+
 - [ ] Implement sync functionality
+  - **User Story Mapping**: 14.2.8.3 Have changes sync when reconnect
+  - **Requirements**: SYNC-002, CONFLICT-001
+  - **Test Cases**:
+    - Auto-sync functionality
+    - Conflict detection
+    - Status notifications
+    - Data consistency
+    - Sync performance
+  - **Corner/Edge Cases**:
+    - Sync conflicts
+    - Network interruptions
+    - Large sync volumes
+    - Performance issues
+    - Data loss
+    - Concurrent sync
+
 - [ ] Implement progressive web app features
+  - **User Story Mapping**: 14.2.8 Mobile and Offline Access
+  - **Requirements**: PWA requirements
+  - **Test Cases**:
+    - Installability
+    - Offline functionality
+    - Performance
+    - Responsiveness
+    - Cross-browser support
+  - **Corner/Edge Cases**:
+    - Browser compatibility
+    - Storage limitations
+    - Network conditions
+    - Performance issues
+    - Update handling
+    - Security concerns
 
 #### 15. Enterprise Features
 - [ ] Implement role-based access control
+  - **User Story Mapping**: 14.3.3.4 Manage user permissions
+  - **Requirements**: ENTERPRISE-001, PERMISSION-MGMT-001
+  - **Test Cases**:
+    - Role creation
+    - Permission assignment
+    - Access control
+    - Activity logging
+    - User management
+  - **Corner/Edge Cases**:
+    - Permission conflicts
+    - Role hierarchy
+    - Concurrent changes
+    - Performance impact
+    - Security issues
+    - Audit requirements
+
 - [ ] Implement user management dashboard
+  - **User Story Mapping**: 14.3.3.4 Manage user permissions
+  - **Requirements**: ENTERPRISE-001, ACTIVITY-001
+  - **Test Cases**:
+    - User listing
+    - Role management
+    - Status controls
+    - Deactivation
+    - Permission updates
+  - **Corner/Edge Cases**:
+    - Large user bases
+    - Concurrent management
+    - Performance issues
+    - Security concerns
+    - Data privacy
+    - Access control
+
 - [ ] Implement activity logging
+  - **User Story Mapping**: 14.3.3.4 Manage user permissions
+  - **Requirements**: ENTERPRISE-001, ACTIVITY-001
+  - **Test Cases**:
+    - Activity recording
+    - Log storage
+    - Search functionality
+    - Export options
+    - Retention policies
+  - **Corner/Edge Cases**:
+    - High volume logging
+    - Storage limitations
+    - Performance impact
+    - Privacy compliance
+    - Security concerns
+    - Log integrity
+
 - [ ] Implement custom workflow engine
+  - **User Story Mapping**: 14.3.3.5 Set up custom workflows
+  - **Requirements**: ENTERPRISE-002, WORKFLOW-001
+  - **Test Cases**:
+    - Workflow definition
+    - Approval steps
+    - Status tracking
+    - Notification system
+    - History tracking
+  - **Corner/Edge Cases**:
+    - Complex workflows
+    - Concurrent workflows
+    - Performance issues
+    - Error handling
+    - Security concerns
+    - Integration issues
+
 - [ ] Implement audit trail functionality
+  - **User Story Mapping**: 14.3.3.5 Set up custom workflows
+  - **Requirements**: ENTERPRISE-002, APPROVAL-001
+  - **Test Cases**:
+    - Action tracking
+    - Change logging
+    - Audit reports
+    - Compliance features
+    - Data retention
+  - **Corner/Edge Cases**:
+    - High volume tracking
+    - Storage limitations
+    - Performance impact
+    - Privacy compliance
+    - Security concerns
+    - Data integrity
 
 ## 15. Conclusion
 
