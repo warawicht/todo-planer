@@ -11,6 +11,7 @@ const mockTaskRepository = {
   findOne: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+  find: jest.fn(),
 };
 
 describe('TasksService', () => {
@@ -177,7 +178,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: taskId, userId },
-        relations: ['project', 'tags', 'timeBlocks'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
       });
       expect(result).toEqual(task);
     });
@@ -316,6 +317,502 @@ describe('TasksService', () => {
       mockTaskRepository.findOne.mockResolvedValue(null);
 
       await expect(service.remove(userId, taskId)).rejects.toThrow('Task not found');
+    });
+  });
+
+  // Subtask functionality tests
+  describe('createSubtask', () => {
+    it('should create a subtask', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const createSubtaskDto = {
+        title: 'Test Subtask',
+        description: 'Test Subtask Description',
+        priority: 1,
+      };
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const subtaskEntity = {
+        id: 'subtask-id',
+        ...createSubtaskDto,
+        userId,
+        parentId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValue(parentTask);
+      mockTaskRepository.create.mockReturnValue(subtaskEntity);
+      mockTaskRepository.save.mockResolvedValue(subtaskEntity);
+
+      const result = await service.createSubtask(userId, parentId, createSubtaskDto);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.create).toHaveBeenCalledWith({
+        ...createSubtaskDto,
+        userId,
+        parentId,
+        status: 'pending',
+      });
+      expect(repository.save).toHaveBeenCalledWith(subtaskEntity);
+      expect(result).toEqual(subtaskEntity);
+    });
+
+    it('should prevent circular references', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const createSubtaskDto = {
+        title: 'Test Subtask',
+        description: 'Test Subtask Description',
+      };
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        parentId: parentId, // This would create a circular reference
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValue(parentTask);
+
+      await expect(service.createSubtask(userId, parentId, createSubtaskDto)).rejects.toThrow(
+        'Cannot create subtask with circular reference',
+      );
+    });
+  });
+
+  describe('findSubtasks', () => {
+    it('should retrieve all subtasks for a parent task', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtasks = [
+        {
+          id: 'subtask-1',
+          title: 'Subtask 1',
+          userId,
+          parentId,
+          status: 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'subtask-2',
+          title: 'Subtask 2',
+          userId,
+          parentId,
+          status: 'completed',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValue(parentTask);
+      mockTaskRepository.find.mockResolvedValue(subtasks);
+
+      const result = await service.findSubtasks(userId, parentId);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.find).toHaveBeenCalledWith({
+        where: { parentId, userId },
+        order: {
+          position: 'ASC',
+          createdAt: 'ASC',
+        },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(result).toEqual(subtasks);
+    });
+  });
+
+  describe('updateSubtask', () => {
+    it('should update a subtask with partial data', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'subtask-id';
+      const updateSubtaskDto = {
+        title: 'Updated Subtask Title',
+        priority: 2,
+      };
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const existingSubtask = {
+        id: subtaskId,
+        title: 'Original Subtask Title',
+        userId,
+        parentId,
+        status: 'pending',
+        priority: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const updatedSubtask = {
+        ...existingSubtask,
+        ...updateSubtaskDto,
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(existingSubtask);
+      mockTaskRepository.update.mockResolvedValue(undefined);
+      mockTaskRepository.findOne.mockResolvedValue(updatedSubtask);
+
+      const result = await service.updateSubtask(userId, parentId, subtaskId, updateSubtaskDto);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: subtaskId, parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.update).toHaveBeenCalledWith(
+        { id: subtaskId, parentId, userId },
+        updateSubtaskDto,
+      );
+      expect(result).toEqual(updatedSubtask);
+    });
+
+    it('should throw NotFoundException if subtask not found', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'non-existent-id';
+      const updateSubtaskDto = {
+        title: 'Updated Subtask Title',
+      };
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(null);
+
+      await expect(service.updateSubtask(userId, parentId, subtaskId, updateSubtaskDto)).rejects.toThrow(
+        'Subtask not found',
+      );
+    });
+  });
+
+  describe('removeSubtask', () => {
+    it('should delete a subtask', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'subtask-id';
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const existingSubtask = {
+        id: subtaskId,
+        title: 'Test Subtask',
+        userId,
+        parentId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(existingSubtask);
+      mockTaskRepository.delete.mockResolvedValue(undefined);
+
+      await expect(service.removeSubtask(userId, parentId, subtaskId)).resolves.toBeUndefined();
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: subtaskId, parentId, userId },
+      });
+      expect(repository.delete).toHaveBeenCalledWith({ id: subtaskId, parentId, userId });
+    });
+
+    it('should throw NotFoundException if subtask not found', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'non-existent-id';
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(null);
+
+      await expect(service.removeSubtask(userId, parentId, subtaskId)).rejects.toThrow(
+        'Subtask not found',
+      );
+    });
+  });
+
+  describe('reorderSubtasks', () => {
+    it('should reorder subtasks', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'subtask-2';
+      const newPosition = 0;
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const subtasks = [
+        {
+          id: 'subtask-1',
+          title: 'Subtask 1',
+          userId,
+          parentId,
+          position: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'subtask-2',
+          title: 'Subtask 2',
+          userId,
+          parentId,
+          position: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'subtask-3',
+          title: 'Subtask 3',
+          userId,
+          parentId,
+          position: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      const reorderedSubtasks = [
+        {
+          id: 'subtask-2',
+          title: 'Subtask 2',
+          userId,
+          parentId,
+          position: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'subtask-1',
+          title: 'Subtask 1',
+          userId,
+          parentId,
+          position: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'subtask-3',
+          title: 'Subtask 3',
+          userId,
+          parentId,
+          position: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockTaskRepository.findOne.mockResolvedValue(parentTask);
+      mockTaskRepository.find.mockResolvedValue(subtasks);
+      mockTaskRepository.update.mockResolvedValue(undefined);
+      mockTaskRepository.find.mockResolvedValue(reorderedSubtasks);
+
+      const result = await service.reorderSubtasks(userId, parentId, subtaskId, newPosition);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.find).toHaveBeenCalledWith({
+        where: { parentId, userId },
+        order: {
+          position: 'ASC',
+          createdAt: 'ASC',
+        },
+      });
+      expect(repository.update).toHaveBeenCalled();
+      expect(repository.find).toHaveBeenCalledWith({
+        where: { parentId, userId },
+        order: {
+          position: 'ASC',
+          createdAt: 'ASC',
+        },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(result).toEqual(reorderedSubtasks);
+    });
+
+    it('should throw NotFoundException if subtask not found', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'non-existent-id';
+      const newPosition = 0;
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const subtasks = [
+        {
+          id: 'subtask-1',
+          title: 'Subtask 1',
+          userId,
+          parentId,
+          position: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      mockTaskRepository.findOne.mockResolvedValue(parentTask);
+      mockTaskRepository.find.mockResolvedValue(subtasks);
+
+      await expect(service.reorderSubtasks(userId, parentId, subtaskId, newPosition)).rejects.toThrow(
+        'Subtask not found',
+      );
+    });
+  });
+
+  describe('convertSubtaskToTask', () => {
+    it('should convert a subtask to a regular task', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'subtask-id';
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const existingSubtask = {
+        id: subtaskId,
+        title: 'Test Subtask',
+        userId,
+        parentId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const convertedTask = {
+        ...existingSubtask,
+        parentId: null,
+        position: null,
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(existingSubtask);
+      mockTaskRepository.update.mockResolvedValue(undefined);
+      mockTaskRepository.findOne.mockResolvedValue(convertedTask);
+
+      const result = await service.convertSubtaskToTask(userId, parentId, subtaskId);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: parentId, userId },
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: subtaskId, parentId, userId },
+      });
+      expect(repository.update).toHaveBeenCalledWith(
+        { id: subtaskId, userId },
+        { parentId: null, position: null },
+      );
+      expect(result).toEqual(convertedTask);
+    });
+
+    it('should throw NotFoundException if subtask not found', async () => {
+      const userId = 'user-id';
+      const parentId = 'parent-task-id';
+      const subtaskId = 'non-existent-id';
+
+      const parentTask = {
+        id: parentId,
+        title: 'Parent Task',
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockTaskRepository.findOne.mockResolvedValueOnce(parentTask);
+      mockTaskRepository.findOne.mockResolvedValueOnce(null);
+
+      await expect(service.convertSubtaskToTask(userId, parentId, subtaskId)).rejects.toThrow(
+        'Subtask not found',
+      );
     });
   });
 

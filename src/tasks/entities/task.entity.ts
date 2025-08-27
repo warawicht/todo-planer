@@ -4,6 +4,7 @@ import { User } from '../../users/user.entity';
 import { Project } from '../../projects/entities/project.entity';
 import { Tag } from '../../tags/entities/tag.entity';
 import { TimeBlock } from '../../time-blocks/entities/time-block.entity';
+import { TaskAttachment } from './attachments/task-attachment.entity';
 
 @Entity('tasks')
 export class Task {
@@ -39,6 +40,20 @@ export class Task {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // Subtask relationships
+  @Column({ nullable: true })
+  parentId: string;
+
+  @ManyToOne(() => Task, task => task.subtasks, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'parentId' })
+  parent: Task;
+
+  @OneToMany(() => Task, task => task.parent)
+  subtasks: Task[];
+
+  @Column({ type: 'int', nullable: true })
+  position: number;
+
   @ManyToOne(() => User, user => user.tasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
@@ -63,4 +78,7 @@ export class Task {
 
   @OneToMany(() => TimeBlock, timeBlock => timeBlock.task, { cascade: true })
   timeBlocks: TimeBlock[];
+
+  @OneToMany(() => TaskAttachment, attachment => attachment.task, { cascade: true })
+  attachments: TaskAttachment[];
 }

@@ -5,6 +5,7 @@ import { Task } from '../tasks/entities/task.entity';
 import { Project } from '../projects/entities/project.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { TimeBlock } from '../time-blocks/entities/time-block.entity';
+import { TaskAttachment } from '../tasks/entities/attachments/task-attachment.entity';
 
 @Entity('users')
 export class User {
@@ -69,4 +70,7 @@ export class User {
   
   @OneToMany(() => TimeBlock, timeBlock => timeBlock.user)
   timeBlocks: TimeBlock[];
+  
+  @OneToMany(() => TaskAttachment, taskAttachment => taskAttachment.user)
+  taskAttachments: TaskAttachment[];
 }

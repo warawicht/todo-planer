@@ -4,6 +4,8 @@ import { Repository, FindOptionsWhere } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateSubtaskDto } from './dto/subtasks/create-subtask.dto';
+import { UpdateSubtaskDto } from './dto/subtasks/update-subtask.dto';
 
 @Injectable()
 export class TasksService {
@@ -56,14 +58,14 @@ export class TasksService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['project', 'tags', 'timeBlocks'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
     });
   }
 
   async findOne(userId: string, id: string): Promise<Task> {
     const task = await this.tasksRepository.findOne({
       where: { id, userId },
-      relations: ['project', 'tags', 'timeBlocks'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
     });
     
     if (!task) {
@@ -100,8 +102,162 @@ export class TasksService {
     // Check if task exists and belongs to user
     await this.findOne(userId, id);
     
-    // Delete task (cascade will handle time blocks)
+    // Delete task (cascade will handle time blocks, subtasks, and attachments)
     await this.tasksRepository.delete({ id, userId });
+  }
+
+  // Subtask methods
+  async createSubtask(userId: string, parentId: string, createSubtaskDto: CreateSubtaskDto): Promise<Task> {
+    // Check if parent task exists and belongs to user
+    const parentTask = await this.findOne(userId, parentId);
+    
+    // Prevent circular references
+    if (parentId === parentTask.parentId) {
+      throw new BadRequestException('Cannot create subtask with circular reference');
+    }
+    
+    // Create subtask with user and parent association
+    const subtaskData = {
+      ...createSubtaskDto,
+      userId,
+      parentId,
+      status: 'pending', // Default status
+    };
+
+    const newSubtask = this.tasksRepository.create(subtaskData);
+    return this.tasksRepository.save(newSubtask);
+  }
+
+  async findSubtasks(userId: string, parentId: string): Promise<Task[]> {
+    // Check if parent task exists and belongs to user
+    await this.findOne(userId, parentId);
+    
+    // Find all subtasks for the parent task
+    return this.tasksRepository.find({
+      where: { parentId, userId },
+      order: {
+        position: 'ASC',
+        createdAt: 'ASC',
+      },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+    });
+  }
+
+  async updateSubtask(userId: string, parentId: string, subtaskId: string, updateSubtaskDto: UpdateSubtaskDto): Promise<Task> {
+    // Check if parent task exists and belongs to user
+    await this.findOne(userId, parentId);
+    
+    // Check if subtask exists and belongs to user
+    const existingSubtask = await this.tasksRepository.findOne({
+      where: { id: subtaskId, parentId, userId },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+    });
+    
+    if (!existingSubtask) {
+      throw new NotFoundException('Subtask not found');
+    }
+    
+    // Handle status transitions
+    if (updateSubtaskDto.status && updateSubtaskDto.status !== existingSubtask.status) {
+      if (!this.isValidStatusTransition(existingSubtask.status, updateSubtaskDto.status)) {
+        throw new BadRequestException('Invalid status transition');
+      }
+      
+      // Handle completedAt timestamp
+      if (updateSubtaskDto.status === 'completed') {
+        updateSubtaskDto.completedAt = new Date().toISOString();
+      } else if (existingSubtask.status === 'completed') {
+        updateSubtaskDto.completedAt = undefined;
+      }
+    }
+    
+    // Perform partial update
+    await this.tasksRepository.update({ id: subtaskId, parentId, userId }, updateSubtaskDto);
+    return this.tasksRepository.findOne({
+      where: { id: subtaskId, parentId, userId },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+    });
+  }
+
+  async removeSubtask(userId: string, parentId: string, subtaskId: string): Promise<void> {
+    // Check if parent task exists and belongs to user
+    await this.findOne(userId, parentId);
+    
+    // Check if subtask exists and belongs to user
+    const existingSubtask = await this.tasksRepository.findOne({
+      where: { id: subtaskId, parentId, userId },
+    });
+    
+    if (!existingSubtask) {
+      throw new NotFoundException('Subtask not found');
+    }
+    
+    // Delete subtask
+    await this.tasksRepository.delete({ id: subtaskId, parentId, userId });
+  }
+
+  async reorderSubtasks(userId: string, parentId: string, subtaskId: string, newPosition: number): Promise<Task[]> {
+    // Check if parent task exists and belongs to user
+    await this.findOne(userId, parentId);
+    
+    // Get all subtasks for the parent
+    const subtasks = await this.tasksRepository.find({
+      where: { parentId, userId },
+      order: {
+        position: 'ASC',
+        createdAt: 'ASC',
+      },
+    });
+    
+    // Find the subtask to move
+    const subtaskToMove = subtasks.find(task => task.id === subtaskId);
+    if (!subtaskToMove) {
+      throw new NotFoundException('Subtask not found');
+    }
+    
+    // Remove the subtask from its current position
+    const currentIndex = subtasks.findIndex(task => task.id === subtaskId);
+    subtasks.splice(currentIndex, 1);
+    
+    // Insert the subtask at the new position
+    subtasks.splice(newPosition, 0, subtaskToMove);
+    
+    // Update positions for all subtasks
+    for (let i = 0; i < subtasks.length; i++) {
+      subtasks[i].position = i;
+      await this.tasksRepository.update({ id: subtasks[i].id, userId }, { position: i });
+    }
+    
+    return this.tasksRepository.find({
+      where: { parentId, userId },
+      order: {
+        position: 'ASC',
+        createdAt: 'ASC',
+      },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+    });
+  }
+
+  async convertSubtaskToTask(userId: string, parentId: string, subtaskId: string): Promise<Task> {
+    // Check if parent task exists and belongs to user
+    await this.findOne(userId, parentId);
+    
+    // Check if subtask exists and belongs to user
+    const existingSubtask = await this.tasksRepository.findOne({
+      where: { id: subtaskId, parentId, userId },
+    });
+    
+    if (!existingSubtask) {
+      throw new NotFoundException('Subtask not found');
+    }
+    
+    // Convert subtask to regular task by removing parent relationship
+    await this.tasksRepository.update({ id: subtaskId, userId }, { parentId: null, position: null });
+    
+    return this.tasksRepository.findOne({
+      where: { id: subtaskId, userId },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+    });
   }
 
   private isValidStatusTransition(currentStatus: string, newStatus: string): boolean {
