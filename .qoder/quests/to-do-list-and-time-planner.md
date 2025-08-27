@@ -100,6 +100,7 @@ App
 │   ├── Header
 │   │   ├── Navigation
 │   │   ├── UserMenu
+│   │   ├── NotificationsBell
 │   │   └── Search
 │   ├── Sidebar
 │   │   ├── MainMenu
@@ -107,9 +108,13 @@ App
 │   └── MainContent
 ├── Pages
 │   ├── Dashboard
+│   │   ├── DashboardHeader
 │   │   ├── TaskSummary
 │   │   ├── UpcomingTasks
-│   │   └── ScheduleOverview
+│   │   ├── ScheduleOverview
+│   │   ├── ProductivityMetrics
+│   │   ├── RecentActivity
+│   │   └── QuickActions
 │   ├── TaskList
 │   │   ├── TaskFilters
 │   │   ├── TaskTable
@@ -141,6 +146,18 @@ App
     ├── TimeBlock
     │   ├── TimeBlockCard
     │   └── TimeBlockForm
+    ├── Dashboard
+    │   ├── TaskSummaryWidget
+    │   ├── UpcomingTasksWidget
+    │   ├── ScheduleOverviewWidget
+    │   ├── ProductivityMetricsWidget
+    │   ├── RecentActivityWidget
+    │   └── QuickActionsWidget
+    ├── Notifications
+    │   ├── NotificationBell
+    │   ├── NotificationList
+    │   ├── NotificationItem
+    │   └── NotificationPreferences
     └── Statistics
         ├── ProductivityChart
         └── TaskCompletionStats
@@ -155,6 +172,12 @@ App
 | CalendarView | Interactive calendar display of tasks and time blocks | events: Array, onEventClick: Function, onDateChange: Function | Selected date, view mode |
 | TimeBlockCard | Visual representation of time blocks with drag-and-drop support | block: TimeBlockObject, onEdit: Function, onMove: Function | Drag state, hover state |
 | Header | Navigation and user controls with responsive behavior | user: UserObject, onLogout: Function | Mobile menu state, search query |
+| DashboardHeader | Main dashboard header with user greeting and quick actions | user: UserObject, onQuickAction: Function | Date range selection, view mode |
+| TaskSummaryWidget | Widget displaying task statistics and completion metrics | tasks: TaskArray, filter: FilterObject | Loading state, error state |
+| UpcomingTasksWidget | Widget showing upcoming tasks with due dates | tasks: TaskArray, limit: Number | Task selection, loading state |
+| ScheduleOverviewWidget | Widget visualizing daily/weekly schedule | timeBlocks: TimeBlockArray, date: Date | Date navigation, view mode |
+| NotificationBell | Notification indicator showing unread count | notifications: NotificationArray, onOpen: Function | Unread count, dropdown open state |
+| NotificationItem | Individual notification display with actions | notification: NotificationObject, onDismiss: Function, onAction: Function | Read status, expanded state |
 
 ### 2.3 State Management
 
@@ -200,6 +223,14 @@ App
 - `/settings/billing` - Subscription and billing management
 - `/search` - Global search across tasks and projects
 
+##### 2.4.1.1 Notification Settings Page
+- **Channel preferences** - Enable/disable email, push, and in-app notifications
+- **Reminder timing** - Configure when to receive reminders for tasks and time blocks
+- **Priority filters** - Select which priority levels trigger notifications
+- **Do Not Disturb** - Set quiet hours for notifications
+- **Sound settings** - Customize notification sounds
+- **Notification history** - View recent notifications and their status
+
 #### 2.4.2 Navigation Patterns
 - Responsive sidebar navigation for desktop
 - Mobile-friendly bottom navigation or hamburger menu
@@ -226,6 +257,10 @@ App
 - `useNotifications()` - Handle real-time notifications
 - `useSearch()` - Implement full-text search functionality
 - `usePreferences()` - Manage user preferences and settings
+- `useDashboard()` - Fetch dashboard data and widgets configuration
+- `useReminders()` - Manage task reminders and alert settings
+- `useAlerts()` - Handle real-time alerts and system notifications
+- `useProductivityMetrics()` - Retrieve productivity data and trends
 
 #### 2.5.3 Data Management
 - Loading states with skeleton loaders and progress indicators
@@ -349,6 +384,29 @@ App
 | `/time-blocks/:id/link-task` | PUT | Link time block to specific task | JWT |
 | `/time-blocks/bulk` | POST | Bulk create/update time blocks | JWT |
 
+#### 3.3.4 Notifications
+| Endpoint | Method | Description | Authentication |
+|----------|--------|-------------|--------------|
+| `/notifications` | GET | Get all notifications for user with filtering | JWT |
+| `/notifications/:id` | GET | Get specific notification details | JWT |
+| `/notifications/:id` | PUT | Mark notification as read | JWT |
+| `/notifications/:id` | DELETE | Dismiss notification | JWT |
+| `/notifications/bulk` | PUT | Mark multiple notifications as read | JWT |
+| `/notifications/bulk` | DELETE | Dismiss multiple notifications | JWT |
+| `/notifications/unread-count` | GET | Get count of unread notifications | JWT |
+
+#### 3.3.5 Reminders
+| Endpoint | Method | Description | Authentication |
+|----------|--------|-------------|--------------|
+| `/reminders` | GET | Get all reminders for user with filtering | JWT |
+| `/reminders` | POST | Create new reminder for task | JWT |
+| `/reminders/:id` | GET | Get specific reminder details | JWT |
+| `/reminders/:id` | PUT | Update reminder settings | JWT |
+| `/reminders/:id` | DELETE | Delete reminder | JWT |
+| `/reminders/bulk` | POST | Bulk create reminders for tasks | JWT |
+| `/reminders/bulk` | PUT | Bulk update reminders | JWT |
+| `/reminders/bulk` | DELETE | Bulk delete reminders | JWT |
+
 ### 3.4 Data Models
 
 #### 3.4.1 User Model
@@ -374,11 +432,22 @@ interface UserPreferences {
   notifications: {
     email: boolean;
     push: boolean;
+    inApp: boolean;
+    soundEnabled: boolean;
+    reminderTimes: {
+      upcomingTask: number; // minutes before
+      deadlineWarning: number; // minutes before
+      timeBlockStart: number; // minutes before
+    };
   };
   calendar: {
     view: 'day' | 'week' | 'month';
     startTime: string;
     endTime: string;
+  };
+  dashboard: {
+    widgets: string[];
+    layout: 'single' | 'double' | 'triple';
   };
 }
 ```
@@ -402,6 +471,10 @@ interface Task {
   parentId?: number;
   subtasks: Task[];
   timeBlocks: TimeBlock[];
+  reminders: Reminder[];
+  reminderEnabled: boolean;
+  reminderTime?: Date;
+  reminderOffset?: number; // in minutes
   createdAt: Date;
   updatedAt: Date;
 }
@@ -463,6 +536,44 @@ interface Tag {
 }
 ```
 
+##### Notification Model
+``typescript
+interface Notification {
+  id: number;
+  userId: number;
+  title: string;
+  message: string;
+  type: 'task_reminder' | 'timeblock_alert' | 'deadline_warning' | 'schedule_change' | 'system_alert' | 'collaboration';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  read: boolean;
+  actionRequired: boolean;
+  taskId?: number;
+  timeBlockId?: number;
+  relatedEntityId?: number;
+  createdAt: Date;
+  readAt?: Date;
+}
+```
+
+##### Reminder Model
+``typescript
+interface Reminder {
+  id: number;
+  userId: number;
+  taskId: number;
+  type: 'email' | 'push' | 'in_app';
+  triggerTime: Date;
+  sent: boolean;
+  sentAt?: Date;
+  method: 'at_time' | 'before_time';
+  offset?: number; // in minutes
+  recurring: boolean;
+  recurrencePattern?: RecurrencePattern;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
 ### 3.5 Business Logic Layer
 
 #### 3.5.1 Task Service
@@ -495,11 +606,38 @@ interface Tag {
 - Activity logging and audit trails
 
 #### 3.5.4 Notification Service
-- Email notifications for task reminders
-- Push notifications for time block alerts
-- Daily/weekly productivity summaries
-- Deadline approaching warnings
-- Schedule change notifications
+- **Email notifications** for task reminders and important updates
+- **Push notifications** for time block alerts and real-time updates
+- **In-app notifications** for all user interactions and system messages
+- **Daily/weekly productivity summaries** with insights and recommendations
+- **Deadline approaching warnings** with configurable time thresholds (1 hour, 1 day, 3 days)
+- **Schedule change notifications** for rescheduled tasks and time blocks
+- **Task assignment notifications** when tasks are assigned to users
+- **Collaboration notifications** for comments, mentions, and task updates
+- **System alerts** for maintenance, updates, and important announcements
+- **Custom notification rules** based on user preferences and task priorities
+
+### 3.5.5 Dashboard Service
+- **Task summary aggregation** with counts by status, priority, and due date
+- **Schedule overview** with today's and upcoming time blocks
+- **Productivity metrics** with trend analysis and goal tracking
+- **Recent activity feed** showing task updates and completed items
+- **Quick action shortcuts** for common task and scheduling operations
+- **Personalized recommendations** based on user behavior and patterns
+- **Customizable widgets** allowing users to personalize their dashboard layout
+- **Real-time updates** with WebSocket connections for live data refresh
+
+### 3.5.6 Alert and Reminder System
+- **Task-based reminders** with configurable timing (at time, 5 min before, 1 hour before, 1 day before)
+- **Recurring task reminders** for daily, weekly, and monthly repeating tasks
+- **Time block alerts** with start and end time notifications
+- **Deadline warnings** with escalating alerts as due dates approach
+- **Productivity goal reminders** for habit tracking and goal maintenance
+- **Calendar integration alerts** for external calendar events
+- **Smart snooze functionality** with intelligent rescheduling options
+- **Custom reminder rules** based on task properties and user preferences
+- **Multi-channel delivery** (email, push, in-app) for critical alerts
+- **Reminder history tracking** with user interaction logging
 
 ### 3.6 Middleware & Interceptors
 
@@ -1494,11 +1632,45 @@ sequenceDiagram
 - Polling as fallback mechanism
 - Conflict resolution for concurrent edits
 
+#### 5.5.1 Notification Updates
+- WebSocket connections for real-time notification delivery
+- Server-sent events for push notifications
+- Notification badge updates in real-time
+- Sound alerts for high-priority notifications
+- Banner notifications for desktop users
+- Mobile push notifications via Firebase or similar services
+
 ### 5.6 Data Synchronization
 - Offline-first approach for mobile support
 - Conflict detection and resolution strategies
 - Data versioning for sync reconciliation
 - Progressive data loading for performance
+
+## Testable Architecture Patterns
+
+### Dependency Injection and Inversion of Control
+- **NestJS DI Container**: Leverage NestJS built-in dependency injection for loose coupling
+- **Interface-based Contracts**: Define clear interfaces for all services and repositories
+- **Mockable Dependencies**: Design components to accept dependencies through constructors
+- **Configuration Injection**: Externalize configuration through dependency injection
+
+### Separation of Concerns
+- **Layered Architecture**: Clear separation between presentation, business logic, and data access layers
+- **Single Responsibility Principle**: Each component has one reason to change
+- **Pure Functions**: Business logic functions without side effects for easy testing
+- **Stateless Services**: Minimize shared state to reduce test complexity
+
+### Testability Patterns
+- **Ports and Adapters**: Define ports for external dependencies and adapters for implementations
+- **Repository Pattern**: Abstract data access behind repository interfaces
+- **Service Layer**: Encapsulate business logic in testable service classes
+- **Facade Pattern**: Simplify complex subsystems with facades for easier testing
+
+### Design for Testability
+- **Constructor Injection**: All dependencies injected through constructors
+- **Configurable Time Providers**: Abstract time-related operations for deterministic testing
+- **External Service Abstractions**: Wrap external APIs in testable interfaces
+- **Event-Driven Architecture**: Loose coupling through event publishing/subscription
 
 ## 6. Testing Strategy
 
@@ -1513,6 +1685,14 @@ sequenceDiagram
 - Snapshot testing for component output consistency
 - Accessibility testing at component level
 
+##### 6.1.1.1 Testable Component Design
+- **Pure Components**: Components with minimal internal state for easier testing
+- **Props-Driven Behavior**: Component behavior controlled through props
+- **Callback Props**: Event handling through callback props for test verification
+- **Render Prop Pattern**: Flexible rendering through render props
+- **Compound Components**: Related components that work together with shared state
+- **Controlled Components**: Form components controlled by props for deterministic testing
+
 #### 6.1.2 Integration Testing
 - API integration testing with MSW (Mock Service Worker)
 - State management testing with Redux Toolkit
@@ -1521,6 +1701,15 @@ sequenceDiagram
 - Context provider testing for global state
 - Custom hook integration testing
 - Third-party library integration testing
+
+##### 6.1.2.1 Mocking Strategies
+- **Service Mocks**: Mock external services with predictable responses
+- **API Mocks**: Simulate API endpoints with MSW for consistent testing
+- **Database Mocks**: In-memory database implementations for fast testing
+- **Time Mocks**: Controlled time providers for deterministic time-based tests
+- **Network Mocks**: Simulate network conditions and failures
+- **Storage Mocks**: Mock localStorage, sessionStorage, and cookies
+- **Event Mocks**: Simulate browser events and user interactions
 
 #### 6.1.3 End-to-End Testing
 - User journey testing with Cypress
@@ -1531,6 +1720,15 @@ sequenceDiagram
 - Real device testing with BrowserStack
 - Cross-platform testing for PWA features
 
+##### 6.1.3.1 Testable E2E Architecture
+- **Page Object Model**: Encapsulate UI elements and interactions in page objects
+- **Test Data Setup**: Automated test data preparation before test execution
+- **Test Environment Isolation**: Dedicated test environments per test run
+- **Flaky Test Management**: Retry mechanisms and test stability monitoring
+- **Parallel Test Execution**: Concurrent test runs for faster feedback
+- **Test Reporting**: Comprehensive test reports with screenshots and logs
+- **Cross-Environment Testing**: Consistent testing across dev, staging, and production
+
 #### 6.1.4 Testing Patterns and Best Practices
 - Page Object Model for UI test organization
 - Test data factories for consistent test data
@@ -1540,6 +1738,15 @@ sequenceDiagram
 - Test retries for flaky test management
 - Test environment isolation
 - Continuous testing in CI/CD pipeline
+
+##### 6.1.4.1 Test Infrastructure
+- **Test Database**: Dedicated PostgreSQL instance for testing with automatic reset
+- **Containerized Testing**: Docker containers for consistent test environments
+- **Test Data Management**: Automated test data setup and teardown
+- **Performance Testing Infrastructure**: Dedicated environment for load testing
+- **Browser Testing Grid**: Selenium grid for cross-browser testing
+- **Mobile Device Cloud**: Access to real mobile devices for testing
+- **Test Reporting Dashboard**: Centralized test results and metrics visualization
 
 #### 6.1.5 Specialized Testing
 - Internationalization testing for multi-language support
@@ -1561,6 +1768,15 @@ sequenceDiagram
 - Utility function testing
 - Exception handling testing
 
+##### 6.2.1.1 Testable Service Design
+- **Single Responsibility Services**: Each service handles one domain area
+- **Injectable Dependencies**: All external dependencies injected through constructor
+- **Interface Contracts**: Services implement interfaces for easy mocking
+- **Pure Business Logic**: Business methods without side effects when possible
+- **Configurable Behavior**: Behavior controlled through configuration parameters
+- **Event Publishing**: Services publish domain events for loose coupling
+- **Transaction Management**: Clear transaction boundaries for data consistency
+
 #### 6.2.2 Integration Testing
 - Database integration testing with test databases
 - Repository pattern testing with TypeORM
@@ -1570,6 +1786,24 @@ sequenceDiagram
 - Message queue integration testing
 - File storage integration testing
 - Cache layer integration testing
+
+##### 6.2.2.1 Test Data Management
+- **Test Data Factories**: Reusable data generation functions for consistent test data
+- **Fixture Management**: Predefined test data sets for common scenarios
+- **Data Seeding Scripts**: Automated test database population
+- **Data Cleanup Strategies**: Automatic test data cleanup between tests
+- **Anonymized Production Data**: Sanitized production data for realistic testing
+- **Data Versioning**: Version-controlled test data schemas
+- **Test Data Isolation**: Separate test data per test run to prevent interference
+
+##### 6.2.2.2 Integration Test Patterns
+- **Database Transaction Rollback**: Use database transactions that are rolled back after each test
+- **Service Integration Testing**: Test service interactions with real dependencies in controlled environments
+- **API Contract Testing**: Verify API contracts between services using Pact or similar tools
+- **Message Queue Testing**: Test event-driven communication with in-memory message brokers
+- **External API Mocking**: Mock external services while testing integration points
+- **Repository Integration Testing**: Test database operations with real database instances
+- **Authentication Integration Testing**: Test full authentication flows with real JWT tokens
 
 #### 6.2.3 Load and Performance Testing
 - Stress testing with Artillery or k6
@@ -1599,6 +1833,15 @@ sequenceDiagram
 - Disaster recovery testing
 - Compliance testing (GDPR, CCPA, etc.)
 - Audit trail verification testing
+
+##### 6.2.5.1 Test Coverage and Quality Metrics
+- **Code Coverage Targets**: 80%+ coverage for unit tests, 70%+ for integration tests
+- **Mutation Testing**: Verify test quality with mutation testing tools
+- **Test Execution Time**: Monitor and optimize test suite execution times
+- **Flaky Test Detection**: Automated detection and reporting of flaky tests
+- **Test Coverage Analysis**: Per-module coverage analysis and reporting
+- **Performance Benchmarks**: Track performance metrics over time
+- **Security Test Coverage**: Measure security testing coverage across attack vectors
 
 ## 7. Deployment Considerations
 
@@ -1639,6 +1882,15 @@ sequenceDiagram
 - Business metrics tracking
 - Alerting and notification systems
 - Log retention and archival policies
+
+#### 7.3.1 Test-Related Observability
+- **Test Execution Metrics**: Track test execution times, success rates, and coverage
+- **Flaky Test Monitoring**: Identify and track flaky test occurrences
+- **Test Environment Health**: Monitor test environment availability and performance
+- **Test Data Quality**: Monitor test data consistency and freshness
+- **CI/CD Pipeline Metrics**: Track build times, test times, and deployment frequency
+- **Test Coverage Trends**: Monitor code coverage changes over time
+- **Performance Test Results**: Track performance benchmarks and regression detection
 
 ### 7.4 Security Considerations
 - Environment variable management with secrets management
@@ -1703,6 +1955,16 @@ sequenceDiagram
 - **Security scanning** integrated into pipeline
 - **Accessibility testing** automated in pipeline
 
+##### 8.3.1.1 Continuous Testing Architecture
+- **Test Stage Gating**: Automated test execution blocking deployment on failure
+- **Parallel Test Execution**: Distributed test runs across multiple workers
+- **Test Result Aggregation**: Centralized test reporting across all test types
+- **Flaky Test Quarantine**: Automatic isolation of flaky tests to maintain pipeline reliability
+- **Test Impact Analysis**: Selective test execution based on code changes
+- **Test Environment Management**: Automated provisioning and cleanup of test environments
+- **Test Data Management**: Automated test data setup and teardown in CI/CD
+- **Test Performance Monitoring**: Track test execution times and identify bottlenecks
+
 #### 8.3.2 Release Management
 - **Release notes generation** from commit messages
 - **Changelog management** with automated tools
@@ -1710,11 +1972,80 @@ sequenceDiagram
 - **Incident management** integration with monitoring
 - **Feedback loops** from production to development
 
-## 9. Conclusion
+## 9. Testing Tools and Frameworks
+
+### 9.1 Frontend Testing Tools
+- **Jest**: JavaScript testing framework for unit and integration tests
+- **React Testing Library**: Component testing utilities for React applications
+- **Cypress**: End-to-end testing framework for web applications
+- **MSW**: Mock Service Worker for API mocking in browser and Node.js
+- **Storybook**: UI component development and testing environment
+- **axe-core**: Accessibility testing utilities
+- **Lighthouse**: Web performance and accessibility auditing
+
+### 9.2 Backend Testing Tools
+- **Jest**: JavaScript testing framework for unit and integration tests
+- **Supertest**: HTTP assertion library for API testing
+- **TypeORM**: ORM testing utilities and database migration tools
+- **Pact**: Contract testing framework for microservices
+- **Artillery**: Load and performance testing toolkit
+- **Sinon**: Standalone test spies, stubs, and mocks
+
+### 9.3 Cross-Cutting Testing Tools
+- **Docker**: Containerization for consistent test environments
+- **GitHub Actions**: CI/CD pipeline automation
+- **SonarQube**: Code quality and security analysis
+- **Snyk**: Security vulnerability scanning
+- **Postman**: API testing and documentation
+- **New Relic**: Application performance monitoring
+
+## 10. Testing Patterns and Anti-Patterns
+
+### 8.1 Testing Patterns
+- **Arrange-Act-Assert**: Clear test structure with setup, execution, and verification phases
+- **Given-When-Then**: Behavior-driven testing approach for clear test scenarios
+- **Test Data Builder**: Fluent interface for creating test data with default values
+- **Object Mother**: Centralized test data creation with predefined scenarios
+- **Test Hook**: Lifecycle methods for setup and teardown operations
+- **Parameterized Tests**: Run same test logic with different input data
+- **Contract Tests**: Verify interface contracts between components
+- **Snapshot Tests**: Capture and verify component output automatically
+
+### 8.2 Testing Anti-Patterns
+- **Test Code Duplication**: Repeating setup code instead of using test utilities
+- **Over-Mocking**: Mocking everything instead of testing real interactions
+- **Brittle Tests**: Tests that break easily with minor implementation changes
+- **Slow Tests**: Tests that take too long to execute, slowing down development
+- **Test Order Dependency**: Tests that depend on execution order for success
+- **Incomplete Coverage**: Missing edge cases and error conditions in tests
+- **Magic Values**: Hardcoded values in tests instead of named constants
+- **Testing Implementation Details**: Tests coupled to internal implementation rather than behavior
+
+## 11. Test-Driven Development Practices
+
+### 10.1 TDD Workflow
+- **Red-Green-Refactor**: Write failing test, implement solution, refactor for quality
+- **Baby Steps**: Implement functionality in small, incremental steps
+- **Outside-In Development**: Start with acceptance tests, work down to unit tests
+- **Mockist vs Classicist**: Choose mocking approach based on architectural preferences
+
+### 10.2 TDD Benefits
+- **Design Quality**: Better design through testability requirements
+- **Documentation**: Tests serve as living documentation
+- **Regression Prevention**: Immediate feedback on breaking changes
+- **Confidence**: High confidence in code changes and refactoring
+
+### 10.3 TDD Challenges
+- **Learning Curve**: Initial investment in learning TDD practices
+- **Test Maintenance**: Ongoing effort to maintain test suites
+- **Speed of Development**: Initial slower pace with long-term benefits
+- **Legacy Code**: Challenges in applying TDD to existing codebases
+
+## 12. Conclusion
 
 The To-Do List and Time Planner application architecture has been designed as a modern, scalable, and maintainable solution that leverages the strengths of Next.js for the frontend and NestJS for the backend. The design incorporates industry best practices for performance, security, and user experience while providing a solid foundation for future growth and feature expansion.
 
-### 9.1 Key Design Decisions
+### 12.1 Key Design Decisions
 
 1. **Technology Stack**: The choice of Next.js and NestJS provides a unified TypeScript development experience across the entire stack, reducing context switching and improving developer productivity.
 
@@ -1726,7 +2057,7 @@ The To-Do List and Time Planner application architecture has been designed as a 
 
 5. **Security**: Multi-layered security approach with authentication, authorization, and data protection mechanisms.
 
-### 9.2 Future Considerations
+### 12.2 Future Considerations
 
 1. **Mobile Application**: The API-first approach facilitates future mobile app development for iOS and Android platforms.
 
