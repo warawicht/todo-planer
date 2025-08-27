@@ -2448,11 +2448,133 @@ These features are not currently planned but may be considered for future releas
 - Dedicated infrastructure options
 - Advanced analytics and business intelligence
 
-## 14. Conclusion
+## 14. User Stories
+
+### 14.1 User Personas
+
+#### 14.1.1 The Busy Professional
+- **Name**: Sarah, 32
+- **Role**: Marketing Manager at a tech company
+- **Goals**: Manage multiple projects, coordinate with team members, meet tight deadlines
+- **Frustrations**: Overwhelmed by scattered tasks, difficulty tracking time spent on activities
+- **Technology Comfort**: High, uses multiple productivity tools daily
+
+#### 14.1.2 The University Student
+- **Name**: Alex, 20
+- **Role**: Computer Science student
+- **Goals**: Balance coursework, part-time job, and social life
+- **Frustrations**: Procrastination, difficulty prioritizing assignments
+- **Technology Comfort**: High, tech-savvy with attention to mobile apps
+
+#### 14.1.3 The Freelancer
+- **Name**: Michael, 28
+- **Role**: Freelance graphic designer
+- **Goals**: Track project time, manage client deadlines, maintain work-life balance
+- **Frustrations**: Inconsistent income tracking, difficulty separating work and personal tasks
+- **Technology Comfort**: Medium, comfortable with essential digital tools
+
+#### 14.1.4 The Stay-at-Home Parent
+- **Name**: Jennifer, 35
+- **Role**: Managing household and part-time remote work
+- **Goals**: Balance family responsibilities with personal projects
+- **Frustrations**: Limited uninterrupted work time, difficulty maintaining routines
+- **Technology Comfort**: Medium, uses technology for communication and basic tasks
+
+### 14.2 Core User Stories
+
+#### 14.2.1 Authentication and User Management
+- **As a** new user, **I want to** register for an account **so that** I can start using the application
+- **As a** registered user, **I want to** log in to my account **so that** I can access my tasks and schedule
+- **As a** user, **I want to** reset my password **so that** I can regain access if I forget it
+- **As a** user, **I want to** update my profile information **so that** my account reflects my current details
+- **As a** user, **I want to** securely log out of my account **so that** my data is protected on shared devices
+
+#### 14.2.2 Task Management
+- **As a** user, **I want to** create a new task with a title and description **so that** I can capture what needs to be done
+- **As a** user, **I want to** set due dates and priorities for tasks **so that** I can focus on what's important and urgent
+- **As a** user, **I want to** categorize tasks into projects **so that** I can organize my work effectively
+- **As a** user, **I want to** mark tasks as complete **so that** I can track my progress
+- **As a** user, **I want to** edit existing tasks **so that** I can update information as needed
+- **As a** user, **I want to** delete tasks I no longer need **so that** my task list stays relevant
+- **As a** user, **I want to** add subtasks to complex tasks **so that** I can break down large projects
+- **As a** user, **I want to** attach files to tasks **so that** I can keep relevant documents organized
+- **As a** user, **I want to** tag tasks with custom labels **so that** I can filter and group them by context
+- **As a** user, **I want to** set estimated time for tasks **so that** I can plan my schedule more effectively
+
+#### 14.2.3 Time Blocking
+- **As a** user, **I want to** create time blocks on my calendar **so that** I can allocate specific time for tasks
+- **As a** user, **I want to** link tasks to time blocks **so that** I can track time spent on specific activities
+- **As a** user, **I want to** visualize my schedule in day, week, and month views **so that** I can plan short and long-term activities
+- **As a** user, **I want to** receive conflict warnings when scheduling overlapping time blocks **so that** I can avoid overbooking myself
+- **As a** user, **I want to** drag and drop time blocks to reschedule them **so that** I can easily adjust my plans
+- **As a** user, **I want to** set recurring time blocks for regular activities **so that** I don't have to manually schedule them each week
+- **As a** user, **I want to** color-code time blocks **so that** I can visually distinguish between different types of activities
+
+#### 14.2.4 Productivity Tracking
+- **As a** user, **I want to** view statistics on completed tasks **so that** I can measure my productivity
+- **As a** user, **I want to** track time spent on tasks **so that** I can identify where my time goes
+- **As a** user, **I want to** see productivity trends over time **so that** I can improve my habits
+- **As a** user, **I want to** set productivity goals **so that** I can work toward specific targets
+- **As a** user, **I want to** receive insights on my productivity patterns **so that** I can optimize my schedule
+
+#### 14.2.5 Notifications and Reminders
+- **As a** user, **I want to** receive reminders before task due dates **so that** I don't miss important deadlines
+- **As a** user, **I want to** get notifications when time blocks are about to start **so that** I can prepare for activities
+- **As a** user, **I want to** customize notification preferences **so that** I'm not overwhelmed by alerts
+- **As a** user, **I want to** set up recurring reminders for habits **so that** I can build positive routines
+- **As a** user, **I want to** receive summary emails of upcoming tasks **so that** I can plan my day
+
+#### 14.2.6 Collaboration Features
+- **As a** team member, **I want to** share tasks with colleagues **so that** we can collaborate on projects
+- **As a** team member, **I want to** assign tasks to others **so that** responsibilities are clearly defined
+- **As a** team member, **I want to** comment on shared tasks **so that** we can communicate context
+- **As a** team member, **I want to** see team members' availability **so that** I can schedule meetings effectively
+- **As a** team member, **I want to** receive notifications when assigned tasks are updated **so that** I stay informed of progress
+
+#### 14.2.7 Search and Filtering
+- **As a** user, **I want to** search for tasks by keywords **so that** I can quickly find specific items
+- **As a** user, **I want to** filter tasks by project, priority, or due date **so that** I can focus on relevant items
+- **As a** user, **I want to** sort tasks by different criteria **so that** I can view them in my preferred order
+- **As a** user, **I want to** view overdue tasks separately **so that** I can catch up on missed items
+
+#### 14.2.8 Mobile and Offline Access
+- **As a** user on the go, **I want to** access my tasks from a mobile device **so that** I can manage my schedule anywhere
+- **As a** user with intermittent connectivity, **I want to** use the app offline **so that** I can continue working without internet
+- **As a** user, **I want to** have my changes sync when I reconnect **so that** my data stays consistent across devices
+
+#### 14.2.9 Settings and Customization
+- **As a** user, **I want to** customize the app's theme and appearance **so that** it matches my preferences
+- **As a** user, **I want to** set my preferred timezone **so that** times display correctly
+- **As a** user, **I want to** configure notification settings **so that** I receive alerts in my preferred way
+- **As a** user, **I want to** export my data **so that** I can back it up or move to another service
+- **As a** user, **I want to** integrate with my calendar service **so that** all my scheduling is in one place
+
+### 14.3 Advanced User Stories
+
+#### 14.3.1 AI-Powered Features
+- **As a** user, **I want to** receive smart scheduling suggestions **so that** I can optimize my time allocation
+- **As a** user, **I want to** get productivity insights based on my patterns **so that** I can improve my habits
+- **As a** user, **I want to** have tasks automatically prioritized **so that** I focus on what matters most
+- **As a** user, **I want to** receive natural language processing for task creation **so that** I can quickly add items via text
+
+#### 14.3.2 Analytics and Reporting
+- **As a** user, **I want to** view detailed reports on time spent **so that** I can bill clients accurately
+- **As a** user, **I want to** see productivity trends over weeks and months **so that** I can identify patterns
+- **As a** user, **I want to** compare my productivity to goals **so that** I can measure success
+- **As a** user, **I want to** export reports in various formats **so that** I can share them with others
+
+#### 14.3.3 Team and Enterprise Features
+- **As a** team leader, **I want to** view team member workloads **so that** I can distribute tasks fairly
+- **As a** team leader, **I want to** generate team productivity reports **so that** I can assess performance
+- **As a** team member, **I want to** see shared team calendars **so that** I can coordinate with colleagues
+- **As an** administrator, **I want to** manage user permissions **so that** data access is controlled appropriately
+- **As an** administrator, **I want to** set up custom workflows **so that** our processes are standardized
+
+## 15. Conclusion
 
 The To-Do List and Time Planner application architecture has been designed as a modern, scalable, and maintainable solution that leverages the strengths of Next.js for the frontend and NestJS for the backend. The design incorporates industry best practices for performance, security, and user experience while providing a solid foundation for future growth and feature expansion.
 
-### 14.1 Key Design Decisions
+### 15.1 Key Design Decisions
 
 1. **Technology Stack**: The choice of Next.js and NestJS provides a unified TypeScript development experience across the entire stack, reducing context switching and improving developer productivity.
 
@@ -2464,7 +2586,7 @@ The To-Do List and Time Planner application architecture has been designed as a 
 
 5. **Security**: Multi-layered security approach with authentication, authorization, and data protection mechanisms.
 
-### 14.2 Future Considerations
+### 15.2 Future Considerations
 
 1. **Mobile Application**: The API-first approach facilitates future mobile app development for iOS and Android platforms.
 
