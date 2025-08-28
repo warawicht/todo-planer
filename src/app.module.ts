@@ -12,6 +12,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { TagsModule } from './tags/tags.module';
 import { TimeBlocksModule } from './time-blocks/time-blocks.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SettingsModule } from './settings/settings.module';
 import { User } from './users/user.entity';
 import { RefreshToken } from './auth/refresh-token.entity';
 import { Task } from './tasks/entities/task.entity';
@@ -28,6 +29,11 @@ import { ProductivityStatistic } from './productivity-tracking/entities/producti
 import { TimeEntry } from './productivity-tracking/entities/time-entry.entity';
 import { TrendData } from './productivity-tracking/entities/trend-data.entity';
 import { DashboardWidget } from './productivity-tracking/entities/dashboard-widget.entity';
+// Settings Entities
+import { ThemePreference } from './settings/entities/theme-preference.entity';
+import { TimezonePreference } from './settings/entities/timezone-preference.entity';
+import { ProfilePreference } from './settings/entities/profile-preference.entity';
+import { DataExport } from './settings/entities/data-export.entity';
 
 @Module({
   imports: [
@@ -54,7 +60,12 @@ import { DashboardWidget } from './productivity-tracking/entities/dashboard-widg
         ProductivityStatistic,
         TimeEntry,
         TrendData,
-        DashboardWidget
+        DashboardWidget,
+        // Settings Entities
+        ThemePreference,
+        TimezonePreference,
+        ProfilePreference,
+        DataExport
       ],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
@@ -69,6 +80,7 @@ import { DashboardWidget } from './productivity-tracking/entities/dashboard-widg
     TagsModule,
     TimeBlocksModule,
     NotificationsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [
