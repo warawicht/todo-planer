@@ -18,6 +18,7 @@ import { TaskAttachment } from './tasks/entities/attachments/task-attachment.ent
 import { Project } from './projects/entities/project.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { TimeBlock } from './time-blocks/entities/time-block.entity';
+import { CalendarViewPreference } from './users/entities/calendar-view-preference.entity';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { TimeBlock } from './time-blocks/entities/time-block.entity';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'todo_planer',
-      entities: [User, RefreshToken, Task, TaskAttachment, Project, Tag, TimeBlock],
+      entities: [User, RefreshToken, Task, TaskAttachment, Project, Tag, TimeBlock, CalendarViewPreference],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     MulterModule.register({

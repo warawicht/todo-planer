@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { RefreshToken } from '../auth/refresh-token.entity';
 import { Task } from '../tasks/entities/task.entity';
@@ -6,6 +6,7 @@ import { Project } from '../projects/entities/project.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from '../tasks/entities/attachments/task-attachment.entity';
+import { CalendarViewPreference } from './entities/calendar-view-preference.entity';
 
 @Entity('users')
 export class User {
@@ -73,4 +74,7 @@ export class User {
   
   @OneToMany(() => TaskAttachment, taskAttachment => taskAttachment.user)
   taskAttachments: TaskAttachment[];
+  
+  @OneToOne(() => CalendarViewPreference, calendarViewPreference => calendarViewPreference.user)
+  calendarViewPreference: CalendarViewPreference;
 }

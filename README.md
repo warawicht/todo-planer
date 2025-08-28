@@ -95,6 +95,18 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
 
+## Calendar Views Frontend Components
+
+This project includes React frontend components for calendar views located in the [frontend](frontend) directory:
+
+- Day, Week, and Month views
+- Navigation controls
+- Keyboard shortcuts
+- Responsive design
+- Performance optimized rendering
+
+For more information about the frontend components and how to test them, see [frontend/README.md](frontend/README.md) and [frontend/TESTING.md](frontend/TESTING.md).
+
 ## Authentication Tests
 
 The authentication system includes comprehensive tests:

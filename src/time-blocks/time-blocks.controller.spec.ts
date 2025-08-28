@@ -4,6 +4,7 @@ import { TimeBlocksService } from './time-blocks.service';
 import { CreateTimeBlockDto } from './dto/create-time-block.dto';
 import { UpdateTimeBlockDto } from './dto/update-time-block.dto';
 import { TimeBlockQueryDto } from './dto/time-block-query.dto';
+import { CalendarViewQueryDto } from './dto/calendar-view.dto';
 
 const mockTimeBlocksService = {
   create: jest.fn(),
@@ -11,6 +12,7 @@ const mockTimeBlocksService = {
   findOne: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  getCalendarView: jest.fn(),
 };
 
 describe('TimeBlocksController', () => {
@@ -127,6 +129,32 @@ describe('TimeBlocksController', () => {
 
       expect(await controller.remove(req, id)).toEqual(result);
       expect(service.remove).toHaveBeenCalledWith(req.user.id, id);
+    });
+  });
+
+  describe('getCalendarView', () => {
+    it('should return calendar view data', async () => {
+      const req = { user: { id: 'user-id' } };
+      const query: CalendarViewQueryDto = {
+        view: 'week',
+        date: '2023-06-15T00:00:00Z',
+      };
+      const result = {
+        view: 'week',
+        referenceDate: new Date('2023-06-15T00:00:00Z'),
+        startDate: new Date('2023-06-11T00:00:00Z'),
+        endDate: new Date('2023-06-17T23:59:59.999Z'),
+        timeBlocks: [],
+      };
+
+      mockTimeBlocksService.getCalendarView.mockResolvedValue(result);
+
+      expect(await controller.getCalendarView(req, query)).toBe(result);
+      expect(service.getCalendarView).toHaveBeenCalledWith(
+        req.user.id,
+        query.view,
+        new Date(query.date),
+      );
     });
   });
 });
