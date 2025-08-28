@@ -11,6 +11,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TagsModule } from './tags/tags.module';
 import { TimeBlocksModule } from './time-blocks/time-blocks.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { User } from './users/user.entity';
 import { RefreshToken } from './auth/refresh-token.entity';
 import { Task } from './tasks/entities/task.entity';
@@ -19,6 +20,9 @@ import { Project } from './projects/entities/project.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { TimeBlock } from './time-blocks/entities/time-block.entity';
 import { CalendarViewPreference } from './users/entities/calendar-view-preference.entity';
+import { Notification } from './notifications/entities/notification.entity';
+import { NotificationPreference } from './notifications/entities/notification-preference.entity';
+import { Reminder } from './notifications/entities/reminder.entity';
 
 @Module({
   imports: [
@@ -29,7 +33,7 @@ import { CalendarViewPreference } from './users/entities/calendar-view-preferenc
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'todo_planer',
-      entities: [User, RefreshToken, Task, TaskAttachment, Project, Tag, TimeBlock, CalendarViewPreference],
+      entities: [User, RefreshToken, Task, TaskAttachment, Project, Tag, TimeBlock, CalendarViewPreference, Notification, NotificationPreference, Reminder],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     MulterModule.register({
@@ -42,6 +46,7 @@ import { CalendarViewPreference } from './users/entities/calendar-view-preferenc
     ProjectsModule,
     TagsModule,
     TimeBlocksModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

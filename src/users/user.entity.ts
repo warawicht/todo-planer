@@ -7,6 +7,7 @@ import { Tag } from '../tags/entities/tag.entity';
 import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from '../tasks/entities/attachments/task-attachment.entity';
 import { CalendarViewPreference } from './entities/calendar-view-preference.entity';
+import { Notification } from '../notifications/entities/notification.entity';
 
 @Entity('users')
 export class User {
@@ -77,4 +78,7 @@ export class User {
   
   @OneToOne(() => CalendarViewPreference, calendarViewPreference => calendarViewPreference.user)
   calendarViewPreference: CalendarViewPreference;
+  
+  @OneToMany(() => Notification, notification => notification.user)
+  notifications: Notification[];
 }
