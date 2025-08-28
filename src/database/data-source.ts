@@ -5,6 +5,11 @@ import { Task } from '../tasks/entities/task.entity';
 import { Project } from '../projects/entities/project.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { TimeBlock } from '../time-blocks/entities/time-block.entity';
+// Productivity Tracking Entities
+import { ProductivityStatistic } from '../productivity-tracking/entities/productivity-statistic.entity';
+import { TimeEntry } from '../productivity-tracking/entities/time-entry.entity';
+import { TrendData } from '../productivity-tracking/entities/trend-data.entity';
+import { DashboardWidget } from '../productivity-tracking/entities/dashboard-widget.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -15,7 +20,19 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'todo_planer',
   synchronize: false,
   logging: false,
-  entities: [User, RefreshToken, Task, Project, Tag, TimeBlock],
+  entities: [
+    User, 
+    RefreshToken, 
+    Task, 
+    Project, 
+    Tag, 
+    TimeBlock,
+    // Productivity Tracking Entities
+    ProductivityStatistic,
+    TimeEntry,
+    TrendData,
+    DashboardWidget
+  ],
   migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
   subscribers: [],
 });

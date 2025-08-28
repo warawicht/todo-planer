@@ -6,6 +6,7 @@ import { Tag } from '../../tags/entities/tag.entity';
 import { TimeBlock } from '../../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from './attachments/task-attachment.entity';
 import { Reminder } from '../../notifications/entities/reminder.entity';
+import { TimeEntry } from '../../productivity-tracking/entities/time-entry.entity';
 
 @Entity('tasks')
 export class Task {
@@ -85,4 +86,7 @@ export class Task {
   
   @OneToMany(() => Reminder, reminder => reminder.task, { cascade: true })
   reminders: Reminder[];
+  
+  @OneToMany(() => TimeEntry, timeEntry => timeEntry.task)
+  timeEntries: TimeEntry[];
 }

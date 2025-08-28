@@ -8,6 +8,11 @@ import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from '../tasks/entities/attachments/task-attachment.entity';
 import { CalendarViewPreference } from './entities/calendar-view-preference.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+// Productivity Tracking Entities
+import { ProductivityStatistic } from '../productivity-tracking/entities/productivity-statistic.entity';
+import { TimeEntry } from '../productivity-tracking/entities/time-entry.entity';
+import { TrendData } from '../productivity-tracking/entities/trend-data.entity';
+import { DashboardWidget } from '../productivity-tracking/entities/dashboard-widget.entity';
 
 @Entity('users')
 export class User {
@@ -81,4 +86,17 @@ export class User {
   
   @OneToMany(() => Notification, notification => notification.user)
   notifications: Notification[];
+  
+  // Productivity Tracking Relationships
+  @OneToMany(() => ProductivityStatistic, statistic => statistic.user)
+  productivityStatistics: ProductivityStatistic[];
+  
+  @OneToMany(() => TimeEntry, timeEntry => timeEntry.user)
+  timeEntries: TimeEntry[];
+  
+  @OneToMany(() => TrendData, trendData => trendData.user)
+  trendData: TrendData[];
+  
+  @OneToMany(() => DashboardWidget, dashboardWidget => dashboardWidget.user)
+  dashboardWidgets: DashboardWidget[];
 }

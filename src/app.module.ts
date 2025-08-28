@@ -23,6 +23,11 @@ import { CalendarViewPreference } from './users/entities/calendar-view-preferenc
 import { Notification } from './notifications/entities/notification.entity';
 import { NotificationPreference } from './notifications/entities/notification-preference.entity';
 import { Reminder } from './notifications/entities/reminder.entity';
+// Productivity Tracking Entities
+import { ProductivityStatistic } from './productivity-tracking/entities/productivity-statistic.entity';
+import { TimeEntry } from './productivity-tracking/entities/time-entry.entity';
+import { TrendData } from './productivity-tracking/entities/trend-data.entity';
+import { DashboardWidget } from './productivity-tracking/entities/dashboard-widget.entity';
 
 @Module({
   imports: [
@@ -33,7 +38,24 @@ import { Reminder } from './notifications/entities/reminder.entity';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'todo_planer',
-      entities: [User, RefreshToken, Task, TaskAttachment, Project, Tag, TimeBlock, CalendarViewPreference, Notification, NotificationPreference, Reminder],
+      entities: [
+        User, 
+        RefreshToken, 
+        Task, 
+        TaskAttachment, 
+        Project, 
+        Tag, 
+        TimeBlock, 
+        CalendarViewPreference, 
+        Notification, 
+        NotificationPreference, 
+        Reminder,
+        // Productivity Tracking Entities
+        ProductivityStatistic,
+        TimeEntry,
+        TrendData,
+        DashboardWidget
+      ],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     MulterModule.register({
