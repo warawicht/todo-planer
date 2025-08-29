@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build --path src",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -21,9 +21,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm migration:generate -- -d src/database/data-source.ts",
-    "migration:run": "npm run typeorm migration:run -- -d src/database/data-source.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d src/database/data-source.ts",
+    "migration:generate": "npm run typeorm migration:generate -- -d backend/database/data-source.ts",
+    "migration:run": "npm run typeorm migration:run -- -d backend/database/data-source.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d backend/database/data-source.ts",
     "frontend:dev": "cd frontend && vite",
     "frontend:build": "cd frontend && vite build",
     "frontend:preview": "cd frontend && vite preview"

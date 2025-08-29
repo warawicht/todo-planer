@@ -3,18 +3,17 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { TaskSharingModule } from '../src/collaboration/task-sharing/task-sharing.module';
-import { TaskAssignmentModule } from '../src/collaboration/task-assignment/task-assignment.module';
-import { CommentsModule } from '../src/collaboration/comments/comments.module';
-import { AvailabilityModule } from '../src/collaboration/availability/availability.module';
-import { AuthModule } from '../src/auth/auth.module';
-import { TasksModule } from '../src/tasks/tasks.module';
-import { UsersModule } from '../src/users/users.module';
-import { DatabaseModule } from '../src/database/database.module';
+import { TaskSharingModule } from '../backend/collaboration/task-sharing/task-sharing.module';
+import { TaskAssignmentModule } from '../backend/collaboration/task-assignment/task-assignment.module';
+import { CommentsModule } from '../backend/collaboration/comments/comments.module';
+import { AvailabilityModule } from '../backend/collaboration/availability/availability.module';
+import { AuthModule } from '../backend/auth/auth.module';
+import { TasksModule } from '../backend/tasks/tasks.module';
+import { UsersModule } from '../backend/users/users.module';
+
 
 describe('Collaboration (e2e)', () => {
   let app: INestApplication;
-  let dataSource: DataSource;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -22,10 +21,9 @@ describe('Collaboration (e2e)', () => {
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
-          entities: [__dirname + '/../src/**/*.entity{.ts,.js}'],
+          entities: [__dirname + '/../backend/**/*.entity{.ts,.js}'],
           synchronize: true,
         }),
-        DatabaseModule,
         AuthModule,
         UsersModule,
         TasksModule,
@@ -38,11 +36,9 @@ describe('Collaboration (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    dataSource = moduleFixture.get(DataSource);
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
     await app.close();
   });
 

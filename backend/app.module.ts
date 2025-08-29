@@ -14,7 +14,7 @@ import { TimeBlocksModule } from './time-blocks/time-blocks.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SettingsModule } from './settings/settings.module';
 import { AISchedulingModule } from './ai-scheduling/ai-scheduling.module';
-import { OfflineModule } from './offline/offline.module';
+
 import { User } from './users/user.entity';
 import { RefreshToken } from './auth/refresh-token.entity';
 import { Task } from './tasks/entities/task.entity';
@@ -133,7 +133,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
     NotificationsModule,
     SettingsModule,
     AISchedulingModule,
-    OfflineModule,
+    
     EnterpriseModule,
     CollaborationModule,
   ],

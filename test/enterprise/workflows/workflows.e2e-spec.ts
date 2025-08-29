@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkflowsModule } from '../../src/enterprise/workflows/workflows.module';
-import { Workflow } from '../../src/enterprise/entities/workflow.entity';
-import { WorkflowInstance } from '../../src/enterprise/entities/workflow-instance.entity';
+import { WorkflowsModule } from '../../backend/enterprise/workflows/workflows.module';
+import { Workflow } from '../../backend/enterprise/entities/workflow.entity';
+import { WorkflowInstance } from '../../backend/enterprise/entities/workflow-instance.entity';
 
 describe('WorkflowsController (e2e)', () => {
   let app: INestApplication;

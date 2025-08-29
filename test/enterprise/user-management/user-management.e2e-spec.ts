@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserManagementModule } from '../../src/enterprise/user-management/user-management.module';
-import { User } from '../../src/users/user.entity';
-import { Role } from '../../src/enterprise/entities/role.entity';
-import { UserRole } from '../../src/enterprise/entities/user-role.entity';
+import { UserManagementModule } from '../../backend/enterprise/user-management/user-management.module';
+import { User } from '../../backend/users/user.entity';
+import { Role } from '../../backend/enterprise/entities/role.entity';
+import { UserRole } from '../../backend/enterprise/entities/user-role.entity';
 
 describe('UserManagementController (e2e)', () => {
   let app: INestApplication;

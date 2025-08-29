@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThemePreference } from '../../src/settings/entities/theme-preference.entity';
-import { User } from '../../src/users/user.entity';
-import { SettingsModule } from '../../src/settings/settings.module';
-import { AuthModule } from '../../src/auth/auth.module';
-import { UsersModule } from '../../src/users/users.module';
+import { ThemePreference } from '../../backend/settings/entities/theme-preference.entity';
+import { User } from '../../backend/users/user.entity';
+import { SettingsModule } from '../../backend/settings/settings.module';
+import { AuthModule } from '../../backend/auth/auth.module';
+import { UsersModule } from '../../backend/users/users.module';
 
 describe('ThemePreferenceController (e2e)', () => {
   let app: INestApplication;

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ProductivityTrackingModule } from '../src/productivity-tracking/productivity-tracking.module';
+import { ProductivityTrackingModule } from '../backend/productivity-tracking/productivity-tracking.module';
 
 describe('ProductivityTrackingController (e2e)', () => {
   let app: INestApplication;
