@@ -13,6 +13,7 @@ import { TagsModule } from './tags/tags.module';
 import { TimeBlocksModule } from './time-blocks/time-blocks.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SettingsModule } from './settings/settings.module';
+import { AISchedulingModule } from './ai-scheduling/ai-scheduling.module';
 import { User } from './users/user.entity';
 import { RefreshToken } from './auth/refresh-token.entity';
 import { Task } from './tasks/entities/task.entity';
@@ -34,6 +35,11 @@ import { ThemePreference } from './settings/entities/theme-preference.entity';
 import { TimezonePreference } from './settings/entities/timezone-preference.entity';
 import { ProfilePreference } from './settings/entities/profile-preference.entity';
 import { DataExport } from './settings/entities/data-export.entity';
+// AI Scheduling Entities
+import { AISuggestion } from './ai-scheduling/entities/ai-suggestion.entity';
+import { ProductivityPattern } from './ai-scheduling/entities/productivity-pattern.entity';
+import { TaskPriorityRecommendation } from './ai-scheduling/entities/task-priority-recommendation.entity';
+import { NLPProcessedTask } from './ai-scheduling/entities/nlp-processed-task.entity';
 
 @Module({
   imports: [
@@ -65,7 +71,12 @@ import { DataExport } from './settings/entities/data-export.entity';
         ThemePreference,
         TimezonePreference,
         ProfilePreference,
-        DataExport
+        DataExport,
+        // AI Scheduling Entities
+        AISuggestion,
+        ProductivityPattern,
+        TaskPriorityRecommendation,
+        NLPProcessedTask
       ],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
@@ -81,6 +92,7 @@ import { DataExport } from './settings/entities/data-export.entity';
     TimeBlocksModule,
     NotificationsModule,
     SettingsModule,
+    AISchedulingModule,
   ],
   controllers: [AppController],
   providers: [
