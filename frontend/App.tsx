@@ -1,4 +1,16 @@
-// ... existing imports ...
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Login } from './components/Login';
+import { Register } from './components/Register';
+import { ForgotPassword } from './components/ForgotPassword';
+import { ResetPassword } from './components/ResetPassword';
+import { Calendar } from './components/Calendar';
+import { Dashboard } from './components/Dashboard';
+import NetworkStatusIndicator from './components/NetworkStatusIndicator';
+import NotificationPanel from './components/NotificationPanel';
+import ErrorBoundary from './components/ErrorBoundary';
+import { CalendarViewType } from './types/calendar.types';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
