@@ -42,6 +42,13 @@ export class Task {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // Version tracking for sync functionality
+  @Column({ type: 'int', default: 1 })
+  version: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastSynced: Date;
+
   // Subtask relationships
   @Column({ nullable: true })
   parentId: string;

@@ -29,6 +29,13 @@ export class Project {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // Version tracking for sync functionality
+  @Column({ type: 'int', default: 1 })
+  version: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastSynced: Date;
+
   @ManyToOne(() => User, user => user.projects, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
