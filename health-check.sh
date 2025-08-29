@@ -1,14 +1,21 @@
 #!/bin/bash
 
-# Health check script for the authentication system
+# Health check script for the todo-planer application
 echo "Performing health check..."
 
-# Check if the application is running
+# Check if the backend application is running
 if curl -s http://localhost:3000/health > /dev/null; then
-  echo "✅ Application is running and healthy"
+  echo "✅ Backend application is running and healthy"
 else
-  echo "❌ Application is not responding"
+  echo "❌ Backend application is not responding"
   exit 1
+fi
+
+# Check if the frontend application is running
+if curl -s http://localhost:3001 > /dev/null; then
+  echo "✅ Frontend application is running and accessible"
+else
+  echo "❌ Frontend application is not responding"
 fi
 
 # Check if the auth endpoints are accessible

@@ -26,27 +26,37 @@ if [ ! -d "node_modules" ]; then
   }
 fi
 
-# Try to build the application
-if command -v nest &> /dev/null; then
-  echo "Building application with NestJS CLI..."
-  nest build || {
-    echo "Build failed. This may be due to missing dependencies."
-    echo "Attempting to start the application anyway..."
-  }
-else
-  echo "NestJS CLI not found. Using npm to build..."
-  npm run build || echo "Build failed, but continuing to start the application..."
-fi
+# Build both frontend and backend applications
+echo "Building frontend and backend applications..."
+npm run build && npm run frontend:build || {
+  echo "Build failed. This may be due to missing dependencies."
+  echo "Attempting to start the application anyway..."
+}
 
-# Start the application in development mode
-echo "Starting application in development mode..."
-if command -v nest &> /dev/null; then
-  nest start --watch
-else
-  npm run start:dev || {
-    echo "Failed to start application in development mode."
-    echo "Please ensure all dependencies are properly installed."
-    echo "You may need to use a supported Node.js version (18.x, 20.x, or 22.x)."
-    exit 1
-  }
-fi
+# Function to clean up background processes on exit
+cleanup() {
+  echo "Stopping applications..."
+  kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+  exit 0
+}
+
+# Trap SIGINT and SIGTERM to clean up processes
+trap cleanup SIGINT SIGTERM
+
+# Start the backend application in development mode
+echo "Starting backend application in development mode..."
+npm run start:dev &
+BACKEND_PID=$!
+
+# Start the frontend application in development mode
+echo "Starting frontend application in development mode..."
+npm run frontend:dev &
+FRONTEND_PID=$!
+
+echo "Applications started:"
+echo "- Backend running on http://localhost:3000"
+echo "- Frontend running on http://localhost:3001"
+echo "Press Ctrl+C to stop both applications"
+
+# Wait for both processes
+wait $BACKEND_PID $FRONTEND_PID
