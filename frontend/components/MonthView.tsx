@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { CalendarTimeBlock, CalendarViewResponse } from '../types/calendar.types';
-import { getWeeksInMonth, isSameDay, addDays } from '../utils/date.utils';
+import React from 'react';
+import { CalendarViewResponse, CalendarTimeBlock } from '../types/calendar.types';
+import { getWeeksInMonth, isSameDay } from '../utils/date.utils';
 
 interface MonthViewProps {
-  calendarData: CalendarViewResponse | null;
+  calendarData: CalendarViewResponse;
   currentDate: Date;
   onDayClick?: (date: Date) => void;
   onTimeBlockClick?: (timeBlock: CalendarTimeBlock) => void;
@@ -15,132 +15,91 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onDayClick,
   onTimeBlockClick
 }) => {
-  const [weeks, setWeeks] = useState<Date[][]>([]);
-  const [timeBlocksByDay, setTimeBlocksByDay] = useState<Record<string, CalendarTimeBlock[]>>({});
-
-  // Calculate weeks for the month
-  useEffect(() => {
-    const newWeeks = getWeeksInMonth(currentDate.getFullYear(), currentDate.getMonth());
-    setWeeks(newWeeks);
-  }, [currentDate]);
-
-  // Group time blocks by day
-  useEffect(() => {
-    if (!calendarData) return;
-
-    const grouped: Record<string, CalendarTimeBlock[]> = {};
-    
-    calendarData.timeBlocks.forEach(timeBlock => {
-      const dateKey = timeBlock.startTime.toISOString().split('T')[0]; // YYYY-MM-DD
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey].push(timeBlock);
-    });
-    
-    setTimeBlocksByDay(grouped);
-  }, [calendarData]);
-
   // Get time blocks for a specific day
   const getTimeBlocksForDay = (day: Date): CalendarTimeBlock[] => {
-    const dateKey = day.toISOString().split('T')[0]; // YYYY-MM-DD
-    return timeBlocksByDay[dateKey] || [];
+    if (!calendarData?.timeBlocks) return [];
+    
+    return calendarData.timeBlocks.filter(block => {
+      const blockDate = new Date(block.startTime);
+      return isSameDay(blockDate, day);
+    });
   };
 
-  // Check if a day is in the current month
-  const isCurrentMonth = (day: Date): boolean => {
-    return day.getMonth() === currentDate.getMonth() && 
-           day.getFullYear() === currentDate.getFullYear();
-  };
-
-  // Check if a day is today
-  const isToday = (day: Date): boolean => {
-    return isSameDay(day, new Date());
-  };
-
-  // Handle day click
-  const handleDayClick = (day: Date) => {
-    if (onDayClick) {
-      onDayClick(day);
-    }
-  };
-
-  // Render time blocks for a day (limited to 3 for display)
-  const renderDayTimeBlocks = (day: Date) => {
-    const timeBlocks = getTimeBlocksForDay(day);
-    const limitedBlocks = timeBlocks.slice(0, 3);
+  // Render a single day cell
+  const renderDay = (day: Date, isCurrentMonth: boolean) => {
+    const dayTimeBlocks = getTimeBlocksForDay(day);
+    const isToday = isSameDay(day, new Date());
     
     return (
-      <div className="space-y-1 mt-1">
-        {limitedBlocks.map((timeBlock, index) => (
-          <div
-            key={`${timeBlock.id}-${index}`}
-            className="text-xs p-1 rounded truncate cursor-pointer hover:opacity-90"
-            style={{ backgroundColor: timeBlock.color || '#3b82f6' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onTimeBlockClick?.(timeBlock);
-            }}
-          >
-            <span className="text-white truncate">
-              {timeBlock.title}
-            </span>
-          </div>
-        ))}
-        {timeBlocks.length > 3 && (
-          <div className="text-xs text-gray-500">
-            +{timeBlocks.length - 3} more
-          </div>
-        )}
+      <div
+        key={day.toString()}
+        className={`min-h-24 p-1 border border-gray-200 ${
+          isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'
+        } ${isToday ? 'bg-blue-50' : ''}`}
+        onClick={() => onDayClick?.(day)}
+      >
+        <div className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+          {day.getDate()}
+        </div>
+        <div className="mt-1 space-y-1">
+          {dayTimeBlocks.slice(0, 3).map(block => (
+            <div
+              key={block.id}
+              className="text-xs p-1 bg-blue-100 rounded truncate cursor-pointer hover:bg-blue-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onTimeBlockClick?.(block);
+              }}
+            >
+              {block.title}
+            </div>
+          ))}
+          {dayTimeBlocks.length > 3 && (
+            <div className="text-xs text-gray-500">
+              +{dayTimeBlocks.length - 3} more
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
+  // Generate calendar grid
+  const weeks = getWeeksInMonth(currentDate.getFullYear(), currentDate.getMonth());
+  
   return (
-    <div className="flex flex-col h-full">
-      {/* Month header */}
-      <div className="grid grid-cols-7 border-b">
+    <div className="h-full flex flex-col">
+      {/* Day headers */}
+      <div className="grid grid-cols-7 gap-0 border-b">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="text-center p-2 text-sm font-medium text-gray-500">
+          <div key={day} className="p-2 text-center text-sm font-medium text-gray-500 bg-gray-50">
             {day}
           </div>
         ))}
       </div>
       
-      {/* Month body */}
-      <div className="flex-1 overflow-y-auto">
-        {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7">
-            {week.map((day, dayIndex) => {
-              const timeBlocks = getTimeBlocksForDay(day);
-              const isCurrent = isCurrentMonth(day);
-              const isTodayDay = isToday(day);
-              
-              return (
-                <div
-                  key={`${weekIndex}-${dayIndex}`}
-                  className={`min-h-24 border p-1 cursor-pointer hover:bg-gray-50 ${
-                    !isCurrent ? 'bg-gray-50 text-gray-400' : ''
-                  } ${isTodayDay ? 'bg-blue-50' : ''}`}
-                  onClick={() => handleDayClick(day)}
-                >
-                  <div className={`text-right p-1 ${
-                    isTodayDay ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center ml-auto' : ''
-                  }`}>
-                    {day.getDate()}
-                  </div>
-                  {renderDayTimeBlocks(day)}
-                </div>
-              );
-            })}
-          </div>
+      {/* Calendar grid */}
+      <div className="flex-1 grid grid-cols-7 gap-0">
+        {weeks.map((week) => (
+          week.map((day) => {
+            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+            return renderDay(day, isCurrentMonth);
+          })
         ))}
       </div>
       
-      {/* Handle empty state */}
-      {calendarData && calendarData.timeBlocks.length === 0 && (
-        <div className="flex items-center justify-center h-32 text-gray-500">
-          No time blocks scheduled for this month
+      {/* Empty state */}
+      {calendarData.timeBlocks.length === 0 && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No time blocks</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              No time blocks scheduled for this month
+            </p>
+          </div>
         </div>
       )}
     </div>

@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { CalendarTimeBlock, CalendarViewResponse } from '../types/calendar.types';
-import { formatTime, isSameDay } from '../utils/date.utils';
+import React from 'react';
+import { CalendarViewResponse, CalendarTimeBlock } from '../types/calendar.types';
 
 interface DayViewProps {
-  calendarData: CalendarViewResponse | null;
+  calendarData: CalendarViewResponse;
   currentDate: Date;
   onTimeBlockClick?: (timeBlock: CalendarTimeBlock) => void;
   onTimeSlotClick?: (date: Date) => void;
 }
-
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 export const DayView: React.FC<DayViewProps> = ({
   calendarData,
@@ -17,123 +14,90 @@ export const DayView: React.FC<DayViewProps> = ({
   onTimeBlockClick,
   onTimeSlotClick
 }) => {
-  const [currentTimeIndicatorPosition, setCurrentTimeIndicatorPosition] = useState<number>(0);
-  const dayViewRef = useRef<HTMLDivElement>(null);
-
-  // Update current time indicator position
-  useEffect(() => {
-    const updateCurrentTimeIndicator = () => {
-      const now = new Date();
-      if (isSameDay(now, currentDate)) {
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        const position = (hours + minutes / 60) * 60; // 60px per hour
-        setCurrentTimeIndicatorPosition(position);
-      }
-    };
-
-    updateCurrentTimeIndicator();
-    const interval = setInterval(updateCurrentTimeIndicator, 60000); // Update every minute
-
-    return () => clearInterval(interval);
-  }, [currentDate]);
-
+  // Generate time slots (hours from 00:00 to 23:00)
+  const timeSlots = Array(24).fill(null).map((_, i) => i);
+  
+  // Get time blocks for the current day
+  const dayTimeBlocks = calendarData?.timeBlocks || [];
+  
   // Calculate time block position
-  const calculateTimeBlockPosition = (timeBlock: CalendarTimeBlock) => {
-    const startHours = timeBlock.startTime.getHours();
-    const startMinutes = timeBlock.startTime.getMinutes();
-    const endHours = timeBlock.endTime.getHours();
-    const endMinutes = timeBlock.endTime.getMinutes();
+  const calculateBlockPosition = (block: CalendarTimeBlock) => {
+    const startHour = block.startTime.getHours();
+    const startMinute = block.startTime.getMinutes();
+    const endHour = block.endTime.getHours();
+    const endMinute = block.endTime.getMinutes();
     
-    const top = (startHours + startMinutes / 60) * 60; // 60px per hour
-    const height = ((endHours + endMinutes / 60) - (startHours + startMinutes / 60)) * 60;
+    const top = (startHour * 60 + startMinute) * (60 / 60); // 60px per hour
+    const height = ((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) * (60 / 60);
     
     return { top, height };
   };
 
-  // Handle time slot click
-  const handleTimeSlotClick = (hour: number) => {
-    if (onTimeSlotClick) {
-      const clickedDate = new Date(currentDate);
-      clickedDate.setHours(hour, 0, 0, 0);
-      onTimeSlotClick(clickedDate);
-    }
-  };
-
-  // Render time blocks for the current day
-  const renderTimeBlocks = () => {
-    if (!calendarData) return null;
-
-    return calendarData.timeBlocks
-      .filter(tb => isSameDay(tb.startTime, currentDate))
-      .map(timeBlock => {
-        const position = calculateTimeBlockPosition(timeBlock);
-        
-        return (
-          <div
-            key={timeBlock.id}
-            className="absolute left-20 right-2 rounded border p-2 cursor-pointer hover:opacity-90 transition-opacity"
-            style={{
-              top: `${position.top}px`,
-              height: `${position.height}px`,
-              backgroundColor: timeBlock.color || '#3b82f6',
-              minHeight: '20px'
-            }}
-            onClick={() => onTimeBlockClick?.(timeBlock)}
-          >
-            <div className="text-white font-medium text-sm truncate">
-              {timeBlock.title}
-            </div>
-            <div className="text-white text-xs truncate">
-              {formatTime(timeBlock.startTime)} - {formatTime(timeBlock.endTime)}
-            </div>
-          </div>
-        );
-      });
-  };
-
   return (
-    <div className="flex flex-col h-full">
-      <div 
-        ref={dayViewRef}
-        className="flex-1 overflow-y-auto relative"
-        style={{ minHeight: '1440px' }} // 24 hours * 60px
-      >
-        {/* Current time indicator */}
-        {isSameDay(new Date(), currentDate) && (
-          <div 
-            className="absolute left-20 right-2 h-0.5 bg-red-500 z-10"
-            style={{ top: `${currentTimeIndicatorPosition}px` }}
-          >
-            <div className="absolute -top-1.5 -left-3 w-3 h-3 bg-red-500 rounded-full"></div>
-          </div>
-        )}
-        
-        {/* Time slots */}
-        {HOURS.map(hour => (
-          <div 
-            key={hour}
-            className="flex border-b relative hover:bg-gray-50 cursor-pointer"
-            style={{ height: '60px' }}
-            onClick={() => handleTimeSlotClick(hour)}
-          >
-            <div className="w-20 pr-2 text-right text-sm text-gray-500 pt-1">
-              {formatTime(new Date(2023, 0, 1, hour, 0))}
-            </div>
-            <div className="flex-1 border-l pl-2 pt-1">
-              {/* Time block will be positioned absolutely here */}
-            </div>
-          </div>
-        ))}
-        
-        {/* Time blocks */}
-        {renderTimeBlocks()}
+    <div className="h-full flex flex-col">
+      {/* Day header */}
+      <div className="p-4 border-b bg-gray-50">
+        <h2 className="text-xl font-semibold">
+          {currentDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+        </h2>
       </div>
       
-      {/* Handle empty state */}
-      {calendarData && calendarData.timeBlocks.length === 0 && (
-        <div className="flex items-center justify-center h-32 text-gray-500">
-          No time blocks scheduled for this day
+      {/* Time slots and blocks */}
+      <div className="flex-1 overflow-auto relative">
+        <div className="absolute inset-0">
+          {/* Time slots */}
+          {timeSlots.map(hour => (
+            <div 
+              key={hour} 
+              className="h-16 border-b border-gray-100 flex cursor-pointer hover:bg-gray-50"
+              onClick={() => onTimeSlotClick?.(new Date(currentDate.setHours(hour, 0, 0, 0)))}
+            >
+              <div className="w-16 p-1 text-right text-xs text-gray-500 border-r">
+                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+              </div>
+              <div className="flex-1"></div>
+            </div>
+          ))}
+          
+          {/* Time blocks */}
+          {dayTimeBlocks.map(block => {
+            const position = calculateBlockPosition(block);
+            return (
+              <div
+                key={block.id}
+                className="absolute left-16 right-4 bg-blue-500 text-white p-2 rounded cursor-pointer hover:bg-blue-600"
+                style={{
+                  top: `${position.top}px`,
+                  height: `${position.height}px`,
+                }}
+                onClick={() => onTimeBlockClick?.(block)}
+              >
+                <div className="font-medium truncate">{block.title}</div>
+                <div className="truncate">
+                  {block.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                  {block.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                {block.description && (
+                  <div className="text-xs mt-1 truncate">{block.description}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Empty state */}
+      {dayTimeBlocks.length === 0 && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No time blocks</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              No time blocks scheduled for this day
+            </p>
+          </div>
         </div>
       )}
     </div>

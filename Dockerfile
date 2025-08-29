@@ -13,8 +13,15 @@ RUN npm ci --only=production
 # Copy the rest of the application code
 COPY . .
 
-# Build the application
+# Build the backend application
 RUN npm run build
+
+# Build the frontend application
+RUN npm run frontend:build
+
+# Copy frontend build to backend static directory
+RUN mkdir -p dist/src/public
+RUN cp -r frontend/dist/* dist/src/public/
 
 # Expose the port the app runs on
 EXPOSE 3000

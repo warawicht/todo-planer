@@ -26,10 +26,7 @@ const CalendarExample: React.FC = () => {
     // Save preference to backend
   };
 
-  const handleDateChange = (date: Date) => {
-    console.log('Date changed to:', date);
-    // Update URL or save to state
-  };
+
 
   return (
     <div className="h-screen p-4 bg-gray-100">
@@ -41,7 +38,7 @@ const CalendarExample: React.FC = () => {
         onTimeSlotClick={handleTimeSlotClick}
         onDayClick={handleDayClick}
         onViewChange={handleViewChange}
-        onDateChange={handleDateChange}
+
       />
     </div>
   );

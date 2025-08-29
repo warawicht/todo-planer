@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MonthView } from './MonthView';
 import { CalendarViewResponse, CalendarViewType } from '../types';
@@ -87,7 +86,7 @@ describe('MonthView', () => {
   it('handles null calendar data', () => {
     render(
       <MonthView 
-        calendarData={null} 
+        calendarData={null as any} 
         currentDate={currentDate} 
       />
     );

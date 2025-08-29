@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { WeekView } from './WeekView';
 import { CalendarViewResponse, CalendarViewType } from '../types';
@@ -87,7 +86,7 @@ describe('WeekView', () => {
   it('handles null calendar data', () => {
     render(
       <WeekView 
-        calendarData={null} 
+        calendarData={null as any} 
         currentDate={currentDate} 
       />
     );

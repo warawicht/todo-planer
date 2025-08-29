@@ -13,7 +13,7 @@ interface CalendarProps {
   onTimeSlotClick?: (date: Date) => void;
   onDayClick?: (date: Date) => void;
   onViewChange?: (view: CalendarViewType) => void;
-  onDateChange?: (date: Date) => void;
+  // onDateChange?: (date: Date) => void;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
@@ -23,8 +23,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   onTimeBlockClick,
   onTimeSlotClick,
   onDayClick,
-  onViewChange,
-  onDateChange
+  onViewChange
 }) => {
   const {
     currentDate,
@@ -36,7 +35,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     navigateToNext,
     navigateToToday,
     changeView,
-    goToDay,
     refresh
   } = useCalendar({
     initialView,
@@ -89,12 +87,6 @@ export const Calendar: React.FC<CalendarProps> = ({
       default:
         break;
     }
-  };
-
-  // Handle date change
-  const handleDateChange = (newDate: Date) => {
-    goToDay(newDate);
-    onDateChange?.(newDate);
   };
 
   // Format current date for display
@@ -217,7 +209,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           </div>
         )}
         
-        {!loading && !error && (
+        {!loading && !error && calendarData && (
           <>
             {view === CalendarViewType.DAY && (
               <DayView

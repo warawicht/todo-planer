@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DayView } from './DayView';
 import { CalendarViewResponse, CalendarViewType } from '../types';
@@ -81,7 +80,7 @@ describe('DayView', () => {
   it('handles null calendar data', () => {
     render(
       <DayView 
-        calendarData={null} 
+        calendarData={null as any} 
         currentDate={currentDate} 
       />
     );

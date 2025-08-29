@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CalendarViewType, CalendarViewResponse, CalendarViewQuery, CalendarTimeBlock } from '../types/calendar.types';
-import { getStartOfWeek, getEndOfWeek, getStartOfMonth, getEndOfMonth, addDays, addWeeks, addMonths } from '../utils/date.utils';
+import { CalendarViewType, CalendarViewResponse, CalendarViewQuery } from '../types/calendar.types';
+import { addDays, addWeeks, addMonths } from '../utils/date.utils';
 import { CalendarService } from '../services/calendar.service';
 
 interface UseCalendarProps {

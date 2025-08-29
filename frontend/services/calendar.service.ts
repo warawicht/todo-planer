@@ -1,87 +1,79 @@
-import { CalendarViewResponse, CalendarViewQuery, CalendarViewType, CalendarViewPreference } from '../types/calendar.types';
+import axios from 'axios';
+import { CalendarViewResponse, CalendarViewQuery, CalendarViewPreference } from '../types/calendar.types';
 
-// Mock API client - in a real implementation, this would use fetch or axios
-class ApiClient {
-  async get<T>(url: string): Promise<T> {
-    // This is a mock implementation
-    // In a real app, you would use fetch or axios
-    throw new Error('Not implemented');
-  }
-  
-  async post<T>(url: string, data: any): Promise<T> {
-    // This is a mock implementation
-    throw new Error('Not implemented');
-  }
-  
-  async put<T>(url: string, data: any): Promise<T> {
-    // This is a mock implementation
-    throw new Error('Not implemented');
-  }
-}
+// Configure axios base URL (adjust according to your backend URL)
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
-const apiClient = new ApiClient();
+// Create axios instance with default config
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Important for cookie-based authentication
+});
+
+// Add a request interceptor to include auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export class CalendarService {
   static async getCalendarView(query: CalendarViewQuery): Promise<CalendarViewResponse> {
-    // In a real implementation, this would call the backend API
-    // For now, we'll return mock data to demonstrate the structure
-    
-    // Calculate date range based on view type
-    let startDate: Date;
-    let endDate: Date;
-    
-    switch (query.view) {
-      case CalendarViewType.DAY:
-        startDate = new Date(query.referenceDate);
-        endDate = new Date(query.referenceDate);
-        break;
-      case CalendarViewType.WEEK:
-        // Calculate start and end of week
-        const dayOfWeek = query.referenceDate.getDay();
-        startDate = new Date(query.referenceDate);
-        startDate.setDate(query.referenceDate.getDate() - dayOfWeek);
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        break;
-      case CalendarViewType.MONTH:
-        // Calculate start and end of month
-        startDate = new Date(query.referenceDate.getFullYear(), query.referenceDate.getMonth(), 1);
-        endDate = new Date(query.referenceDate.getFullYear(), query.referenceDate.getMonth() + 1, 0);
-        break;
-      default:
-        startDate = new Date(query.referenceDate);
-        endDate = new Date(query.referenceDate);
+    try {
+      // In a real implementation, this calls the backend API
+      const response = await apiClient.get('/time-blocks/calendar', {
+        params: {
+          view: query.view,
+          referenceDate: query.referenceDate.toISOString(),
+          userId: query.userId
+        }
+      });
+      
+      // Transform the response to match our expected format
+      return {
+        ...response.data,
+        startDate: new Date(response.data.startDate),
+        endDate: new Date(response.data.endDate),
+        referenceDate: new Date(response.data.referenceDate),
+        timeBlocks: response.data.timeBlocks.map((block: any) => ({
+          ...block,
+          startTime: new Date(block.startTime),
+          endTime: new Date(block.endTime)
+        }))
+      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch calendar data');
     }
-    
-    // Return mock data for demonstration
-    return {
-      timeBlocks: [],
-      startDate,
-      endDate,
-      view: query.view,
-      referenceDate: query.referenceDate,
-      totalItems: 0,
-      hasMore: false
-    };
   }
   
   static async getViewPreference(userId: string): Promise<CalendarViewPreference> {
-    // In a real implementation, this would call the backend API
-    return {
-      id: 'pref-1',
-      userId,
-      defaultView: CalendarViewType.WEEK,
-      updatedAt: new Date()
-    };
+    try {
+      const response = await apiClient.get(`/users/${userId}/calendar-preference`);
+      return {
+        ...response.data,
+        updatedAt: new Date(response.data.updatedAt)
+      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch view preference');
+    }
   }
   
   static async updateViewPreference(userId: string, preference: Partial<CalendarViewPreference>): Promise<CalendarViewPreference> {
-    // In a real implementation, this would call the backend API
-    return {
-      id: 'pref-1',
-      userId,
-      defaultView: preference.defaultView || CalendarViewType.WEEK,
-      updatedAt: new Date()
-    };
+    try {
+      const response = await apiClient.put(`/users/${userId}/calendar-preference`, preference);
+      return {
+        ...response.data,
+        updatedAt: new Date(response.data.updatedAt)
+      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update view preference');
+    }
   }
 }
