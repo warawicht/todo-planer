@@ -6,7 +6,7 @@ import { Tag } from '../../tags/entities/tag.entity';
 import { TimeBlock } from '../../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from './attachments/task-attachment.entity';
 import { Reminder } from '../../notifications/entities/reminder.entity';
-import { TimeEntry } from '../../productivity-tracking/entities/time-entry.entity';
+import { TaskShare } from '../../collaboration/task-sharing/entities/task-share.entity';
 
 @Entity('tasks')
 export class Task {
@@ -89,4 +89,13 @@ export class Task {
   
   @OneToMany(() => TimeEntry, timeEntry => timeEntry.task)
   timeEntries: TimeEntry[];
+
+  @OneToMany(() => TaskShare, share => share.task)
+  shares: TaskShare[];
+
+  @OneToMany(() => TaskAssignment, assignment => assignment.task)
+  assignments: TaskAssignment[];
+
+  @OneToMany(() => TaskComment, comment => comment.task)
+  comments: TaskComment[];
 }

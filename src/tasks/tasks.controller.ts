@@ -10,6 +10,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { TaskWithCollaborationDto } from './dto/task-with-collaboration.dto';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -35,7 +36,7 @@ export class TasksController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    const [tasks, total] = await this.tasksService.findAll(req.user.id, {
+    const [tasks, total] = await this.tasksService.findAllWithCollaboration(req.user.id, {
       status,
       priority: priority !== undefined ? Number(priority) : undefined,
       dueDate,
@@ -53,7 +54,7 @@ export class TasksController {
 
   @Get(':id')
   async findOne(@Request() req, @Param('id') id: string) {
-    return this.tasksService.findOne(req.user.id, id);
+    return this.tasksService.findOneWithCollaboration(req.user.id, id);
   }
 
   @Put(':id')
@@ -77,7 +78,9 @@ export class TasksController {
 
   @Get(':id/subtasks')
   async findSubtasks(@Request() req, @Param('id') id: string) {
-    return this.tasksService.findSubtasks(req.user.id, id);
+    const subtasks = await this.tasksService.findSubtasks(req.user.id, id);
+    // Convert to collaboration DTOs
+    return subtasks.map(subtask => TaskWithCollaborationDto.fromTask(subtask, req.user.id));
   }
 
   @Put(':id/subtasks/:subtaskId')
@@ -107,7 +110,9 @@ export class TasksController {
     if (position === undefined) {
       throw new BadRequestException('Position is required');
     }
-    return this.tasksService.reorderSubtasks(req.user.id, id, subtaskId, position);
+    const subtasks = await this.tasksService.reorderSubtasks(req.user.id, id, subtaskId, position);
+    // Convert to collaboration DTOs
+    return subtasks.map(subtask => TaskWithCollaborationDto.fromTask(subtask, req.user.id));
   }
 
   @Post(':id/subtasks/:subtaskId/convert')

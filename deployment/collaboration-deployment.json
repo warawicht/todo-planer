@@ -1,0 +1,124 @@
+{
+  "name": "todo-planner-collaboration",
+  "version": "1.0.0",
+  "description": "Deployment configuration for collaboration components",
+  "main": "dist/src/main.js",
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "node scripts/deploy-collaboration.js",
+    "deploy:staging": "NODE_ENV=staging node scripts/deploy-collaboration.js",
+    "deploy:production": "NODE_ENV=production node scripts/deploy-collaboration.js",
+    "rollback": "node scripts/rollback-collaboration.js",
+    "health": "node scripts/health-check.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "deployment": {
+    "staging": {
+      "host": "staging.todo-planner.com",
+      "port": 3000,
+      "database": {
+        "host": "staging-db.todo-planner.com",
+        "port": 5432,
+        "name": "todo_planner_staging",
+        "username": "todo_planner_user"
+      },
+      "redis": {
+        "host": "staging-redis.todo-planner.com",
+        "port": 6379
+      },
+      "replicas": 2,
+      "resources": {
+        "memory": "1Gi",
+        "cpu": "1"
+      }
+    },
+    "production": {
+      "host": "api.todo-planner.com",
+      "port": 3000,
+      "database": {
+        "host": "prod-db.todo-planner.com",
+        "port": 5432,
+        "name": "todo_planner_production",
+        "username": "todo_planner_user"
+      },
+      "redis": {
+        "host": "prod-redis.todo-planner.com",
+        "port": 6379
+      },
+      "replicas": 4,
+      "resources": {
+        "memory": "2Gi",
+        "cpu": "2"
+      },
+      "autoscaling": {
+        "enabled": true,
+        "minReplicas": 4,
+        "maxReplicas": 10,
+        "targetCPUUtilizationPercentage": 70
+      }
+    }
+  },
+  "healthChecks": {
+    "livenessProbe": {
+      "httpGet": {
+        "path": "/health",
+        "port": 3000
+      },
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10
+    },
+    "readinessProbe": {
+      "httpGet": {
+        "path": "/ready",
+        "port": 3000
+      },
+      "initialDelaySeconds": 5,
+      "periodSeconds": 5
+    }
+  },
+  "monitoring": {
+    "prometheus": {
+      "enabled": true,
+      "port": 9090
+    },
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "outputs": [
+        {
+          "type": "file",
+          "path": "/var/log/collaboration.log"
+        },
+        {
+          "type": "stdout"
+        }
+      ]
+    }
+  },
+  "backup": {
+    "schedule": "0 2 * * *", 
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 3
+    },
+    "storage": {
+      "type": "s3",
+      "bucket": "todo-planner-backups",
+      "region": "us-west-2"
+    }
+  }
+}

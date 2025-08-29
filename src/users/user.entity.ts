@@ -13,6 +13,10 @@ import { ProductivityStatistic } from '../productivity-tracking/entities/product
 import { TimeEntry } from '../productivity-tracking/entities/time-entry.entity';
 import { TrendData } from '../productivity-tracking/entities/trend-data.entity';
 import { DashboardWidget } from '../productivity-tracking/entities/dashboard-widget.entity';
+import { TaskShare } from '../collaboration/task-sharing/entities/task-share.entity';
+import { TaskAssignment } from '../collaboration/task-assignment/entities/task-assignment.entity';
+import { TaskComment } from '../collaboration/comments/entities/task-comment.entity';
+import { UserAvailability } from '../collaboration/availability/entities/user-availability.entity';
 
 @Entity('users')
 export class User {
@@ -99,4 +103,22 @@ export class User {
   
   @OneToMany(() => DashboardWidget, dashboardWidget => dashboardWidget.user)
   dashboardWidgets: DashboardWidget[];
+
+  @OneToMany(() => TaskShare, share => share.owner)
+  sharedTasks: TaskShare[];
+
+  @OneToMany(() => TaskShare, share => share.sharedWith)
+  receivedSharedTasks: TaskShare[];
+
+  @OneToMany(() => TaskAssignment, assignment => assignment.assignedBy)
+  assignedTasks: TaskAssignment[];
+
+  @OneToMany(() => TaskAssignment, assignment => assignment.assignedTo)
+  receivedAssignedTasks: TaskAssignment[];
+
+  @OneToMany(() => TaskComment, comment => comment.user)
+  taskComments: TaskComment[];
+
+  @OneToMany(() => UserAvailability, availability => availability.user)
+  availability: UserAvailability[];
 }

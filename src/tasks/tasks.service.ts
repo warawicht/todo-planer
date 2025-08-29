@@ -6,6 +6,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateSubtaskDto } from './dto/subtasks/create-subtask.dto';
 import { UpdateSubtaskDto } from './dto/subtasks/update-subtask.dto';
+import { TaskWithCollaborationDto } from './dto/task-with-collaboration.dto';
 
 @Injectable()
 export class TasksService {
@@ -58,14 +59,14 @@ export class TasksService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
   }
 
   async findOne(userId: string, id: string): Promise<Task> {
     const task = await this.tasksRepository.findOne({
       where: { id, userId },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
     
     if (!task) {
@@ -73,6 +74,31 @@ export class TasksService {
     }
     
     return task;
+  }
+
+  async findOneWithCollaboration(userId: string, id: string): Promise<TaskWithCollaborationDto> {
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
+    });
+    
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+    
+    return TaskWithCollaborationDto.fromTask(task, userId);
+  }
+
+  async findAllWithCollaboration(userId: string, filters?: {
+    status?: string;
+    priority?: number;
+    dueDate?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<[TaskWithCollaborationDto[], number]> {
+    const [tasks, total] = await this.findAll(userId, filters);
+    const tasksWithCollaboration = tasks.map(task => TaskWithCollaborationDto.fromTask(task, userId));
+    return [tasksWithCollaboration, total];
   }
 
   async update(userId: string, id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
@@ -139,7 +165,7 @@ export class TasksService {
         position: 'ASC',
         createdAt: 'ASC',
       },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
   }
 
@@ -150,7 +176,7 @@ export class TasksService {
     // Check if subtask exists and belongs to user
     const existingSubtask = await this.tasksRepository.findOne({
       where: { id: subtaskId, parentId, userId },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
     
     if (!existingSubtask) {
@@ -175,7 +201,7 @@ export class TasksService {
     await this.tasksRepository.update({ id: subtaskId, parentId, userId }, updateSubtaskDto);
     return this.tasksRepository.findOne({
       where: { id: subtaskId, parentId, userId },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
   }
 
@@ -234,7 +260,7 @@ export class TasksService {
         position: 'ASC',
         createdAt: 'ASC',
       },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
   }
 
@@ -256,7 +282,7 @@ export class TasksService {
     
     return this.tasksRepository.findOne({
       where: { id: subtaskId, userId },
-      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+      relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
   }
 

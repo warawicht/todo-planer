@@ -1,0 +1,148 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-planner
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-planner-config
+  namespace: todo-planner
+data:
+  NODE_ENV: "production"
+  DATABASE_HOST: "postgres.todo-planner.svc.cluster.local"
+  DATABASE_PORT: "5432"
+  REDIS_HOST: "redis.todo-planner.svc.cluster.local"
+  REDIS_PORT: "6379"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: todo-planner-secrets
+  namespace: todo-planner
+type: Opaque
+data:
+  DATABASE_USERNAME: dG9kb19wbGFubmVyX3VzZXI=  # base64 encoded "todo_planner_user"
+  DATABASE_PASSWORD: dG9kb19wbGFuX3Bhc3N3b3Jk  # base64 encoded "todo_plan_password"
+  JWT_SECRET: eW91ci1qd3Qtc2VjcmV0LWtleS1jaGFuZ2UtaW4tcHJvZHVjdGlvbg==  # base64 encoded "your-jwt-secret-key-change-in-production"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-planner-app
+  namespace: todo-planner
+  labels:
+    app: todo-planner
+    component: collaboration
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: todo-planner
+      component: collaboration
+  template:
+    metadata:
+      labels:
+        app: todo-planner
+        component: collaboration
+    spec:
+      containers:
+      - name: app
+        image: todo-planner/collaboration:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: todo-planner-config
+        - secretRef:
+            name: todo-planner-secrets
+        env:
+        - name: DATABASE_NAME
+          value: "todo_planner_production"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log
+      volumes:
+      - name: logs
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-planner-service
+  namespace: todo-planner
+spec:
+  selector:
+    app: todo-planner
+    component: collaboration
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: todo-planner-hpa
+  namespace: todo-planner
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: todo-planner-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-planner-ingress
+  namespace: todo-planner
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: api.todo-planner.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: todo-planner-service
+            port:
+              number: 80
