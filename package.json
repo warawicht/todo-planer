@@ -24,7 +24,7 @@
     "migration:generate": "npm run typeorm migration:generate -- -d backend/database/data-source.ts",
     "migration:run": "npm run typeorm migration:run -- -d backend/database/data-source.ts",
     "migration:revert": "npm run typeorm migration:revert -- -d backend/database/data-source.ts",
-    "frontend:dev": "cd frontend && vite",
+    "frontend:dev": "cd frontend && npx vite --port 3001",
     "frontend:build": "cd frontend && vite build",
     "frontend:preview": "cd frontend && vite preview"
   },

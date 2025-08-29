@@ -1,6 +1,5 @@
 import React from 'react';
 import { usePWA } from '../hooks/usePWA';
-import 'styled-jsx';
 
 interface NetworkStatusIndicatorProps {
   syncStatus?: 'idle' | 'syncing' | 'success' | 'error';
@@ -16,103 +15,57 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
   const { isOnline, updateAvailable, updateServiceWorker } = usePWA();
 
   return (
-    <div className="network-status-indicator">
-      <style jsx>{`
-        .network-status-indicator {
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          z-index: 1000;
-        }
-        
-        .status-badge {
-          display: flex;
-          align-items: center;
-          padding: 8px 12px;
-          border-radius: 20px;
-          font-size: 14px;
-          font-weight: 500;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        
-        .online {
-          background-color: #d4edda;
-          color: #155724;
-        }
-        
-        .offline {
-          background-color: #f8d7da;
-          color: #721c24;
-        }
-        
-        .sync-status {
-          background-color: #d1ecf1;
-          color: #0c5460;
-        }
-        
-        .update-available {
-          background-color: #fff3cd;
-          color: #856404;
-        }
-        
-        .pending-changes {
-          background-color: #e2e3e5;
-          color: #383d41;
-        }
-        
-        .status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          margin-right: 8px;
-        }
-        
-        .dot-online {
-          background-color: #28a745;
-        }
-        
-        .dot-offline {
-          background-color: #dc3545;
-        }
-        
-        .dot-syncing {
-          background-color: #ffc107;
-        }
-        
-        .sync-button {
-          background-color: #007bff;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          margin-top: 5px;
-        }
-        
-        .sync-button:hover {
-          background-color: #0056b3;
-        }
-        
-        .sync-button:disabled {
-          background-color: #6c757d;
-          cursor: not-allowed;
-        }
-      `}</style>
-      
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+      zIndex: 1000
+    }}>
       {/* Network status */}
-      <div className={`status-badge ${isOnline ? 'online' : 'offline'}`}>
-        <span className={`status-dot dot-${isOnline ? 'online' : 'offline'}`}></span>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 12px',
+        borderRadius: '20px',
+        fontSize: '14px',
+        fontWeight: 500,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        backgroundColor: isOnline ? '#d4edda' : '#f8d7da',
+        color: isOnline ? '#155724' : '#721c24'
+      }}>
+        <span style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          marginRight: '8px',
+          backgroundColor: isOnline ? '#28a745' : '#dc3545'
+        }}></span>
         {isOnline ? 'Online' : 'Offline'}
       </div>
       
       {/* Sync status */}
       {syncStatus !== 'idle' && (
-        <div className="status-badge sync-status">
-          <span className={`status-dot dot-${syncStatus === 'syncing' ? 'syncing' : 'online'}`}></span>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '8px 12px',
+          borderRadius: '20px',
+          fontSize: '14px',
+          fontWeight: 500,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          backgroundColor: '#d1ecf1',
+          color: '#0c5460'
+        }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            marginRight: '8px',
+            backgroundColor: syncStatus === 'syncing' ? '#ffc107' : '#28a745'
+          }}></span>
           {syncStatus === 'syncing' ? 'Syncing...' : 
            syncStatus === 'success' ? 'Sync complete' : 'Sync failed'}
         </div>
@@ -120,16 +73,48 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
       
       {/* Pending changes */}
       {pendingChanges > 0 && (
-        <div className="status-badge pending-changes">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '8px 12px',
+          borderRadius: '20px',
+          fontSize: '14px',
+          fontWeight: 500,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          backgroundColor: '#e2e3e5',
+          color: '#383d41'
+        }}>
           {pendingChanges} pending change{pendingChanges !== 1 ? 's' : ''}
         </div>
       )}
       
       {/* Update available */}
       {updateAvailable && (
-        <div className="status-badge update-available">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '8px 12px',
+          borderRadius: '20px',
+          fontSize: '14px',
+          fontWeight: 500,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          backgroundColor: '#fff3cd',
+          color: '#856404'
+        }}>
           Update available
-          <button className="sync-button" onClick={updateServiceWorker}>
+          <button 
+            onClick={updateServiceWorker}
+            style={{
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              marginLeft: '10px'
+            }}
+          >
             Update
           </button>
         </div>
@@ -137,7 +122,20 @@ const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
       
       {/* Manual sync button */}
       {!isOnline && pendingChanges > 0 && (
-        <button className="sync-button" onClick={onSync} disabled={syncStatus === 'syncing'}>
+        <button 
+          onClick={onSync} 
+          disabled={syncStatus === 'syncing'}
+          style={{
+            backgroundColor: syncStatus === 'syncing' ? '#6c757d' : '#007bff',
+            color: 'white',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            cursor: syncStatus === 'syncing' ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            marginTop: '5px'
+          }}
+        >
           {syncStatus === 'syncing' ? 'Syncing...' : 'Sync when online'}
         </button>
       )}

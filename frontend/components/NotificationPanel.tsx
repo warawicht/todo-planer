@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import 'styled-jsx';
 
 interface Notification {
   id: string;
@@ -69,43 +68,114 @@ const NotificationPanel: React.FC = () => {
   };
 
   return (
-    <div className="notification-panel">
+    <div style={{ position: 'relative' }}>
       <button 
-        className="notification-bell"
+        style={{ 
+          position: 'relative',
+          background: 'none',
+          border: 'none',
+          fontSize: '1.5rem',
+          cursor: 'pointer'
+        }}
         onClick={() => setIsOpen(!isOpen)}
       >
         🔔
         {unreadCount > 0 && (
-          <span className="unread-count">{unreadCount}</span>
+          <span style={{
+            position: 'absolute',
+            top: '-5px',
+            right: '-5px',
+            backgroundColor: '#ff4757',
+            color: 'white',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.75rem'
+          }}>
+            {unreadCount}
+          </span>
         )}
       </button>
       
       {isOpen && (
-        <div className="notification-dropdown">
-          <div className="notification-header">
-            <h3>Notifications</h3>
-            <button onClick={markAllAsRead}>Mark all as read</button>
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          right: '0',
+          width: '350px',
+          background: 'white',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '15px',
+            borderBottom: '1px solid #eee'
+          }}>
+            <h3 style={{ margin: 0 }}>Notifications</h3>
+            <button 
+              onClick={markAllAsRead}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#007bff',
+                cursor: 'pointer'
+              }}
+            >
+              Mark all as read
+            </button>
           </div>
           
-          <div className="notification-list">
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
             {notifications.length === 0 ? (
-              <p className="no-notifications">No notifications</p>
+              <p style={{ padding: '15px', textAlign: 'center', color: '#666' }}>No notifications</p>
             ) : (
               notifications.map(notification => (
                 <div 
                   key={notification.id} 
-                  className={`notification-item ${notification.read ? 'read' : 'unread'}`}
+                  style={{
+                    padding: '15px',
+                    borderBottom: '1px solid #eee',
+                    backgroundColor: notification.read ? 'white' : '#f0f8ff'
+                  }}
                 >
-                  <div className="notification-content">
-                    <h4>{notification.title}</h4>
-                    <p>{notification.message}</p>
-                    <small>{new Date(notification.createdAt).toLocaleString()}</small>
+                  <div>
+                    <h4 style={{ margin: '0 0 5px 0' }}>{notification.title}</h4>
+                    <p style={{ margin: '5px 0', color: '#666' }}>{notification.message}</p>
+                    <small style={{ color: '#999' }}>{new Date(notification.createdAt).toLocaleString()}</small>
                   </div>
-                  <div className="notification-actions">
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                     {!notification.read && (
-                      <button onClick={() => markAsRead(notification.id)}>Mark as read</button>
+                      <button 
+                        onClick={() => markAsRead(notification.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#007bff',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Mark as read
+                      </button>
                     )}
-                    <button onClick={() => dismissNotification(notification.id)}>Dismiss</button>
+                    <button 
+                      onClick={() => dismissNotification(notification.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#007bff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Dismiss
+                    </button>
                   </div>
                 </div>
               ))
@@ -113,107 +183,6 @@ const NotificationPanel: React.FC = () => {
           </div>
         </div>
       )}
-      
-      <style jsx>{`
-        .notification-panel {
-          position: relative;
-        }
-        
-        .notification-bell {
-          position: relative;
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          cursor: pointer;
-        }
-        
-        .unread-count {
-          position: absolute;
-          top: -5px;
-          right: -5px;
-          background-color: #ff4757;
-          color: white;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.75rem;
-        }
-        
-        .notification-dropdown {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          width: 350px;
-          background: white;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          z-index: 1000;
-        }
-        
-        .notification-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px;
-          border-bottom: 1px solid #eee;
-        }
-        
-        .notification-header h3 {
-          margin: 0;
-        }
-        
-        .notification-list {
-          max-height: 400px;
-          overflow-y: auto;
-        }
-        
-        .notification-item {
-          padding: 15px;
-          border-bottom: 1px solid #eee;
-        }
-        
-        .notification-item.unread {
-          background-color: #f0f8ff;
-        }
-        
-        .notification-content h4 {
-          margin: 0 0 5px 0;
-        }
-        
-        .notification-content p {
-          margin: 5px 0;
-          color: #666;
-        }
-        
-        .notification-content small {
-          color: #999;
-        }
-        
-        .notification-actions {
-          display: flex;
-          gap: 10px;
-          margin-top: 10px;
-        }
-        
-        .notification-actions button {
-          padding: 5px 10px;
-          border: 1px solid #ddd;
-          background: white;
-          border-radius: 3px;
-          cursor: pointer;
-          font-size: 0.8rem;
-        }
-        
-        .no-notifications {
-          text-align: center;
-          padding: 20px;
-          color: #999;
-        }
-      `}</style>
     </div>
   );
 };

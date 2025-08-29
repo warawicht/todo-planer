@@ -24,15 +24,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check if user is authenticated on app start
   useEffect(() => {
+    console.log('Initializing authentication');
     const initializeAuth = async () => {
       if (AuthService.isAuthenticated()) {
+        console.log('User is authenticated, fetching profile');
         try {
           const profileResponse = await AuthService.getProfile();
+          console.log('Profile fetched:', profileResponse);
           setUser(profileResponse.user);
         } catch (err) {
+          console.error('Error fetching profile:', err);
           // If token is invalid, clear it
           localStorage.removeItem('accessToken');
         }
+      } else {
+        console.log('User is not authenticated');
       }
       setLoading(false);
     };

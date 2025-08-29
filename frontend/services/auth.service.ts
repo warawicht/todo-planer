@@ -8,7 +8,7 @@ import {
 } from '../types/auth.types';
 
 // Configure axios base URL (adjust according to your backend URL)
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const AUTH_API_URL = `${API_BASE_URL}/auth`;
 
 // Create axios instance with default config
@@ -68,9 +68,12 @@ export class AuthService {
   // User registration
   static async register(data: RegisterRequest): Promise<{ success: boolean; message: string; user?: User }> {
     try {
+      console.log('AuthService.register called with:', data);
       const response = await apiClient.post(`${AUTH_API_URL}/register`, data);
+      console.log('AuthService.register response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('AuthService.register error:', error);
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
   }
@@ -78,8 +81,10 @@ export class AuthService {
   // User login
   static async login(data: LoginRequest): Promise<{ success: boolean; accessToken: string; refreshToken: string; user: { email: string } }> {
     try {
+      console.log('AuthService.login called with:', data);
       const response = await apiClient.post(`${AUTH_API_URL}/login`, data);
       const { accessToken, refreshToken, user } = response.data;
+      console.log('AuthService.login response:', response.data);
       
       // Save tokens to localStorage
       localStorage.setItem('accessToken', accessToken);
@@ -87,6 +92,7 @@ export class AuthService {
       
       return { success: true, accessToken, refreshToken, user };
     } catch (error: any) {
+      console.error('AuthService.login error:', error);
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   }
@@ -145,9 +151,12 @@ export class AuthService {
   // Get user profile
   static async getProfile(): Promise<{ success: boolean; user: User }> {
     try {
+      console.log('AuthService.getProfile called');
       const response = await apiClient.get(`${AUTH_API_URL}/profile`);
+      console.log('AuthService.getProfile response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('AuthService.getProfile error:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch profile');
     }
   }
@@ -165,6 +174,7 @@ export class AuthService {
   // Check if user is authenticated
   static isAuthenticated(): boolean {
     const token = localStorage.getItem('accessToken');
+    console.log('AuthService.isAuthenticated called, token exists:', !!token);
     return !!token;
   }
 
