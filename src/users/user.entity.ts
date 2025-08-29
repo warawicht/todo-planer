@@ -17,6 +17,10 @@ import { TaskShare } from '../collaboration/task-sharing/entities/task-share.ent
 import { TaskAssignment } from '../collaboration/task-assignment/entities/task-assignment.entity';
 import { TaskComment } from '../collaboration/comments/entities/task-comment.entity';
 import { UserAvailability } from '../collaboration/availability/entities/user-availability.entity';
+// Enterprise Feature Entities
+import { UserRole } from '../enterprise/entities/user-role.entity';
+import { ActivityLog } from '../enterprise/entities/activity-log.entity';
+import { AuditTrail } from '../enterprise/entities/audit-trail.entity';
 
 @Entity('users')
 export class User {
@@ -121,4 +125,14 @@ export class User {
 
   @OneToMany(() => UserAvailability, availability => availability.user)
   availability: UserAvailability[];
+
+  // Enterprise Feature Relationships
+  @OneToMany(() => UserRole, userRole => userRole.user)
+  userRoles: UserRole[];
+
+  @OneToMany(() => ActivityLog, activityLog => activityLog.user)
+  activityLogs: ActivityLog[];
+
+  @OneToMany(() => AuditTrail, auditTrail => auditTrail.user)
+  auditTrails: AuditTrail[];
 }

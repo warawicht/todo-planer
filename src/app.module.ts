@@ -41,6 +41,17 @@ import { AISuggestion } from './ai-scheduling/entities/ai-suggestion.entity';
 import { ProductivityPattern } from './ai-scheduling/entities/productivity-pattern.entity';
 import { TaskPriorityRecommendation } from './ai-scheduling/entities/task-priority-recommendation.entity';
 import { NLPProcessedTask } from './ai-scheduling/entities/nlp-processed-task.entity';
+// Enterprise Feature Entities
+import { Role } from './enterprise/entities/role.entity';
+import { Permission } from './enterprise/entities/permission.entity';
+import { UserRole } from './enterprise/entities/user-role.entity';
+import { RolePermission } from './enterprise/entities/role-permission.entity';
+import { ActivityLog } from './enterprise/entities/activity-log.entity';
+import { Workflow } from './enterprise/entities/workflow.entity';
+import { WorkflowInstance } from './enterprise/entities/workflow-instance.entity';
+import { AuditTrail } from './enterprise/entities/audit-trail.entity';
+// Enterprise Module
+import { EnterpriseModule } from './enterprise/enterprise.module';
 
 @Module({
   imports: [
@@ -77,7 +88,16 @@ import { NLPProcessedTask } from './ai-scheduling/entities/nlp-processed-task.en
         AISuggestion,
         ProductivityPattern,
         TaskPriorityRecommendation,
-        NLPProcessedTask
+        NLPProcessedTask,
+        // Enterprise Feature Entities
+        Role,
+        Permission,
+        UserRole,
+        RolePermission,
+        ActivityLog,
+        Workflow,
+        WorkflowInstance,
+        AuditTrail
       ],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
@@ -95,6 +115,7 @@ import { NLPProcessedTask } from './ai-scheduling/entities/nlp-processed-task.en
     SettingsModule,
     AISchedulingModule,
     OfflineModule,
+    EnterpriseModule,
   ],
   controllers: [AppController],
   providers: [
