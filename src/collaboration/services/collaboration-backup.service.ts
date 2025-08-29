@@ -34,17 +34,17 @@ export class CollaborationBackupService {
 
   constructor(
     @InjectRepository(TaskShare)
-    private taskShareRepository: Repository&lt;TaskShare&gt;,
+    private taskShareRepository: Repository<TaskShare>,
     @InjectRepository(TaskAssignment)
-    private taskAssignmentRepository: Repository&lt;TaskAssignment&gt;,
+    private taskAssignmentRepository: Repository<TaskAssignment>,
     @InjectRepository(TaskComment)
-    private taskCommentRepository: Repository&lt;TaskComment&gt;,
+    private taskCommentRepository: Repository<TaskComment>,
     @InjectRepository(UserAvailability)
-    private userAvailabilityRepository: Repository&lt;UserAvailability&gt;,
+    private userAvailabilityRepository: Repository<UserAvailability>,
     @InjectRepository(Task)
-    private taskRepository: Repository&lt;Task&gt;,
+    private taskRepository: Repository<Task>,
     @InjectRepository(User)
-    private userRepository: Repository&lt;User&gt;,
+    private userRepository: Repository<User>,
     private readonly encryptionService: EncryptionService,
   ) {}
 
@@ -52,7 +52,7 @@ export class CollaborationBackupService {
    * Create a backup of all collaboration data
    * @param description Optional description for the backup
    */
-  async createBackup(description?: string): Promise&lt;BackupMetadata&gt; {
+  async createBackup(description?: string): Promise<BackupMetadata> {
     try {
       this.logger.log('Starting collaboration data backup');
 
@@ -104,7 +104,7 @@ export class CollaborationBackupService {
    * @param userId The ID of the user to backup data for
    * @param description Optional description for the backup
    */
-  async createBackupForUser(userId: string, description?: string): Promise&lt;BackupMetadata&gt; {
+  async createBackupForUser(userId: string, description?: string): Promise<BackupMetadata> {
     try {
       this.logger.log(`Starting collaboration data backup for user ${userId}`);
 
@@ -161,7 +161,7 @@ export class CollaborationBackupService {
    * @param taskId The ID of the task to backup data for
    * @param description Optional description for the backup
    */
-  async createBackupForTask(taskId: string, description?: string): Promise&lt;BackupMetadata&gt; {
+  async createBackupForTask(taskId: string, description?: string): Promise<BackupMetadata> {
     try {
       this.logger.log(`Starting collaboration data backup for task ${taskId}`);
 
@@ -217,7 +217,7 @@ export class CollaborationBackupService {
    * Restore collaboration data from a backup
    * @param backupId The ID of the backup to restore
    */
-  async restoreBackup(backupId: string): Promise&lt;void&gt; {
+  async restoreBackup(backupId: string): Promise<void> {
     try {
       this.logger.log(`Starting restoration of collaboration data from backup ${backupId}`);
 
@@ -258,7 +258,7 @@ export class CollaborationBackupService {
   /**
    * List available backups
    */
-  async listBackups(): Promise&lt;BackupMetadata[]&gt; {
+  async listBackups(): Promise<BackupMetadata[]> {
     try {
       // In a real implementation, this would query the backup storage
       // For now, we'll return an empty array as we're simulating storage
@@ -274,7 +274,7 @@ export class CollaborationBackupService {
    * Delete a backup
    * @param backupId The ID of the backup to delete
    */
-  async deleteBackup(backupId: string): Promise&lt;void&gt; {
+  async deleteBackup(backupId: string): Promise<void> {
     try {
       this.logger.log(`Deleting backup ${backupId}`);
       
@@ -290,7 +290,7 @@ export class CollaborationBackupService {
   /**
    * Restore task shares from backup data
    */
-  private async restoreTaskShares(taskShares: TaskShare[]): Promise&lt;void&gt; {
+  private async restoreTaskShares(taskShares: TaskShare[]): Promise<void> {
     this.logger.debug(`Restoring ${taskShares.length} task shares`);
     
     for (const taskShare of taskShares) {
@@ -310,7 +310,7 @@ export class CollaborationBackupService {
   /**
    * Restore task assignments from backup data
    */
-  private async restoreTaskAssignments(taskAssignments: TaskAssignment[]): Promise&lt;void&gt; {
+  private async restoreTaskAssignments(taskAssignments: TaskAssignment[]): Promise<void> {
     this.logger.debug(`Restoring ${taskAssignments.length} task assignments`);
     
     for (const taskAssignment of taskAssignments) {
@@ -330,7 +330,7 @@ export class CollaborationBackupService {
   /**
    * Restore task comments from backup data
    */
-  private async restoreTaskComments(taskComments: TaskComment[]): Promise&lt;void&gt; {
+  private async restoreTaskComments(taskComments: TaskComment[]): Promise<void> {
     this.logger.debug(`Restoring ${taskComments.length} task comments`);
     
     for (const taskComment of taskComments) {
@@ -350,7 +350,7 @@ export class CollaborationBackupService {
   /**
    * Restore user availabilities from backup data
    */
-  private async restoreUserAvailabilities(userAvailabilities: UserAvailability[]): Promise&lt;void&gt; {
+  private async restoreUserAvailabilities(userAvailabilities: UserAvailability[]): Promise<void> {
     this.logger.debug(`Restoring ${userAvailabilities.length} user availabilities`);
     
     for (const userAvailability of userAvailabilities) {
@@ -381,10 +381,10 @@ export class CollaborationBackupService {
     // In a real implementation, you would use a proper cryptographic hash function
     // For now, we'll use a simple approach for demonstration
     let hash = 0;
-    for (let i = 0; i &lt; data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = (hash &lt;&lt; 5) - hash + char;
-      hash = hash &amp; hash; // Convert to 32-bit integer
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString();
   }
@@ -392,7 +392,7 @@ export class CollaborationBackupService {
   /**
    * Simulate saving backup to storage
    */
-  private async saveBackupToStorage(backupId: string, encryptedData: string, metadata: BackupMetadata): Promise&lt;void&gt; {
+  private async saveBackupToStorage(backupId: string, encryptedData: string, metadata: BackupMetadata): Promise<void> {
     // In a real implementation, this would save to a secure backup storage system
     // For now, we're just logging the action
     this.logger.debug(`Backup ${backupId} would be saved to storage with metadata:`, metadata);
@@ -401,7 +401,7 @@ export class CollaborationBackupService {
   /**
    * Simulate retrieving backup from storage
    */
-  private async getBackupFromStorage(backupId: string): Promise&lt;{ encryptedData: string; metadata: BackupMetadata }&gt; {
+  private async getBackupFromStorage(backupId: string): Promise<{ encryptedData: string; metadata: BackupMetadata }> {
     // In a real implementation, this would retrieve from a secure backup storage system
     // For now, we're throwing an error as we're not actually storing backups
     throw new Error(`Backup ${backupId} not found in storage`);
@@ -422,14 +422,14 @@ export class CollaborationBackupService {
   /**
    * Get backup statistics
    */
-  async getBackupStatistics(): Promise&lt;Record&lt;string, any&gt;&gt; {
+  async getBackupStatistics(): Promise<Record<string, any>> {
     try {
       const backups = await this.listBackups();
       
       return {
         totalBackups: backups.length,
-        latestBackup: backups.length &gt; 0 ? backups[backups.length - 1] : null,
-        totalBackupSize: backups.reduce((sum, backup) =&gt; sum + backup.size, 0),
+        latestBackup: backups.length > 0 ? backups[backups.length - 1] : null,
+        totalBackupSize: backups.reduce((sum, backup) => sum + backup.size, 0),
       };
     } catch (error) {
       this.logger.error(`Failed to get backup statistics: ${error.message}`, error.stack);

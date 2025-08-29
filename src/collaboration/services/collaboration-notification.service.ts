@@ -141,7 +141,7 @@ export class CollaborationNotificationService {
     maxRetries: number = 3,
     delay: number = 1000
   ): Promise<T> {
-    let lastError: Error;
+    let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {

@@ -7,6 +7,9 @@ import { TimeBlock } from '../../time-blocks/entities/time-block.entity';
 import { TaskAttachment } from './attachments/task-attachment.entity';
 import { Reminder } from '../../notifications/entities/reminder.entity';
 import { TaskShare } from '../../collaboration/task-sharing/entities/task-share.entity';
+import { TaskAssignment } from '../../collaboration/task-assignment/entities/task-assignment.entity';
+import { TaskComment } from '../../collaboration/comments/entities/task-comment.entity';
+import { TimeEntry } from '../../productivity-tracking/entities/time-entry.entity';
 
 @Entity('tasks')
 export class Task {

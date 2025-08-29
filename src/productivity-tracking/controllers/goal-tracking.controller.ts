@@ -13,7 +13,7 @@ import {
 import { GoalTrackingService } from '../services/goal-tracking.service';
 import { CreateGoalDto } from '../dto/create-goal.dto';
 import { UpdateGoalDto } from '../dto/update-goal.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Goal } from '../entities/goal.entity';
 
 @Controller('analytics/goals')

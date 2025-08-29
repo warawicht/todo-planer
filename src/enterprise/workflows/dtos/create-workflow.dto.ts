@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, IsBoolean, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsBoolean, IsNotEmpty, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class WorkflowStepDto {

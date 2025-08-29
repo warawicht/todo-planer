@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePWA } from '../hooks/usePWA';
+import 'styled-jsx';
 
 interface NetworkStatusIndicatorProps {
   syncStatus?: 'idle' | 'syncing' | 'success' | 'error';

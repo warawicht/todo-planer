@@ -210,7 +210,7 @@ export class ExportService {
     
     // CSV rows
     tasks.forEach(task => {
-      csv += `"${task.id}","${task.title}","${task.description || ''}",${task.completed},${task.createdAt.toISOString()},${task.updatedAt.toISOString()},"${task.projectId || ''}"\n`;
+      csv += `"${task.id}","${task.title}","${task.description || ''}",${task.completedAt ? 'true' : 'false'},${task.createdAt.toISOString()},${task.updatedAt.toISOString()},"${task.projectId || ''}"\n`;
     });
     
     return csv;

@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, Logger, OptimisticLockCanRetryException, BadRequestException, CACHE_MANAGER, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadRequestException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository, QueryFailedError, OptimisticLockVersionMismatchError } from 'typeorm';
 import { UserAvailability } from '../entities/user-availability.entity';
 import { CreateUserAvailabilityDto } from '../dto/create-user-availability.dto';
 import { UpdateUserAvailabilityDto } from '../dto/update-user-availability.dto';
@@ -8,7 +9,7 @@ import { User } from '../../../users/user.entity';
 import { InputSanitizationService } from '../../services/input-sanitization.service';
 import { PaginationDto } from '../../dto/pagination.dto';
 import { CollaborationCacheService } from '../../services/collaboration-cache.service';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class AvailabilityService {
@@ -231,7 +232,7 @@ export class AvailabilityService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when updating availability ${sanitizedAvailabilityId}`);
-          throw new OptimisticLockCanRetryException('Availability record was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('UserAvailability', 0, 0);
         }
         throw error;
       }
@@ -271,7 +272,7 @@ export class AvailabilityService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when deleting availability ${sanitizedAvailabilityId}`);
-          throw new OptimisticLockCanRetryException('Availability record was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('UserAvailability', 0, 0);
         }
         throw error;
       }
@@ -317,7 +318,7 @@ export class AvailabilityService {
     maxRetries: number = 3,
     delay: number = 1000
   ): Promise<T> {
-    let lastError: Error;
+    let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {

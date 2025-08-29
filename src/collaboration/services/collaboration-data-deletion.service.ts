@@ -15,17 +15,17 @@ export class CollaborationDataDeletionService {
 
   constructor(
     @InjectRepository(TaskShare)
-    private taskShareRepository: Repository&lt;TaskShare&gt;,
+    private taskShareRepository: Repository<TaskShare>,
     @InjectRepository(TaskAssignment)
-    private taskAssignmentRepository: Repository&lt;TaskAssignment&gt;,
+    private taskAssignmentRepository: Repository<TaskAssignment>,
     @InjectRepository(TaskComment)
-    private taskCommentRepository: Repository&lt;TaskComment&gt;,
+    private taskCommentRepository: Repository<TaskComment>,
     @InjectRepository(UserAvailability)
-    private userAvailabilityRepository: Repository&lt;UserAvailability&gt;,
+    private userAvailabilityRepository: Repository<UserAvailability>,
     @InjectRepository(Task)
-    private taskRepository: Repository&lt;Task&gt;,
+    private taskRepository: Repository<Task>,
     @InjectRepository(User)
-    private userRepository: Repository&lt;User&gt;,
+    private userRepository: Repository<User>,
     private readonly encryptionService: EncryptionService,
   ) {}
 
@@ -33,7 +33,7 @@ export class CollaborationDataDeletionService {
    * Securely delete all collaboration data for a user
    * @param userId The ID of the user whose collaboration data should be deleted
    */
-  async deleteUserCollaborationData(userId: string): Promise&lt;void&gt; {
+  async deleteUserCollaborationData(userId: string): Promise<void> {
     try {
       this.logger.log(`Starting secure deletion of collaboration data for user ${userId}`);
 
@@ -42,7 +42,7 @@ export class CollaborationDataDeletionService {
         where: { ownerId: userId },
       });
       
-      if (ownedTaskShares.length &gt; 0) {
+      if (ownedTaskShares.length > 0) {
         // Mark shares as revoked rather than deleting them to maintain data integrity
         for (const share of ownedTaskShares) {
           share.isRevoked = true;
@@ -57,7 +57,7 @@ export class CollaborationDataDeletionService {
         where: { sharedWithId: userId },
       });
       
-      if (receivedTaskShares.length &gt; 0) {
+      if (receivedTaskShares.length > 0) {
         // Mark shares as revoked rather than deleting them to maintain data integrity
         for (const share of receivedTaskShares) {
           share.isRevoked = true;
@@ -72,7 +72,7 @@ export class CollaborationDataDeletionService {
         where: { assignedById: userId },
       });
       
-      if (assignedTasks.length &gt; 0) {
+      if (assignedTasks.length > 0) {
         await this.taskAssignmentRepository.remove(assignedTasks);
         this.logger.log(`Deleted ${assignedTasks.length} task assignments made by user ${userId}`);
       }
@@ -82,7 +82,7 @@ export class CollaborationDataDeletionService {
         where: { assignedToId: userId },
       });
       
-      if (receivedAssignments.length &gt; 0) {
+      if (receivedAssignments.length > 0) {
         await this.taskAssignmentRepository.remove(receivedAssignments);
         this.logger.log(`Deleted ${receivedAssignments.length} task assignments received by user ${userId}`);
       }
@@ -92,14 +92,14 @@ export class CollaborationDataDeletionService {
         where: { userId },
       });
       
-      if (userComments.length &gt; 0) {
+      if (userComments.length > 0) {
         // First, delete all replies to these comments
-        const commentIds = userComments.map(comment =&gt; comment.id);
+        const commentIds = userComments.map(comment => comment.id);
         const replies = await this.taskCommentRepository.find({
           where: { parentId: In(commentIds) },
         });
         
-        if (replies.length &gt; 0) {
+        if (replies.length > 0) {
           await this.taskCommentRepository.remove(replies);
           this.logger.log(`Deleted ${replies.length} replies to comments by user ${userId}`);
         }
@@ -114,7 +114,7 @@ export class CollaborationDataDeletionService {
         where: { userId },
       });
       
-      if (userAvailabilities.length &gt; 0) {
+      if (userAvailabilities.length > 0) {
         await this.userAvailabilityRepository.remove(userAvailabilities);
         this.logger.log(`Deleted ${userAvailabilities.length} availability records for user ${userId}`);
       }
@@ -130,7 +130,7 @@ export class CollaborationDataDeletionService {
    * Securely delete all collaboration data for a task
    * @param taskId The ID of the task whose collaboration data should be deleted
    */
-  async deleteTaskCollaborationData(taskId: string): Promise&lt;void&gt; {
+  async deleteTaskCollaborationData(taskId: string): Promise<void> {
     try {
       this.logger.log(`Starting secure deletion of collaboration data for task ${taskId}`);
 
@@ -145,7 +145,7 @@ export class CollaborationDataDeletionService {
         where: { taskId },
       });
       
-      if (taskShares.length &gt; 0) {
+      if (taskShares.length > 0) {
         await this.taskShareRepository.remove(taskShares);
         this.logger.log(`Deleted ${taskShares.length} task shares for task ${taskId}`);
       }
@@ -155,7 +155,7 @@ export class CollaborationDataDeletionService {
         where: { taskId },
       });
       
-      if (taskAssignments.length &gt; 0) {
+      if (taskAssignments.length > 0) {
         await this.taskAssignmentRepository.remove(taskAssignments);
         this.logger.log(`Deleted ${taskAssignments.length} task assignments for task ${taskId}`);
       }
@@ -165,7 +165,7 @@ export class CollaborationDataDeletionService {
         where: { taskId },
       });
       
-      if (taskComments.length &gt; 0) {
+      if (taskComments.length > 0) {
         await this.taskCommentRepository.remove(taskComments);
         this.logger.log(`Deleted ${taskComments.length} comments for task ${taskId}`);
       }
@@ -182,7 +182,7 @@ export class CollaborationDataDeletionService {
    * @param shareId The ID of the task share to delete
    * @param userId The ID of the user requesting the deletion (for permission check)
    */
-  async deleteTaskShare(shareId: string, userId: string): Promise&lt;void&gt; {
+  async deleteTaskShare(shareId: string, userId: string): Promise<void> {
     try {
       this.logger.log(`Starting secure deletion of task share ${shareId} by user ${userId}`);
 
@@ -197,7 +197,7 @@ export class CollaborationDataDeletionService {
 
       // Check if user has permission to delete this share
       // Either the owner of the task or the user the task was shared with can delete
-      if (taskShare.ownerId !== userId &amp;&amp; taskShare.sharedWithId !== userId) {
+      if (taskShare.ownerId !== userId && taskShare.sharedWithId !== userId) {
         throw new Error(`User ${userId} does not have permission to delete task share ${shareId}`);
       }
 
@@ -218,7 +218,7 @@ export class CollaborationDataDeletionService {
    * @param assignmentId The ID of the task assignment to delete
    * @param userId The ID of the user requesting the deletion (for permission check)
    */
-  async deleteTaskAssignment(assignmentId: string, userId: string): Promise&lt;void&gt; {
+  async deleteTaskAssignment(assignmentId: string, userId: string): Promise<void> {
     try {
       this.logger.log(`Starting secure deletion of task assignment ${assignmentId} by user ${userId}`);
 
@@ -250,7 +250,7 @@ export class CollaborationDataDeletionService {
    * @param commentId The ID of the comment to delete
    * @param userId The ID of the user requesting the deletion (for permission check)
    */
-  async deleteComment(commentId: string, userId: string): Promise&lt;void&gt; {
+  async deleteComment(commentId: string, userId: string): Promise<void> {
     try {
       this.logger.log(`Starting secure deletion of comment ${commentId} by user ${userId}`);
 
@@ -265,7 +265,7 @@ export class CollaborationDataDeletionService {
 
       // Check if user has permission to delete this comment
       // Either the comment author or the task owner can delete
-      if (comment.userId !== userId &amp;&amp; comment.task.userId !== userId) {
+      if (comment.userId !== userId && comment.task.userId !== userId) {
         throw new Error(`User ${userId} does not have permission to delete comment ${commentId}`);
       }
 
@@ -274,7 +274,7 @@ export class CollaborationDataDeletionService {
         where: { parentId: commentId },
       });
       
-      if (replies.length &gt; 0) {
+      if (replies.length > 0) {
         await this.taskCommentRepository.remove(replies);
         this.logger.log(`Deleted ${replies.length} replies to comment ${commentId}`);
       }
@@ -294,7 +294,7 @@ export class CollaborationDataDeletionService {
    * @param userId The ID of the user whose availability records should be deleted
    * @param availabilityId Optional ID of a specific availability record to delete
    */
-  async deleteUserAvailability(userId: string, availabilityId?: string): Promise&lt;void&gt; {
+  async deleteUserAvailability(userId: string, availabilityId?: string): Promise<void> {
     try {
       if (availabilityId) {
         this.logger.log(`Starting secure deletion of availability record ${availabilityId} for user ${userId}`);
@@ -316,7 +316,7 @@ export class CollaborationDataDeletionService {
           where: { userId },
         });
         
-        if (availabilities.length &gt; 0) {
+        if (availabilities.length > 0) {
           await this.userAvailabilityRepository.remove(availabilities);
           this.logger.log(`Deleted ${availabilities.length} availability records for user ${userId}`);
         }
@@ -332,7 +332,7 @@ export class CollaborationDataDeletionService {
    * This is useful when we need to retain data for legal or audit purposes
    * @param userId The ID of the user whose data should be anonymized
    */
-  async anonymizeUserCollaborationData(userId: string): Promise&lt;void&gt; {
+  async anonymizeUserCollaborationData(userId: string): Promise<void> {
     try {
       this.logger.log(`Starting anonymization of collaboration data for user ${userId}`);
 
@@ -341,7 +341,7 @@ export class CollaborationDataDeletionService {
         where: { ownerId: userId },
       });
       
-      if (ownedTaskShares.length &gt; 0) {
+      if (ownedTaskShares.length > 0) {
         for (const share of ownedTaskShares) {
           // Anonymize the owner information
           share.ownerId = 'anonymous';
@@ -359,7 +359,7 @@ export class CollaborationDataDeletionService {
         where: { sharedWithId: userId },
       });
       
-      if (receivedTaskShares.length &gt; 0) {
+      if (receivedTaskShares.length > 0) {
         for (const share of receivedTaskShares) {
           // Anonymize the recipient information
           share.sharedWithId = 'anonymous';
@@ -373,7 +373,7 @@ export class CollaborationDataDeletionService {
         where: { assignedById: userId },
       });
       
-      if (assignedTasks.length &gt; 0) {
+      if (assignedTasks.length > 0) {
         for (const assignment of assignedTasks) {
           // Anonymize the assigner information
           assignment.assignedById = 'anonymous';
@@ -391,7 +391,7 @@ export class CollaborationDataDeletionService {
         where: { assignedToId: userId },
       });
       
-      if (receivedAssignments.length &gt; 0) {
+      if (receivedAssignments.length > 0) {
         for (const assignment of receivedAssignments) {
           // Anonymize the assignee information
           assignment.assignedToId = 'anonymous';
@@ -405,7 +405,7 @@ export class CollaborationDataDeletionService {
         where: { userId },
       });
       
-      if (userComments.length &gt; 0) {
+      if (userComments.length > 0) {
         for (const comment of userComments) {
           // Anonymize the author information
           comment.userId = 'anonymous';
@@ -423,7 +423,7 @@ export class CollaborationDataDeletionService {
         where: { userId },
       });
       
-      if (userAvailabilities.length &gt; 0) {
+      if (userAvailabilities.length > 0) {
         await this.userAvailabilityRepository.remove(userAvailabilities);
         this.logger.log(`Deleted ${userAvailabilities.length} availability records for user ${userId}`);
       }

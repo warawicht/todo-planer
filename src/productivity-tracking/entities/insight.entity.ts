@@ -15,7 +15,8 @@ export class Insight {
 
   @Column({
     type: 'enum',
-    enum: ['improving_trend', 'declining_trend', 'pattern_identified', 'recommendation']
+    enum: ['improving_trend', 'declining_trend', 'pattern_identified', 'recommendation'],
+    enumName: 'insight_type_enum'
   })
   @IsString()
   type: InsightType;

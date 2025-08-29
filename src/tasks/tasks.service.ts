@@ -199,10 +199,16 @@ export class TasksService {
     
     // Perform partial update
     await this.tasksRepository.update({ id: subtaskId, parentId, userId }, updateSubtaskDto);
-    return this.tasksRepository.findOne({
+    const updatedSubtask = await this.tasksRepository.findOne({
       where: { id: subtaskId, parentId, userId },
       relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
+    
+    if (!updatedSubtask) {
+      throw new NotFoundException('Subtask not found after update');
+    }
+    
+    return updatedSubtask;
   }
 
   async removeSubtask(userId: string, parentId: string, subtaskId: string): Promise<void> {
@@ -278,12 +284,18 @@ export class TasksService {
     }
     
     // Convert subtask to regular task by removing parent relationship
-    await this.tasksRepository.update({ id: subtaskId, userId }, { parentId: null, position: null });
+    await this.tasksRepository.update({ id: subtaskId, userId }, { parentId: undefined, position: undefined });
     
-    return this.tasksRepository.findOne({
+    const convertedTask = await this.tasksRepository.findOne({
       where: { id: subtaskId, userId },
       relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
     });
+    
+    if (!convertedTask) {
+      throw new NotFoundException('Task not found after conversion');
+    }
+    
+    return convertedTask;
   }
 
   private isValidStatusTransition(currentStatus: string, newStatus: string): boolean {

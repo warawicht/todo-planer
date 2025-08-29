@@ -178,7 +178,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: taskId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(result).toEqual(task);
     });
@@ -358,7 +358,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.create).toHaveBeenCalledWith({
         ...createSubtaskDto,
@@ -437,7 +437,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.find).toHaveBeenCalledWith({
         where: { parentId, userId },
@@ -445,7 +445,7 @@ describe('TasksService', () => {
           position: 'ASC',
           createdAt: 'ASC',
         },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(result).toEqual(subtasks);
     });
@@ -496,11 +496,11 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: subtaskId, parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.update).toHaveBeenCalledWith(
         { id: subtaskId, parentId, userId },
@@ -568,7 +568,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: subtaskId, parentId, userId },
@@ -684,7 +684,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.find).toHaveBeenCalledWith({
         where: { parentId, userId },
@@ -700,7 +700,7 @@ describe('TasksService', () => {
           position: 'ASC',
           createdAt: 'ASC',
         },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(result).toEqual(reorderedSubtasks);
     });
@@ -781,7 +781,7 @@ describe('TasksService', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: parentId, userId },
-        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments'],
+        relations: ['project', 'tags', 'timeBlocks', 'subtasks', 'attachments', 'shares', 'assignments', 'comments'],
       });
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: subtaskId, parentId, userId },

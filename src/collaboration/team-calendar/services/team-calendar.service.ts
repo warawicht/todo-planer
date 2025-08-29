@@ -14,11 +14,11 @@ export class TeamCalendarService {
 
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository&lt;User&gt;,
+    private userRepository: Repository<User>,
     @InjectRepository(TimeBlock)
-    private timeBlockRepository: Repository&lt;TimeBlock&gt;,
+    private timeBlockRepository: Repository<TimeBlock>,
     @InjectRepository(UserAvailability)
-    private availabilityRepository: Repository&lt;UserAvailability&gt;,
+    private availabilityRepository: Repository<UserAvailability>,
     private readonly inputSanitizationService: InputSanitizationService,
     private readonly virtualScrollingService: VirtualScrollingService,
   ) {}
@@ -212,14 +212,14 @@ export class TeamCalendarService {
    * @param maxRetries Maximum number of retries (default: 3)
    * @param delay Delay between retries in milliseconds (default: 1000)
    */
-  private async retryOnNetworkFailure&lt;T&gt;(
-    operation: () => Promise&lt;T&gt;,
+  private async retryOnNetworkFailure<T>(
+    operation: () => Promise<T>,
     maxRetries: number = 3,
     delay: number = 1000
-  ): Promise&lt;T&gt; {
-    let lastError: Error;
+  ): Promise<T> {
+    let lastError: Error = new Error('Unknown error');
 
-    for (let attempt = 1; attempt &lt;= maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
       } catch (error) {

@@ -31,8 +31,8 @@ export class TeamCalendarController {
 
     return this.teamCalendarService.getTeamCalendarData(
       userIds,
-      startDate,
-      endDate,
+      startDate ? startDate.toISOString() : undefined,
+      endDate ? endDate.toISOString() : undefined,
       query.page,
       query.limit,
       query.search
@@ -49,8 +49,8 @@ export class TeamCalendarController {
 
     return this.teamCalendarService.getUserCalendarData(
       userId,
-      startDate,
-      endDate,
+      startDate ? startDate.toISOString() : undefined,
+      endDate ? endDate.toISOString() : undefined,
       query.page,
       query.limit,
       query.search
@@ -67,8 +67,8 @@ export class TeamCalendarController {
 
     return this.teamCalendarService.getUserCalendarData(
       req.user.id,
-      startDate,
-      endDate,
+      startDate ? startDate.toISOString() : undefined,
+      endDate ? endDate.toISOString() : undefined,
       query.page,
       query.limit,
       query.search

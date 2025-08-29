@@ -38,7 +38,7 @@ export class RolesService {
     return role;
   }
 
-  async findByName(name: string): Promise<Role> {
+  async findByName(name: string): Promise<Role | null> {
     return this.rolesRepository.findOne({
       where: { name },
     });

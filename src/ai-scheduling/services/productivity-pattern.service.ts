@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductivityPattern, ProductivityPatternType } from '../entities/productivity-pattern.entity';
-import { TimeBlocksService } from '../../time-blocks/services/time-blocks.service';
+import { TimeBlocksService } from '../../time-blocks/time-blocks.service';
 import { TasksService } from '../../tasks/tasks.service';
 import { ProductivityStatistic } from '../../productivity-tracking/entities/productivity-statistic.entity';
 

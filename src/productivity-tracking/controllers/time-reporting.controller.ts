@@ -10,7 +10,7 @@ import {
 import { TimeReportingService } from '../services/time-reporting.service';
 import { TimeReportDto } from '../dto/time-report.dto';
 import { ExportTimeReportDto } from '../dto/export-time-report.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('analytics/time-report')
 @UseGuards(JwtAuthGuard)

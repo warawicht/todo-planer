@@ -162,7 +162,7 @@ export class ReportGenerationService {
     }
 
     const tasks = await query.getMany();
-    const completedTasks = tasks.filter(task => task.completed);
+    const completedTasks = tasks.filter(task => task.completedAt !== null);
 
     return {
       totalTasks: tasks.length,

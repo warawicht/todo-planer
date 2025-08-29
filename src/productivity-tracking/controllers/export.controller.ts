@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ExportService } from '../services/export.service';
 import { ExportDataDto } from '../dto/export-data.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { AnalyticsExport } from '../entities/analytics-export.entity';
 
 @Controller('analytics/export')

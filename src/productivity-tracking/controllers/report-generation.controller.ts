@@ -12,7 +12,7 @@ import {
 import { ReportGenerationService } from '../services/report-generation.service';
 import { CreateReportTemplateDto } from '../dto/create-report-template.dto';
 import { GenerateReportDto } from '../dto/generate-report.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { ReportTemplate } from '../entities/report-template.entity';
 
 @Controller('analytics/reports')

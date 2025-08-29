@@ -7,6 +7,7 @@ import { TasksService } from '../tasks.service';
 import { createReadStream, promises as fsPromises } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import type { Express } from 'express';
 
 @Injectable()
 export class TaskAttachmentsService {

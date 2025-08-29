@@ -104,7 +104,10 @@ export class LazyLoadingService {
         if (!aggregatedByDay.has(dateKey)) {
           aggregatedByDay.set(dateKey, []);
         }
-        aggregatedByDay.get(dateKey).push(timeBlock);
+        const dayBlocks = aggregatedByDay.get(dateKey);
+        if (dayBlocks) {
+          dayBlocks.push(timeBlock);
+        }
       }
       
       // Create simplified time blocks for each day

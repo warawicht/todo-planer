@@ -31,7 +31,7 @@ export class PerformanceMonitoringService {
       this.performanceMetrics.set(operationName, []);
     }
     
-    const metrics = this.performanceMetrics.get(operationName);
+    const metrics = this.performanceMetrics.get(operationName) || [];
     metrics.push(duration);
     
     // Keep only the last 100 measurements to prevent memory issues

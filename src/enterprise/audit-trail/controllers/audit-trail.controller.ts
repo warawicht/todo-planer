@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { AuditTrailService } from '../services/audit-trail.service';
 import { AuditTrail } from '../../entities/audit-trail.entity';
 import { AuditTrailQueryDto } from '../dtos/audit-trail-query.dto';

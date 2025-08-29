@@ -11,7 +11,7 @@ import {
 import { InsightsService } from '../services/insights.service';
 import { GetInsightsDto } from '../dto/get-insights.dto';
 import { DismissInsightDto } from '../dto/dismiss-insight.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Insight } from '../entities/insight.entity';
 
 @Controller('analytics/insights')
@@ -25,23 +25,19 @@ export class InsightsController {
    * Retrieve AI-powered productivity insights
    */
   @Get()
-  async getProductivityInsights(@Query() getInsightsDto: GetInsightsDto): Promise<{
+  async getProductivityInsights(@Query('userId') userId: string): Promise<{
     generatedAt: Date;
     insights: Insight[];
   }> {
     try {
-      const insights = await this.insightsService.getUserInsights(
-        getInsightsDto.userId,
-        getInsightsDto.startDate ? new Date(getInsightsDto.startDate) : undefined,
-        getInsightsDto.endDate ? new Date(getInsightsDto.endDate) : undefined
-      );
+      const insights = await this.insightsService.getUserInsights(userId);
       
       return {
         generatedAt: new Date(),
         insights
       };
     } catch (error) {
-      this.logger.error(`Error retrieving insights for user ${getInsightsDto.userId}: ${error.message}`);
+      this.logger.error(`Error retrieving insights for user ${userId}: ${error.message}`);
       throw error;
     }
   }

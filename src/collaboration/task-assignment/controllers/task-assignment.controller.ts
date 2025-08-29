@@ -36,7 +36,7 @@ export class TaskAssignmentController {
     @Query('status') status?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ): Promise<TaskAssignment[]> {
+  ): Promise<{ data: TaskAssignment[]; total: number; page: number; limit: number }> {
     // Ensure limit is between 1 and 100
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
     return this.taskAssignmentService.getAssignedTasks(req.user.id, status);

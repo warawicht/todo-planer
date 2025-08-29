@@ -1,5 +1,6 @@
-import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users/user.entity';

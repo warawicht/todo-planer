@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SchedulingSuggestionService } from './scheduling-suggestion.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AISuggestion } from '../entities/ai-suggestion.entity';
-import { TimeBlocksService } from '../../time-blocks/services/time-blocks.service';
+import { TimeBlocksService } from '../../time-blocks/time-blocks.service';
 import { TasksService } from '../../tasks/tasks.service';
 
 describe('SchedulingSuggestionService', () => {
@@ -65,7 +65,10 @@ describe('SchedulingSuggestionService', () => {
       (service as any).aiSuggestionRepository.save = jest.fn().mockResolvedValue({ ...mockSuggestion, isDismissed: true });
       
       const result = await service.dismissSuggestion(userId, suggestionId);
-      expect(result.isDismissed).toBe(true);
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.isDismissed).toBe(true);
+      }
     });
 
     it('should return null for non-existent suggestion', async () => {

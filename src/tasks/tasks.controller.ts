@@ -9,7 +9,7 @@ import { TaskAttachmentDto } from './dto/attachments/task-attachment.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { TaskWithCollaborationDto } from './dto/task-with-collaboration.dto';
 
 @Controller('tasks')
@@ -156,7 +156,7 @@ export class TasksController {
     @Request() req, 
     @Param('id') id: string, 
     @Param('attachmentId') attachmentId: string,
-    @Res() res: Response
+    @Res({ passthrough: true }) res: Response
   ) {
     const { stream, filename, mimeType } = await this.taskAttachmentsService.downloadFile(
       req.user.id, 
@@ -169,7 +169,7 @@ export class TasksController {
       'Content-Disposition': `attachment; filename="${filename}"`,
     });
     
-    return stream.pipe(res);
+    return stream;
   }
 
   @Delete(':id/attachments/:attachmentId')

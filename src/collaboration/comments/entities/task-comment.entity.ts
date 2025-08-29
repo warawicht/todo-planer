@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, VersionColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, VersionColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Task } from '../../../tasks/entities/task.entity';
 import { User } from '../../../users/user.entity';
 
@@ -17,7 +17,7 @@ export class TaskComment {
   @Column({ type: 'uuid' })
   userId: string;
 
-  @ManyToOne(() => User, user => user.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.taskComments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

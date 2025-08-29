@@ -66,7 +66,27 @@ describe('AuthController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         refreshTokens: [],
-      });
+        tasks: [],
+        projects: [],
+        tags: [],
+        timeBlocks: [],
+        taskAttachments: [],
+        calendarViewPreference: undefined,
+        notifications: [],
+        productivityStatistics: [],
+        timeEntries: [],
+        trendData: [],
+        dashboardWidgets: [],
+        sharedTasks: [],
+        receivedSharedTasks: [],
+        assignedTasks: [],
+        receivedAssignedTasks: [],
+        taskComments: [],
+        availability: [],
+        userRoles: [],
+        activityLogs: [],
+        auditTrails: [],
+      } as any);
 
       const result = await controller.register(registerDto);
 

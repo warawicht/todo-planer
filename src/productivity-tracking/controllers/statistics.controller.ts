@@ -1,4 +1,5 @@
-import { Controller, Get, Query, Param, ParseUUIDPipe, ParseDatePipe } from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseUUIDPipe } from '@nestjs/common';
+import { ParseDatePipe } from '../pipes/parse-date.pipe';
 import { StatisticsService } from '../services/statistics.service';
 import { ProductivityException } from '../exceptions/productivity.exception';
 

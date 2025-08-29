@@ -33,7 +33,7 @@ export class CommentController {
   @Get(':taskId/comments')
   async getCommentsForTask(
     @Param('taskId') taskId: string,
-  ): Promise<TaskComment[]> {
+  ): Promise<{ data: TaskComment[]; total: number; page: number; limit: number }> {
     return this.commentService.getCommentsForTask(taskId);
   }
 

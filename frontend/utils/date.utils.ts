@@ -21,7 +21,7 @@ export const getEndOfMonth = (date: Date): Date => {
 };
 
 export const getDaysInMonth = (year: number, month: number): Date[] => {
-  const days = [];
+  const days: Date[] = [];
   const date = new Date(year, month, 1);
   const endDate = new Date(year, month + 1, 0);
   

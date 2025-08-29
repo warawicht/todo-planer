@@ -8,8 +8,8 @@ import {
   Body,
   Query,
   ParseUUIDPipe,
-  ParseDatePipe,
 } from '@nestjs/common';
+import { ParseDatePipe } from '../pipes/parse-date.pipe';
 import { TimeTrackingService } from '../services/time-tracking.service';
 import { TimeEntryDto } from '../dto/time-entry.dto';
 import { ProductivityException } from '../exceptions/productivity.exception';

@@ -4,6 +4,7 @@ import { ProfilePreferenceService } from '../services/profile-preference.service
 import { ProfilePreferenceDto, ProfilePreferenceResponseDto } from '../dto/profile-preference.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { FileUploadService } from '../services/file-upload.service';
+import type { Express } from 'express';
 
 @Controller('settings/profile')
 @UseGuards(JwtAuthGuard)

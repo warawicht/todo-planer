@@ -27,6 +27,9 @@ export class EmailTemplateService {
     }
     
     const template = this.templates.get(templateName);
+    if (!template) {
+      throw new Error(`Template ${templateName} not found`);
+    }
     return template(context);
   }
 }

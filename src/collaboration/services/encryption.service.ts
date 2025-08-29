@@ -48,14 +48,14 @@ export class EncryptionService {
       const iv = crypto.randomBytes(this.defaultConfig.ivLength);
       
       // Create cipher
-      const cipher = crypto.createCipher(this.defaultConfig.algorithm, this.encryptionKey);
+      const cipher = crypto.createCipheriv(this.defaultConfig.algorithm, this.encryptionKey, iv);
       
       // Encrypt the data
       let encrypted = cipher.update(data, 'utf8', 'hex');
       encrypted += cipher.final('hex');
       
       // Get the authentication tag
-      const authTag = cipher.getAuthTag();
+      const authTag = (cipher as any).getAuthTag();
       
       // Combine IV, auth tag, and encrypted data
       const result = JSON.stringify({
@@ -83,10 +83,14 @@ export class EncryptionService {
       const { iv, authTag, data } = JSON.parse(decoded);
       
       // Create decipher
-      const decipher = crypto.createDecipher(this.defaultConfig.algorithm, this.encryptionKey);
+      const decipher = crypto.createDecipheriv(
+        this.defaultConfig.algorithm, 
+        this.encryptionKey, 
+        Buffer.from(iv, 'hex')
+      );
       
       // Set the authentication tag
-      decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+      (decipher as any).setAuthTag(Buffer.from(authTag, 'hex'));
       
       // Decrypt the data
       let decrypted = decipher.update(data, 'hex', 'utf8');

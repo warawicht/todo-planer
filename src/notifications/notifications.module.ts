@@ -42,6 +42,6 @@ import { UsersService } from '../users/users.service';
     NotificationPreferenceService,
     UsersService,
   ],
-  exports: [NotificationService],
+  exports: [NotificationService, QuietHoursService, NotificationPreferenceService],
 })
 export class NotificationsModule {}

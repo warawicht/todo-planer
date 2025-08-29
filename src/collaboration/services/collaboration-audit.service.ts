@@ -12,7 +12,7 @@ export interface CollaborationAuditLog {
   ipAddress?: string;
   userAgent?: string;
   timestamp: Date;
-  details?: Record&lt;string, any&gt;;
+  details?: Record<string, any>;
 }
 
 @Injectable()
@@ -21,14 +21,14 @@ export class CollaborationAuditService {
 
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository&lt;User&gt;,
+    private userRepository: Repository<User>,
   ) {}
 
   /**
    * Log a collaboration action for audit purposes
    * @param log The audit log entry to record
    */
-  async logAction(log: CollaborationAuditLog): Promise&lt;void&gt; {
+  async logAction(log: CollaborationAuditLog): Promise<void> {
     try {
       // In a production environment, this would save to a dedicated audit log database
       // For now, we'll log to the application logger
@@ -67,7 +67,7 @@ export class CollaborationAuditService {
     permissionLevel: string,
     ipAddress?: string,
     userAgent?: string,
-  ): Promise&lt;void&gt; {
+  ): Promise<void> {
     await this.logAction({
       userId,
       action: 'TASK_SHARE',
@@ -97,7 +97,7 @@ export class CollaborationAuditService {
     assignedToId: string,
     ipAddress?: string,
     userAgent?: string,
-  ): Promise&lt;void&gt; {
+  ): Promise<void> {
     await this.logAction({
       userId,
       action: 'TASK_ASSIGN',
@@ -128,7 +128,7 @@ export class CollaborationAuditService {
     action: 'CREATE' | 'UPDATE' | 'DELETE',
     ipAddress?: string,
     userAgent?: string,
-  ): Promise&lt;void&gt; {
+  ): Promise<void> {
     await this.logAction({
       userId,
       action: `COMMENT_${action}`,
@@ -157,7 +157,7 @@ export class CollaborationAuditService {
     action: 'CREATE' | 'UPDATE' | 'DELETE',
     ipAddress?: string,
     userAgent?: string,
-  ): Promise&lt;void&gt; {
+  ): Promise<void> {
     await this.logAction({
       userId,
       action: `AVAILABILITY_${action}`,
@@ -181,7 +181,7 @@ export class CollaborationAuditService {
     action: 'VIEW_TEAM_CALENDAR' | 'VIEW_USER_CALENDAR',
     ipAddress?: string,
     userAgent?: string,
-  ): Promise&lt;void&gt; {
+  ): Promise<void> {
     await this.logAction({
       userId,
       action,
@@ -199,7 +199,7 @@ export class CollaborationAuditService {
    * @param limit The maximum number of logs to return
    * @param offset The offset for pagination
    */
-  async getUserAuditLogs(userId: string, limit: number = 50, offset: number = 0): Promise&lt;CollaborationAuditLog[]&gt; {
+  async getUserAuditLogs(userId: string, limit: number = 50, offset: number = 0): Promise<CollaborationAuditLog[]> {
     // In a production environment, this would query the audit log database
     // For now, we'll return an empty array as we're only logging to the application logger
     this.logger.debug(`Getting audit logs for user ${userId} with limit ${limit} and offset ${offset}`);
@@ -218,7 +218,7 @@ export class CollaborationAuditService {
     resourceId: string,
     limit: number = 50,
     offset: number = 0,
-  ): Promise&lt;CollaborationAuditLog[]&gt; {
+  ): Promise<CollaborationAuditLog[]> {
     // In a production environment, this would query the audit log database
     // For now, we'll return an empty array as we're only logging to the application logger
     this.logger.debug(

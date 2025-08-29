@@ -1,9 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger, Inject } from '@nestjs/common';
 import { CollaborationPermissionService } from '../services/collaboration-permission.service';
 import { TaskSharingService } from '../task-sharing/services/task-sharing.service';
 import { TaskAssignmentService } from '../task-assignment/services/task-assignment.service';
-import { TaskService } from '../../tasks/services/tasks.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TasksService } from '../../tasks/tasks.service';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from '../../tasks/entities/task.entity';
 import { Repository } from 'typeorm';
 
@@ -22,12 +22,12 @@ export class CollaborationAccessGuard implements CanActivate {
     private readonly collaborationPermissionService: CollaborationPermissionService,
     private readonly taskSharingService: TaskSharingService,
     private readonly taskAssignmentService: TaskAssignmentService,
-    private readonly taskService: TaskService,
+    private readonly taskService: TasksService,
     @InjectRepository(Task)
-    private taskRepository: Repository&lt;Task&gt;,
+    private taskRepository: Repository<Task>,
   ) {}
 
-  async canActivate(context: ExecutionContext): Promise&lt;boolean&gt; {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     const params = request.params;
@@ -49,13 +49,13 @@ export class CollaborationAccessGuard implements CanActivate {
       // Check permissions based on resource type and action
       switch (options.resourceType) {
         case 'task':
-          return await this.checkTaskAccess(user, params, options);
+          return await this.checkTaskAccess(user, params, body, options);
         case 'comment':
-          return await this.checkCommentAccess(user, params, options);
+          return await this.checkCommentAccess(user, params, body, options);
         case 'availability':
           return await this.checkAvailabilityAccess(user, params, options);
         case 'calendar':
-          return await this.checkCalendarAccess(user, params, options);
+          return await this.checkCalendarAccess(user, params, query, options);
         default:
           this.logger.warn(`Unknown resource type: ${options.resourceType}`);
           return false;
@@ -66,8 +66,8 @@ export class CollaborationAccessGuard implements CanActivate {
     }
   }
 
-  private async checkTaskAccess(user: any, params: any, options: CollaborationAccessControlOptions): Promise&lt;boolean&gt; {
-    const taskId = params.taskId || params.id || body.taskId;
+  private async checkTaskAccess(user: any, params: any, body: any, options: CollaborationAccessControlOptions): Promise<boolean> {
+    const taskId = params.taskId || params.id || body?.taskId;
     
     if (!taskId) {
       this.logger.warn('Task ID not found in request');
@@ -86,13 +86,13 @@ export class CollaborationAccessGuard implements CanActivate {
     }
 
     // If checking ownership, verify the user is the task owner
-    if (options.checkOwnership &amp;&amp; task.userId !== user.id) {
+    if (options.checkOwnership && task.userId !== user.id) {
       this.logger.warn(`User ${user.id} is not the owner of task ${taskId}`);
       return false;
     }
 
     // If checking task ownership specifically, verify the user is the task owner
-    if (options.checkTaskOwnership &amp;&amp; task.userId !== user.id) {
+    if (options.checkTaskOwnership && task.userId !== user.id) {
       this.logger.warn(`User ${user.id} is not the owner of task ${taskId}`);
       return false;
     }
@@ -120,21 +120,26 @@ export class CollaborationAccessGuard implements CanActivate {
     }
   }
 
-  private async checkCommentAccess(user: any, params: any, options: CollaborationAccessControlOptions): Promise&lt;boolean&gt; {
+  private async checkCommentAccess(user: any, params: any, body: any, options: CollaborationAccessControlOptions): Promise<boolean> {
     const commentId = params.commentId || params.id;
-    const taskId = params.taskId || body.taskId;
+    const taskId = params.taskId || body?.taskId;
     
-    if (!commentId &amp;&amp; !taskId) {
+    if (!commentId && !taskId) {
       this.logger.warn('Comment ID or Task ID not found in request');
       return false;
     }
 
     let task: Task;
     if (taskId) {
-      task = await this.taskRepository.findOne({
+      const taskResult = await this.taskRepository.findOne({
         where: { id: taskId },
         relations: ['user'], // Load the task owner
       });
+      if (!taskResult) {
+        this.logger.warn(`Task not found: ${taskId}`);
+        return false;
+      }
+      task = taskResult;
     } else {
       // If we only have commentId, we'd need to get the task from the comment
       // This would require importing the TaskComment entity and repository
@@ -171,7 +176,7 @@ export class CollaborationAccessGuard implements CanActivate {
     }
   }
 
-  private async checkAvailabilityAccess(user: any, params: any, options: CollaborationAccessControlOptions): Promise&lt;boolean&gt; {
+  private async checkAvailabilityAccess(user: any, params: any, options: CollaborationAccessControlOptions): Promise<boolean> {
     const userId = params.userId || user.id;
     
     // Users can only access their own availability data
@@ -186,11 +191,11 @@ export class CollaborationAccessGuard implements CanActivate {
     return true;
   }
 
-  private async checkCalendarAccess(user: any, params: any, options: CollaborationAccessControlOptions): Promise&lt;boolean&gt; {
-    const userIds = params.userIds || query.userIds;
+  private async checkCalendarAccess(user: any, params: any, query: any, options: CollaborationAccessControlOptions): Promise<boolean> {
+    const userIds = params.userIds || query?.userIds;
     
     // If requesting team calendar data, check if user has permission to view team data
-    if (userIds &amp;&amp; Array.isArray(userIds)) {
+    if (userIds && Array.isArray(userIds)) {
       // Check if user is requesting their own data or has permission to view team data
       if (userIds.includes(user.id)) {
         return true;

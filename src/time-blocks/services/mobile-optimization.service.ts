@@ -35,12 +35,13 @@ export class MobileOptimizationService {
     return {
       id: timeBlock.id,
       title: timeBlock.title,
+      description: timeBlock.description || '',
       startTime: timeBlock.startTime,
       endTime: timeBlock.endTime,
       color: timeBlock.color,
       taskId: timeBlock.taskId,
       taskTitle: timeBlock.task ? timeBlock.task.title : ''
-      // Omit description and other non-essential fields for mobile
+      // Omit other non-essential fields for mobile
     };
   }
 
@@ -91,7 +92,10 @@ export class MobileOptimizationService {
       if (!aggregatedByDay.has(dateKey)) {
         aggregatedByDay.set(dateKey, []);
       }
-      aggregatedByDay.get(dateKey).push(timeBlock);
+      const dayBlocks = aggregatedByDay.get(dateKey);
+      if (dayBlocks) {
+        dayBlocks.push(timeBlock);
+      }
     }
     
     // Create simplified time blocks for each day
@@ -101,11 +105,12 @@ export class MobileOptimizationService {
         const simplifiedTimeBlock: CalendarTimeBlockDto = {
           id: `mobile-aggregated-${dateKey}`,
           title: `${dayTimeBlocks.length} event${dayTimeBlocks.length > 1 ? 's' : ''}`,
+          description: '',
           startTime: new Date(dateKey),
           endTime: new Date(dateKey),
           color: dayTimeBlocks[0].color || '#007bff',
-          taskId: null,
-          taskTitle: ''
+          taskId: dayTimeBlocks[0].taskId || '',
+          taskTitle: dayTimeBlocks[0].task ? dayTimeBlocks[0].task.title : ''
         };
         simplifiedTimeBlocks.push(simplifiedTimeBlock);
       }
@@ -131,6 +136,7 @@ export class MobileOptimizationService {
     return limitedTimeBlocks.map(tb => ({
       id: tb.id,
       title: tb.title,
+      description: tb.description || '',
       startTime: tb.startTime,
       endTime: tb.endTime,
       color: tb.color,

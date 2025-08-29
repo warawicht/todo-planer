@@ -38,7 +38,7 @@ export class TaskSharingController {
     @Query('status') status?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ): Promise<TaskShare[]> {
+  ): Promise<{ data: TaskShare[]; total: number; page: number; limit: number }> {
     // Ensure limit is between 1 and 100
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
     return this.taskSharingService.getSharedTasks(req.user.id, permissionLevel, status);

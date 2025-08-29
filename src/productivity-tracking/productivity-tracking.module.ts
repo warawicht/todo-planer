@@ -18,6 +18,7 @@ import { GoalTrackingService } from './services/goal-tracking.service';
 import { ReportGenerationService } from './services/report-generation.service';
 import { ExportService } from './services/export.service';
 import { AnalyticsCacheService } from './services/analytics-cache.service';
+import { ParseDatePipe } from './pipes/parse-date.pipe';
 import { StatisticsController } from './controllers/statistics.controller';
 import { TimeTrackingController } from './controllers/time-tracking.controller';
 import { DashboardController } from './controllers/dashboard.controller';
@@ -67,6 +68,7 @@ import { Project } from '../projects/entities/project.entity';
     ReportGenerationService,
     ExportService,
     AnalyticsCacheService,
+    ParseDatePipe,
   ],
   exports: [
     StatisticsService,
@@ -79,6 +81,7 @@ import { Project } from '../projects/entities/project.entity';
     ReportGenerationService,
     ExportService,
     AnalyticsCacheService,
+    ParseDatePipe,
   ],
 })
 export class ProductivityTrackingModule {}

@@ -1,4 +1,5 @@
-import { Module, CacheModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskSharingModule } from './task-sharing/task-sharing.module';
 import { TaskAssignmentModule } from './task-assignment/task-assignment.module';
@@ -29,6 +30,7 @@ import { User } from '../users/user.entity';
 import { CollaborationHealthIndicator } from './services/collaboration-health.service';
 import { CollaborationMonitoringService } from './services/collaboration-monitoring.service';
 import { CollaborationBackupService } from './services/collaboration-backup.service';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { CollaborationBackupService } from './services/collaboration-backup.serv
     AvailabilityModule,
     TeamCalendarModule,
     TasksModule,
+    NotificationsModule,
     TypeOrmModule.forFeature([
       Notification, 
       Task, 

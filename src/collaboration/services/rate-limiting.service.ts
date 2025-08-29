@@ -109,6 +109,17 @@ export class RateLimitingService {
   }
 
   /**
+   * Get rate limiting statistics
+   * @returns Rate limiting statistics
+   */
+  getStats(): Record<string, any> {
+    return {
+      totalRecords: this.rateLimitStore.size,
+      status: 'active'
+    };
+  }
+
+  /**
    * Reset rate limit for a user and endpoint
    * @param userId The user ID
    * @param endpoint The endpoint name

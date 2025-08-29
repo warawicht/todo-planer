@@ -1,6 +1,7 @@
-import { Module, CacheModule, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as redisStore from 'cache-manager-ioredis';
+// import * as redisStore from 'cache-manager-ioredis';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { UserManagementModule } from './user-management/user-management.module';
@@ -22,9 +23,9 @@ import { ActivityLoggingMiddleware } from './middleware/activity-logging.middlew
 @Module({
   imports: [
     CacheModule.register({
-      store: redisStore,
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
+      // store: redisStore,
+      // host: process.env.REDIS_HOST || 'localhost',
+      // port: parseInt(process.env.REDIS_PORT || '6379'),
       ttl: 300, // 5 minutes
     }),
     TypeOrmModule.forFeature([

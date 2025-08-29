@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException, Logger, OptimisticLockCanRetryException, BadRequestException, CACHE_MANAGER, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException, Logger, BadRequestException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository, QueryFailedError, OptimisticLockVersionMismatchError } from 'typeorm';
 import { TaskShare } from '../entities/task-share.entity';
 import { CreateTaskShareDto } from '../dto/create-task-share.dto';
 import { UpdateTaskShareDto } from '../dto/update-task-share.dto';
@@ -11,7 +12,7 @@ import { PaginationDto } from '../../dto/pagination.dto';
 import { CollaborationCacheService } from '../../services/collaboration-cache.service';
 import { PermissionConflictService } from '../../services/permission-conflict.service';
 import { TaskAssignment } from '../../task-assignment/entities/task-assignment.entity';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class TaskSharingService {
@@ -128,7 +129,7 @@ export class TaskSharingService {
     // Generate cache key
     const cacheKey = this.collaborationCacheService.generateTaskSharesCacheKey(
       sanitizedUserId, 
-      sanitizedPermissionLevel, 
+      sanitizedPermissionLevel || undefined, 
       status
     );
 
@@ -226,7 +227,7 @@ export class TaskSharingService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when updating task share ${sanitizedShareId}`);
-          throw new OptimisticLockCanRetryException('Task share was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskShare', 0, 0);
         }
         throw error;
       }
@@ -275,7 +276,7 @@ export class TaskSharingService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when revoking task share ${sanitizedShareId}`);
-          throw new OptimisticLockCanRetryException('Task share was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskShare', 0, 0);
         }
         throw error;
       }
@@ -328,7 +329,7 @@ export class TaskSharingService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when accepting task share ${sanitizedShareId}`);
-          throw new OptimisticLockCanRetryException('Task share was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskShare', 0, 0);
         }
         throw error;
       }
@@ -346,16 +347,9 @@ export class TaskSharingService {
   }
 
   async getTaskShareById(shareId: string): Promise<TaskShare> {
-    // Sanitize inputs
-    const sanitizedShareId = this.inputSanitizationService.sanitizeUuid(shareId);
-
-    if (!sanitizedShareId) {
-      throw new BadRequestException('Invalid share ID');
-    }
-
     return await this.retryOnNetworkFailure(async () => {
       const taskShare = await this.taskShareRepository.findOne({
-        where: { id: sanitizedShareId },
+        where: { id: shareId },
         relations: ['task', 'owner', 'sharedWith']
       });
 
@@ -364,6 +358,20 @@ export class TaskSharingService {
       }
 
       return taskShare;
+    });
+  }
+
+  /**
+   * Get task share by task ID and user ID
+   * @param taskId The task ID
+   * @param userId The user ID
+   * @returns The task share or null if not found
+   */
+  async getTaskShareByTaskAndUser(taskId: string, userId: string): Promise<TaskShare | null> {
+    return await this.retryOnNetworkFailure(async () => {
+      return await this.taskShareRepository.findOne({
+        where: { taskId, sharedWithId: userId }
+      });
     });
   }
 
@@ -378,7 +386,7 @@ export class TaskSharingService {
     maxRetries: number = 3,
     delay: number = 1000
   ): Promise<T> {
-    let lastError: Error;
+    let lastError: Error = new Error('Unknown error');
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {

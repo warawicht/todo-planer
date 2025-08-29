@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AISuggestion, AISuggestionType } from '../entities/ai-suggestion.entity';
-import { TimeBlocksService } from '../../time-blocks/services/time-blocks.service';
+import { TimeBlocksService } from '../../time-blocks/time-blocks.service';
 import { TasksService } from '../../tasks/tasks.service';
 import { ProductivityStatistic } from '../../productivity-tracking/entities/productivity-statistic.entity';
 
@@ -32,7 +32,7 @@ export class SchedulingSuggestionService {
     return {};
   }
 
-  async dismissSuggestion(userId: string, suggestionId: string): Promise<AISuggestion> {
+  async dismissSuggestion(userId: string, suggestionId: string): Promise<AISuggestion | null> {
     const suggestion = await this.aiSuggestionRepository.findOne({
       where: { id: suggestionId, userId },
     });

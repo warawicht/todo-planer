@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductivityPatternService } from './productivity-pattern.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ProductivityPattern } from '../entities/productivity-pattern.entity';
-import { TimeBlocksService } from '../../time-blocks/services/time-blocks.service';
+import { TimeBlocksService } from '../../time-blocks/time-blocks.service';
 import { TasksService } from '../../tasks/tasks.service';
 
 describe('ProductivityPatternService', () => {

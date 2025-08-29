@@ -5,7 +5,7 @@ export class ApprovalRecord {
   userId: string;
   action: 'approved' | 'rejected';
   timestamp: Date;
-  comments: string;
+  comments?: string;
 }
 
 @Entity('workflow_instances')

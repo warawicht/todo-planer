@@ -1,52 +1,36 @@
-import localforage from 'localforage';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Task } from '../tasks/entities/task.entity';
 import { TimeBlock } from '../time-blocks/entities/time-block.entity';
 import { Project } from '../projects/entities/project.entity';
 
 export class LocalForageService {
-  private taskStore: localforage.LocalForage;
-  private timeBlockStore: localforage.LocalForage;
-  private projectStore: localforage.LocalForage;
-  private syncQueueStore: localforage.LocalForage;
+  private readonly basePath = './offline-storage';
 
   constructor() {
-    this.initializeStores();
+    // Ensure base directory exists
+    if (!fs.existsSync(this.basePath)) {
+      fs.mkdirSync(this.basePath, { recursive: true });
+    }
   }
 
-  private initializeStores(): void {
-    // Initialize Tasks store
-    this.taskStore = localforage.createInstance({
-      name: 'TodoPlaner',
-      storeName: 'tasks',
-      description: 'Tasks storage for offline functionality'
-    });
+  private getStorePath(storeName: string): string {
+    const storePath = path.join(this.basePath, storeName);
+    if (!fs.existsSync(storePath)) {
+      fs.mkdirSync(storePath, { recursive: true });
+    }
+    return storePath;
+  }
 
-    // Initialize TimeBlocks store
-    this.timeBlockStore = localforage.createInstance({
-      name: 'TodoPlaner',
-      storeName: 'timeBlocks',
-      description: 'Time blocks storage for offline functionality'
-    });
-
-    // Initialize Projects store
-    this.projectStore = localforage.createInstance({
-      name: 'TodoPlaner',
-      storeName: 'projects',
-      description: 'Projects storage for offline functionality'
-    });
-
-    // Initialize Sync Queue store
-    this.syncQueueStore = localforage.createInstance({
-      name: 'TodoPlaner',
-      storeName: 'syncQueue',
-      description: 'Sync queue for pending changes'
-    });
+  private getFilePath(storeName: string, key: string): string {
+    return path.join(this.getStorePath(storeName), `${key}.json`);
   }
 
   // Task operations
   async saveTask(task: Task): Promise<void> {
     try {
-      await this.taskStore.setItem(task.id, task);
+      const filePath = this.getFilePath('tasks', task.id);
+      await fs.promises.writeFile(filePath, JSON.stringify(task, null, 2));
     } catch (error) {
       console.error('Error saving task to local storage:', error);
       throw error;
@@ -55,8 +39,12 @@ export class LocalForageService {
 
   async getTask(id: string): Promise<Task | null> {
     try {
-      const task = await this.taskStore.getItem<Task>(id);
-      return task || null;
+      const filePath = this.getFilePath('tasks', id);
+      if (!fs.existsSync(filePath)) {
+        return null;
+      }
+      const data = await fs.promises.readFile(filePath, 'utf8');
+      return JSON.parse(data);
     } catch (error) {
       console.error('Error retrieving task from local storage:', error);
       return null;
@@ -65,10 +53,18 @@ export class LocalForageService {
 
   async getAllTasks(): Promise<Task[]> {
     try {
+      const storePath = this.getStorePath('tasks');
+      const files = await fs.promises.readdir(storePath);
       const tasks: Task[] = [];
-      await this.taskStore.iterate((task: Task) => {
-        tasks.push(task);
-      });
+      
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(storePath, file);
+          const data = await fs.promises.readFile(filePath, 'utf8');
+          tasks.push(JSON.parse(data));
+        }
+      }
+      
       return tasks;
     } catch (error) {
       console.error('Error retrieving all tasks from local storage:', error);
@@ -78,7 +74,10 @@ export class LocalForageService {
 
   async deleteTask(id: string): Promise<void> {
     try {
-      await this.taskStore.removeItem(id);
+      const filePath = this.getFilePath('tasks', id);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
     } catch (error) {
       console.error('Error deleting task from local storage:', error);
       throw error;
@@ -88,7 +87,8 @@ export class LocalForageService {
   // TimeBlock operations
   async saveTimeBlock(timeBlock: TimeBlock): Promise<void> {
     try {
-      await this.timeBlockStore.setItem(timeBlock.id, timeBlock);
+      const filePath = this.getFilePath('timeBlocks', timeBlock.id);
+      await fs.promises.writeFile(filePath, JSON.stringify(timeBlock, null, 2));
     } catch (error) {
       console.error('Error saving time block to local storage:', error);
       throw error;
@@ -97,8 +97,12 @@ export class LocalForageService {
 
   async getTimeBlock(id: string): Promise<TimeBlock | null> {
     try {
-      const timeBlock = await this.timeBlockStore.getItem<TimeBlock>(id);
-      return timeBlock || null;
+      const filePath = this.getFilePath('timeBlocks', id);
+      if (!fs.existsSync(filePath)) {
+        return null;
+      }
+      const data = await fs.promises.readFile(filePath, 'utf8');
+      return JSON.parse(data);
     } catch (error) {
       console.error('Error retrieving time block from local storage:', error);
       return null;
@@ -107,10 +111,18 @@ export class LocalForageService {
 
   async getAllTimeBlocks(): Promise<TimeBlock[]> {
     try {
+      const storePath = this.getStorePath('timeBlocks');
+      const files = await fs.promises.readdir(storePath);
       const timeBlocks: TimeBlock[] = [];
-      await this.timeBlockStore.iterate((timeBlock: TimeBlock) => {
-        timeBlocks.push(timeBlock);
-      });
+      
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(storePath, file);
+          const data = await fs.promises.readFile(filePath, 'utf8');
+          timeBlocks.push(JSON.parse(data));
+        }
+      }
+      
       return timeBlocks;
     } catch (error) {
       console.error('Error retrieving all time blocks from local storage:', error);
@@ -120,7 +132,10 @@ export class LocalForageService {
 
   async deleteTimeBlock(id: string): Promise<void> {
     try {
-      await this.timeBlockStore.removeItem(id);
+      const filePath = this.getFilePath('timeBlocks', id);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
     } catch (error) {
       console.error('Error deleting time block from local storage:', error);
       throw error;
@@ -130,7 +145,8 @@ export class LocalForageService {
   // Project operations
   async saveProject(project: Project): Promise<void> {
     try {
-      await this.projectStore.setItem(project.id, project);
+      const filePath = this.getFilePath('projects', project.id);
+      await fs.promises.writeFile(filePath, JSON.stringify(project, null, 2));
     } catch (error) {
       console.error('Error saving project to local storage:', error);
       throw error;
@@ -139,8 +155,12 @@ export class LocalForageService {
 
   async getProject(id: string): Promise<Project | null> {
     try {
-      const project = await this.projectStore.getItem<Project>(id);
-      return project || null;
+      const filePath = this.getFilePath('projects', id);
+      if (!fs.existsSync(filePath)) {
+        return null;
+      }
+      const data = await fs.promises.readFile(filePath, 'utf8');
+      return JSON.parse(data);
     } catch (error) {
       console.error('Error retrieving project from local storage:', error);
       return null;
@@ -149,10 +169,18 @@ export class LocalForageService {
 
   async getAllProjects(): Promise<Project[]> {
     try {
+      const storePath = this.getStorePath('projects');
+      const files = await fs.promises.readdir(storePath);
       const projects: Project[] = [];
-      await this.projectStore.iterate((project: Project) => {
-        projects.push(project);
-      });
+      
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(storePath, file);
+          const data = await fs.promises.readFile(filePath, 'utf8');
+          projects.push(JSON.parse(data));
+        }
+      }
+      
       return projects;
     } catch (error) {
       console.error('Error retrieving all projects from local storage:', error);
@@ -162,7 +190,10 @@ export class LocalForageService {
 
   async deleteProject(id: string): Promise<void> {
     try {
-      await this.projectStore.removeItem(id);
+      const filePath = this.getFilePath('projects', id);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
     } catch (error) {
       console.error('Error deleting project from local storage:', error);
       throw error;
@@ -173,7 +204,8 @@ export class LocalForageService {
   async addToSyncQueue(item: any): Promise<void> {
     try {
       const key = `${item.type}-${item.id}-${Date.now()}`;
-      await this.syncQueueStore.setItem(key, item);
+      const filePath = this.getFilePath('syncQueue', key);
+      await fs.promises.writeFile(filePath, JSON.stringify(item, null, 2));
     } catch (error) {
       console.error('Error adding item to sync queue:', error);
       throw error;
@@ -182,10 +214,18 @@ export class LocalForageService {
 
   async getSyncQueue(): Promise<any[]> {
     try {
+      const storePath = this.getStorePath('syncQueue');
+      const files = await fs.promises.readdir(storePath);
       const items: any[] = [];
-      await this.syncQueueStore.iterate((item: any) => {
-        items.push(item);
-      });
+      
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(storePath, file);
+          const data = await fs.promises.readFile(filePath, 'utf8');
+          items.push(JSON.parse(data));
+        }
+      }
+      
       return items;
     } catch (error) {
       console.error('Error retrieving sync queue:', error);
@@ -195,38 +235,12 @@ export class LocalForageService {
 
   async removeFromSyncQueue(key: string): Promise<void> {
     try {
-      await this.syncQueueStore.removeItem(key);
+      const filePath = this.getFilePath('syncQueue', key);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
     } catch (error) {
       console.error('Error removing item from sync queue:', error);
-      throw error;
-    }
-  }
-
-  async clearSyncQueue(): Promise<void> {
-    try {
-      await this.syncQueueStore.clear();
-    } catch (error) {
-      console.error('Error clearing sync queue:', error);
-      throw error;
-    }
-  }
-
-  // Database versioning
-  async getVersion(): Promise<number> {
-    try {
-      const version = await localforage.getItem<number>('dbVersion');
-      return version || 1;
-    } catch (error) {
-      console.error('Error retrieving database version:', error);
-      return 1;
-    }
-  }
-
-  async setVersion(version: number): Promise<void> {
-    try {
-      await localforage.setItem('dbVersion', version);
-    } catch (error) {
-      console.error('Error setting database version:', error);
       throw error;
     }
   }

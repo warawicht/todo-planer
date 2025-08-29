@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Body, UseGuards, Request, Res, HttpStatus, NotFoundException } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { DataExportService } from '../services/data-export.service';
 import { DataExportDto, DataExportResponseDto } from '../dto/data-export.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';

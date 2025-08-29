@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ForbiddenException, Logger, OptimisticLockCanRetryException, BadRequestException, CACHE_MANAGER, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger, BadRequestException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository, QueryFailedError, OptimisticLockVersionMismatchError } from 'typeorm';
 import { TaskComment } from '../entities/task-comment.entity';
 import { CreateTaskCommentDto } from '../dto/create-task-comment.dto';
 import { UpdateTaskCommentDto } from '../dto/update-task-comment.dto';
@@ -10,7 +11,7 @@ import { InputSanitizationService } from '../../services/input-sanitization.serv
 import { PaginationDto } from '../../dto/pagination.dto';
 import { CollaborationCacheService } from '../../services/collaboration-cache.service';
 import { StorageLimitationService } from '../../services/storage-limitation.service';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class CommentService {
@@ -85,11 +86,19 @@ export class CommentService {
 
     // Create the comment with retry mechanism and concurrency control
     const comment = await this.retryOnNetworkFailure(async () => {
+      // First, get the task and user entities
+      const task = await this.taskRepository.findOne({ where: { id: sanitizedTaskId } });
+      const user = await this.userRepository.findOne({ where: { id: sanitizedUserId } });
+      
+      if (!task || !user) {
+        throw new NotFoundException('Task or user not found');
+      }
+
       const newComment = this.commentRepository.create({
-        taskId: sanitizedTaskId,
-        userId: sanitizedUserId,
+        task: task,
+        user: user,
         content: sanitizedContent,
-        parentId: sanitizedParentId,
+        parent: sanitizedParentId ? { id: sanitizedParentId } as TaskComment : undefined,
       });
 
       return this.commentRepository.save(newComment);
@@ -202,7 +211,7 @@ export class CommentService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when updating comment ${sanitizedCommentId}`);
-          throw new OptimisticLockCanRetryException('Comment was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskComment', 0, 0);
         }
         throw error;
       }
@@ -227,29 +236,33 @@ export class CommentService {
       throw new BadRequestException('Invalid input parameters');
     }
 
-    const comment = await this.retryOnNetworkFailure(async () => {
-      // First, get the current version of the comment
-      const existingComment = await this.commentRepository.findOne({
+    // First, get the current version of the comment to get taskId and userId for cache invalidation
+    const existingComment = await this.retryOnNetworkFailure(async () => {
+      const comment = await this.commentRepository.findOne({
         where: { id: sanitizedCommentId },
         relations: ['user']
       });
 
-      if (!existingComment) {
+      if (!comment) {
         throw new NotFoundException('Comment not found');
       }
 
       // Check if user is the author of the comment
-      if (existingComment.userId !== sanitizedUserId) {
+      if (comment.userId !== sanitizedUserId) {
         throw new ForbiddenException('You do not have permission to delete this comment');
       }
 
-      // Delete the comment with concurrency control
+      return comment;
+    });
+
+    // Delete the comment with concurrency control
+    await this.retryOnNetworkFailure(async () => {
       try {
         await this.commentRepository.remove(existingComment);
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when deleting comment ${sanitizedCommentId}`);
-          throw new OptimisticLockCanRetryException('Comment was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskComment', 0, 0);
         }
         throw error;
       }
@@ -258,8 +271,8 @@ export class CommentService {
     // Invalidate cache for the task
     this.collaborationCacheService.invalidateCommentCache(
       sanitizedCommentId, 
-      comment.taskId, 
-      comment.userId
+      existingComment.taskId, 
+      existingComment.userId
     );
   }
 
@@ -296,7 +309,7 @@ export class CommentService {
     maxRetries: number = 3,
     delay: number = 1000
   ): Promise<T> {
-    let lastError: Error;
+    let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {

@@ -33,14 +33,14 @@ export class AvailabilityController {
   @Get()
   async getUserAvailability(
     @Request() req,
-  ): Promise<UserAvailability[]> {
+  ): Promise<{ data: UserAvailability[]; total: number; page: number; limit: number }> {
     return this.availabilityService.getUserAvailability(req.user.id);
   }
 
   @Get('team')
   async getTeamAvailability(
     @Query('userIds') userIds: string[],
-  ): Promise<UserAvailability[]> {
+  ): Promise<{ data: UserAvailability[]; total: number; page: number; limit: number }> {
     return this.availabilityService.getTeamAvailability(userIds);
   }
 

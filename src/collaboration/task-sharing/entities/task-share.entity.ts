@@ -17,14 +17,14 @@ export class TaskShare {
   @Column({ type: 'uuid' })
   ownerId: string;
 
-  @ManyToOne(() => User, user => user.taskShares, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.sharedTasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   owner: User;
 
   @Column({ type: 'uuid' })
   sharedWithId: string;
 
-  @ManyToOne(() => User, user => user.sharedTasks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.receivedSharedTasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'sharedWithId' })
   sharedWith: User;
 
@@ -43,6 +43,12 @@ export class TaskShare {
 
   @Column({ default: false })
   isRevoked: boolean;
+
+  @Column({ nullable: true })
+  revokedAt: Date;
+
+  @Column({ type: 'text', nullable: true })
+  notes: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { DataSource, Repository, MoreThan } from 'typeorm';
 import { TaskShare } from '../task-sharing/entities/task-share.entity';
 import { TaskAssignment } from '../task-assignment/entities/task-assignment.entity';
 import { TaskComment } from '../comments/entities/task-comment.entity';
@@ -74,13 +74,15 @@ export class CollaborationMonitoringService {
 
   constructor(
     @InjectRepository(TaskShare)
-    private taskShareRepository: Repository&lt;TaskShare&gt;,
+    private taskShareRepository: Repository<TaskShare>,
     @InjectRepository(TaskAssignment)
-    private taskAssignmentRepository: Repository&lt;TaskAssignment&gt;,
+    private taskAssignmentRepository: Repository<TaskAssignment>,
     @InjectRepository(TaskComment)
-    private taskCommentRepository: Repository&lt;TaskComment&gt;,
+    private taskCommentRepository: Repository<TaskComment>,
     @InjectRepository(UserAvailability)
-    private userAvailabilityRepository: Repository&lt;UserAvailability&gt;,
+    private userAvailabilityRepository: Repository<UserAvailability>,
+    @InjectDataSource()
+    private dataSource: DataSource,
     private readonly collaborationCacheService: CollaborationCacheService,
     private readonly rateLimitingService: RateLimitingService,
   ) {}
@@ -88,7 +90,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect and update all collaboration metrics
    */
-  async collectMetrics(): Promise&lt;CollaborationMetrics&gt; {
+  async collectMetrics(): Promise<CollaborationMetrics> {
     try {
       this.logger.debug('Collecting collaboration metrics');
       
@@ -124,7 +126,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect entity counts
    */
-  private async collectEntityCounts(): Promise&lt;void&gt; {
+  private async collectEntityCounts(): Promise<void> {
     this.metrics.taskShareCount = await this.taskShareRepository.count();
     this.metrics.taskAssignmentCount = await this.taskAssignmentRepository.count();
     this.metrics.taskCommentCount = await this.taskCommentRepository.count();
@@ -134,7 +136,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect recent activity metrics (last 24 hours)
    */
-  private async collectRecentActivity(): Promise&lt;void&gt; {
+  private async collectRecentActivity(): Promise<void> {
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
 
@@ -166,7 +168,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect user engagement metrics
    */
-  private async collectUserEngagement(): Promise&lt;void&gt; {
+  private async collectUserEngagement(): Promise<void> {
     // Count distinct users who have shared tasks
     const usersWithSharedTasks = await this.taskShareRepository
       .createQueryBuilder('share')
@@ -182,29 +184,13 @@ export class CollaborationMonitoringService {
     this.metrics.usersWithAssignedTasks = parseInt(usersWithAssignedTasks.count, 10) || 0;
 
     // Count distinct users active in collaboration (shared, assigned, or commented)
-    const activeUsers = await this.taskShareRepository
-      .createQueryBuilder('share')
-      .select('share.ownerId')
-      .union(
-        this.taskAssignmentRepository
-          .createQueryBuilder('assignment')
-          .select('assignment.assignedById')
-      )
-      .union(
-        this.taskCommentRepository
-          .createQueryBuilder('comment')
-          .select('comment.userId')
-      )
-      .distinct(true)
-      .getRawMany();
-      
-    this.metrics.activeUsersInCollaboration = activeUsers.length;
+    await this.collectActiveUserMetrics();
   }
 
   /**
    * Collect cache metrics
    */
-  private async collectCacheMetrics(): Promise&lt;void&gt; {
+  private async collectCacheMetrics(): Promise<void> {
     const cacheStats = await this.collaborationCacheService.getStats();
     this.metrics.cacheHitRate = cacheStats.hitRate || 0;
     this.metrics.cacheSize = cacheStats.size || 0;
@@ -213,7 +199,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect rate limiting metrics
    */
-  private async collectRateLimitingMetrics(): Promise&lt;void&gt; {
+  private async collectRateLimitingMetrics(): Promise<void> {
     const rateLimitStats = await this.rateLimitingService.getStats();
     this.metrics.rateLimitHits = rateLimitStats.hits || 0;
     this.metrics.rateLimitBlocks = rateLimitStats.blocks || 0;
@@ -222,7 +208,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect performance metrics (simulated)
    */
-  private async collectPerformanceMetrics(): Promise&lt;void&gt; {
+  private async collectPerformanceMetrics(): Promise<void> {
     // In a real implementation, these would be collected from actual response times
     // For now, we'll simulate reasonable values
     this.metrics.averageTaskShareResponseTime = this.simulateResponseTime(50, 200);
@@ -233,7 +219,7 @@ export class CollaborationMonitoringService {
   /**
    * Collect error rates (simulated)
    */
-  private async collectErrorRates(): Promise&lt;void&gt; {
+  private async collectErrorRates(): Promise<void> {
     // In a real implementation, these would be collected from actual error logs
     // For now, we'll simulate low error rates
     this.metrics.taskShareErrorRate = this.simulateErrorRate(0.01, 0.05);
@@ -296,7 +282,7 @@ export class CollaborationMonitoringService {
    * @param event The event name
    * @param details Additional details about the event
    */
-  logEvent(event: string, details?: Record&lt;string, any&gt;): void {
+  logEvent(event: string, details?: Record<string, any>): void {
     this.logger.log({
       message: 'Collaboration monitoring event',
       event,
@@ -310,7 +296,7 @@ export class CollaborationMonitoringService {
    * @param error The error that occurred
    * @param context Additional context about where the error occurred
    */
-  logError(error: Error, context?: Record&lt;string, any&gt;): void {
+  logError(error: Error, context?: Record<string, any>): void {
     this.logger.error({
       message: 'Collaboration monitoring error',
       error: error.message,
@@ -328,29 +314,29 @@ export class CollaborationMonitoringService {
     let status: 'ok' | 'warning' | 'critical' = 'ok';
 
     // Check for high error rates
-    if (this.metrics.taskShareErrorRate &gt; 0.05) {
+    if (this.metrics.taskShareErrorRate > 0.05) {
       messages.push(`High task share error rate: ${(this.metrics.taskShareErrorRate * 100).toFixed(2)}%`);
       status = this.getWorstStatus(status, 'warning');
     }
 
-    if (this.metrics.taskAssignmentErrorRate &gt; 0.05) {
+    if (this.metrics.taskAssignmentErrorRate > 0.05) {
       messages.push(`High task assignment error rate: ${(this.metrics.taskAssignmentErrorRate * 100).toFixed(2)}%`);
       status = this.getWorstStatus(status, 'warning');
     }
 
-    if (this.metrics.commentErrorRate &gt; 0.03) {
+    if (this.metrics.commentErrorRate > 0.03) {
       messages.push(`High comment error rate: ${(this.metrics.commentErrorRate * 100).toFixed(2)}%`);
       status = this.getWorstStatus(status, 'warning');
     }
 
     // Check for rate limiting blocks
-    if (this.metrics.rateLimitBlocks &gt; 100) {
+    if (this.metrics.rateLimitBlocks > 100) {
       messages.push(`High rate limiting blocks: ${this.metrics.rateLimitBlocks}`);
       status = this.getWorstStatus(status, 'warning');
     }
 
     // Check for cache issues
-    if (this.metrics.cacheHitRate &lt; 0.5) {
+    if (this.metrics.cacheHitRate < 0.5) {
       messages.push(`Low cache hit rate: ${(this.metrics.cacheHitRate * 100).toFixed(2)}%`);
       status = this.getWorstStatus(status, 'warning');
     }
@@ -365,5 +351,21 @@ export class CollaborationMonitoringService {
     if (current === 'critical' || newStatus === 'critical') return 'critical';
     if (current === 'warning' || newStatus === 'warning') return 'warning';
     return 'ok';
+  }
+
+  private async collectActiveUserMetrics(): Promise<void> {
+    // Get distinct user IDs from task shares, assignments, and comments
+    // Using raw query for union operation since TypeORM doesn't support union directly
+    const activeUsers = await this.dataSource.query(`
+      SELECT DISTINCT userId FROM (
+        SELECT "ownerId" as userId FROM task_shares
+        UNION
+        SELECT "assignedById" as userId FROM task_assignments
+        UNION
+        SELECT "userId" as userId FROM task_comments
+      ) AS active_users
+    `);
+    
+    this.metrics.activeUsersInCollaboration = activeUsers.length;
   }
 }

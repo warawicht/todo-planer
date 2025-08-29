@@ -6,13 +6,18 @@ import { User } from '../../users/user.entity';
 import { TimeBlock } from '../../time-blocks/entities/time-block.entity';
 import { UserAvailability } from '../availability/entities/user-availability.entity';
 import { VirtualScrollingService } from '../../time-blocks/services/virtual-scrolling.service';
+import { InputSanitizationService } from '../services/input-sanitization.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, TimeBlock, UserAvailability]),
   ],
   controllers: [TeamCalendarController],
-  providers: [TeamCalendarService, VirtualScrollingService],
+  providers: [
+    TeamCalendarService, 
+    VirtualScrollingService,
+    InputSanitizationService,
+  ],
   exports: [TeamCalendarService],
 })
 export class TeamCalendarModule {}

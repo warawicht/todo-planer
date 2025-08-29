@@ -3,7 +3,7 @@ import { IsString, IsUUID, IsOptional, IsDateString } from 'class-validator';
 import { User } from '../../users/user.entity';
 
 export type ExportFormat = 'pdf' | 'csv' | 'excel';
-export type ExportStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type ExportStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
 
 @Entity('analytics_exports')
 export class AnalyticsExport {
@@ -16,7 +16,8 @@ export class AnalyticsExport {
 
   @Column({
     type: 'enum',
-    enum: ['pdf', 'csv', 'excel']
+    enum: ['pdf', 'csv', 'excel'],
+    enumName: 'export_format_enum'
   })
   @IsString()
   format: ExportFormat;
@@ -35,7 +36,8 @@ export class AnalyticsExport {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'processing', 'completed', 'failed'],
+    enum: ['pending', 'processing', 'completed', 'failed', 'cancelled'],
+    enumName: 'export_status_enum',
     default: 'pending'
   })
   @IsString()
@@ -44,6 +46,26 @@ export class AnalyticsExport {
   @Column({ type: 'jsonb', nullable: true })
   @IsOptional()
   filters: any;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @IsOptional()
+  @IsDateString()
+  startDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @IsOptional()
+  @IsDateString()
+  endDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @IsOptional()
+  @IsDateString()
+  completedAt: Date;
+
+  @Column({ type: 'text', nullable: true })
+  @IsOptional()
+  @IsString()
+  errorMessage: string;
 
   @CreateDateColumn()
   @IsDateString()

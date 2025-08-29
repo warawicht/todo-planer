@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException, Logger, OptimisticLockCanRetryException, BadRequestException, CACHE_MANAGER, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException, Logger, BadRequestException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository, QueryFailedError, OptimisticLockVersionMismatchError } from 'typeorm';
 import { TaskAssignment } from '../entities/task-assignment.entity';
 import { CreateTaskAssignmentDto } from '../dto/create-task-assignment.dto';
 import { UpdateTaskAssignmentStatusDto } from '../dto/update-task-assignment-status.dto';
@@ -9,7 +10,7 @@ import { User } from '../../../users/user.entity';
 import { InputSanitizationService } from '../../services/input-sanitization.service';
 import { PaginationDto } from '../../dto/pagination.dto';
 import { CollaborationCacheService } from '../../services/collaboration-cache.service';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class TaskAssignmentService {
@@ -109,7 +110,7 @@ export class TaskAssignmentService {
     // Generate cache key
     const cacheKey = this.collaborationCacheService.generateTaskAssignmentsCacheKey(
       sanitizedUserId, 
-      sanitizedStatus
+      sanitizedStatus || undefined
     );
 
     // Try to get from cache first
@@ -198,7 +199,7 @@ export class TaskAssignmentService {
       } catch (error) {
         if (error instanceof QueryFailedError && error.message.includes('version')) {
           this.logger.warn(`Concurrency conflict when updating task assignment ${sanitizedAssignmentId}`);
-          throw new OptimisticLockCanRetryException('Task assignment was modified by another user. Please try again.');
+          throw new OptimisticLockVersionMismatchError('TaskAssignment', 0, 0);
         }
         throw error;
       }
@@ -248,7 +249,7 @@ export class TaskAssignmentService {
     maxRetries: number = 3,
     delay: number = 1000
   ): Promise<T> {
-    let lastError: Error;
+    let lastError: Error = new Error('Unknown error');
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {

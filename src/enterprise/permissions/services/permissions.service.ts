@@ -38,7 +38,7 @@ export class PermissionsService {
     return permission;
   }
 
-  async findByName(name: string): Promise<Permission> {
+  async findByName(name: string): Promise<Permission | null> {
     return this.permissionsRepository.findOne({
       where: { name },
     });

@@ -33,14 +33,16 @@ export class Goal {
 
   @Column({
     type: 'enum',
-    enum: ['daily', 'weekly', 'monthly']
+    enum: ['daily', 'weekly', 'monthly'],
+    enumName: 'goal_period_enum'
   })
   @IsEnum(['daily', 'weekly', 'monthly'])
   period: GoalPeriod;
 
   @Column({
     type: 'enum',
-    enum: ['tasks_completed', 'time_tracked', 'projects_completed']
+    enum: ['tasks_completed', 'time_tracked', 'projects_completed'],
+    enumName: 'goal_metric_enum'
   })
   @IsEnum(['tasks_completed', 'time_tracked', 'projects_completed'])
   metric: GoalMetric;

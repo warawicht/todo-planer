@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import 'styled-jsx';
 
 interface Notification {
   id: string;

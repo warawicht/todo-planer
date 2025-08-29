@@ -8,7 +8,7 @@ import { User } from '../../users/user.entity';
 @Injectable()
 export class CollaborationPermissionService {
   // Check if user has permission to view a task
-  canViewTask(user: User, task: Task, taskShare?: TaskShare): boolean {
+  canViewTask(user: User, task: Task, taskShare?: TaskShare | null): boolean {
     // Owner can always view their task
     if (task.userId === user.id) {
       return true;
@@ -23,7 +23,7 @@ export class CollaborationPermissionService {
   }
 
   // Check if user has permission to edit a task
-  canEditTask(user: User, task: Task, taskShare?: TaskShare): boolean {
+  canEditTask(user: User, task: Task, taskShare?: TaskShare | null): boolean {
     // Owner can always edit their task
     if (task.userId === user.id) {
       return true;
@@ -42,7 +42,7 @@ export class CollaborationPermissionService {
   }
 
   // Check if user has permission to manage a task
-  canManageTask(user: User, task: Task, taskShare?: TaskShare): boolean {
+  canManageTask(user: User, task: Task, taskShare?: TaskShare | null): boolean {
     // Owner can always manage their task
     if (task.userId === user.id) {
       return true;
@@ -88,7 +88,7 @@ export class CollaborationPermissionService {
   }
 
   // Check if user can assign a task
-  canAssignTask(user: User, task: Task, taskShare?: TaskShare): boolean {
+  canAssignTask(user: User, task: Task, taskShare?: TaskShare | null): boolean {
     // Owner can always assign their task
     if (task.userId === user.id) {
       return true;
@@ -133,7 +133,7 @@ export class CollaborationPermissionService {
   }
 
   // Check if user can add a comment to a task
-  canAddComment(user: User, task: Task, taskShare?: TaskShare): boolean {
+  canAddComment(user: User, task: Task, taskShare?: TaskShare | null): boolean {
     // Owner can always comment on their task
     if (task.userId === user.id) {
       return true;

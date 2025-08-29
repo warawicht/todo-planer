@@ -24,7 +24,7 @@ export class TaskAssignment {
   @Column({ type: 'uuid' })
   assignedToId: string;
 
-  @ManyToOne(() => User, user => user.assignedToTasks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.assignedTasks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'assignedToId' })
   assignedTo: User;
 
@@ -34,6 +34,9 @@ export class TaskAssignment {
     default: 'pending'
   })
   status: 'pending' | 'accepted' | 'rejected' | 'completed';
+
+  @Column({ type: 'text', nullable: true })
+  notes: string;
 
   @CreateDateColumn()
   createdAt: Date;

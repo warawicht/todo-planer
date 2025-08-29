@@ -1,11 +1,52 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
+import { Inject } from '@nestjs/common';
 
 @Injectable()
 export class CollaborationCacheService {
   private readonly logger = new Logger(CollaborationCacheService.name);
 
-  constructor() {}
+  constructor(@Inject('CACHE_MANAGER') private cacheManager: Cache) {}
+
+  /**
+   * Set a value in the cache
+   * @param key The cache key
+   * @param value The value to cache
+   * @param ttl Time to live in seconds
+   */
+  async set(key: string, value: any, ttl?: number): Promise<void> {
+    await this.cacheManager.set(key, value, ttl);
+  }
+
+  /**
+   * Get a value from the cache
+   * @param key The cache key
+   * @returns The cached value or undefined
+   */
+  async get(key: string): Promise<any> {
+    return await this.cacheManager.get(key);
+  }
+
+  /**
+   * Delete a value from the cache
+   * @param key The cache key
+   */
+  async del(key: string): Promise<void> {
+    await this.cacheManager.del(key);
+  }
+
+  /**
+   * Get cache statistics
+   * @returns Cache statistics
+   */
+  async getStats(): Promise<Record<string, any>> {
+    // This is a simplified implementation
+    // In a real implementation, you might get actual stats from the cache provider
+    return {
+      provider: 'cache-manager',
+      status: 'active'
+    };
+  }
 
   /**
    * Generate a cache key for task shares

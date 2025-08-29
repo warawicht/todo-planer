@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { TaskShare } from '../task-sharing/entities/task-share.entity';
 import { TaskAssignment } from '../task-assignment/entities/task-assignment.entity';
 import { TaskComment } from '../comments/entities/task-comment.entity';
@@ -15,13 +15,13 @@ export class CollaborationHealthIndicator extends HealthIndicator {
 
   constructor(
     @InjectRepository(TaskShare)
-    private taskShareRepository: Repository&lt;TaskShare&gt;,
+    private taskShareRepository: Repository<TaskShare>,
     @InjectRepository(TaskAssignment)
-    private taskAssignmentRepository: Repository&lt;TaskAssignment&gt;,
+    private taskAssignmentRepository: Repository<TaskAssignment>,
     @InjectRepository(TaskComment)
-    private taskCommentRepository: Repository&lt;TaskComment&gt;,
+    private taskCommentRepository: Repository<TaskComment>,
     @InjectRepository(UserAvailability)
-    private userAvailabilityRepository: Repository&lt;UserAvailability&gt;,
+    private userAvailabilityRepository: Repository<UserAvailability>,
     private readonly collaborationCacheService: CollaborationCacheService,
     private readonly rateLimitingService: RateLimitingService,
   ) {
@@ -31,9 +31,8 @@ export class CollaborationHealthIndicator extends HealthIndicator {
   /**
    * Check the health of collaboration services
    */
-  async checkCollaborationHealth(): Promise&lt;HealthIndicatorResult&gt; {
-    const key = 'collaboration';
-    const detailedInfo: Record&lt;string, any&gt; = {};
+  async checkCollaborationHealth(key: string = 'collaboration'): Promise<HealthIndicatorResult> {
+    const detailedInfo: Record<string, any> = {};
 
     try {
       // Check database connectivity by counting records in each table
@@ -68,7 +67,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
   /**
    * Check the health of the cache service
    */
-  private async checkCacheHealth(): Promise&lt;{ status: string; details?: string }&gt; {
+  private async checkCacheHealth(): Promise<{ status: string; details?: string }> {
     try {
       // Test cache by setting and getting a value
       const testKey = 'health_check_test';
@@ -93,11 +92,11 @@ export class CollaborationHealthIndicator extends HealthIndicator {
   /**
    * Check the health of the rate limiting service
    */
-  private async checkRateLimitingHealth(): Promise&lt;{ status: string; details?: string }&gt; {
+  private async checkRateLimitingHealth(): Promise<{ status: string; details?: string }> {
     try {
       // Test rate limiting by checking a test key
       const testKey = 'health_check_test';
-      const limitInfo = await this.rateLimitingService.getLimitInfo(testKey);
+      const limitInfo = await this.rateLimitingService.getRateLimitInfo(testKey, 'healthCheck');
       
       // If we can get limit info without error, the service is healthy
       return { status: 'healthy' };
@@ -110,8 +109,8 @@ export class CollaborationHealthIndicator extends HealthIndicator {
   /**
    * Get performance metrics for collaboration services
    */
-  async getCollaborationMetrics(): Promise&lt;Record&lt;string, any&gt;&gt; {
-    const metrics: Record&lt;string, any&gt; = {};
+  async getCollaborationMetrics(): Promise<Record<string, any>> {
+    const metrics: Record<string, any> = {};
 
     try {
       // Get counts of various collaboration entities
@@ -158,8 +157,8 @@ export class CollaborationHealthIndicator extends HealthIndicator {
   /**
    * Check for any potential issues in collaboration data
    */
-  async checkForIssues(): Promise&lt;Record&lt;string, any&gt;&gt; {
-    const issues: Record&lt;string, any&gt; = {};
+  async checkForIssues(): Promise<Record<string, any>> {
+    const issues: Record<string, any> = {};
 
     try {
       // Check for orphaned task shares (shares for non-existent tasks)
@@ -169,7 +168,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
         .where('task.id IS NULL')
         .getCount();
       
-      if (orphanedShares &gt; 0) {
+      if (orphanedShares > 0) {
         issues.orphanedTaskShares = orphanedShares;
       }
 
@@ -180,7 +179,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
         .where('task.id IS NULL')
         .getCount();
       
-      if (orphanedAssignments &gt; 0) {
+      if (orphanedAssignments > 0) {
         issues.orphanedTaskAssignments = orphanedAssignments;
       }
 
@@ -191,7 +190,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
         .where('task.id IS NULL')
         .getCount();
       
-      if (orphanedComments &gt; 0) {
+      if (orphanedComments > 0) {
         issues.orphanedComments = orphanedComments;
       }
 
@@ -203,7 +202,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
         },
       });
       
-      if (revokedAcceptedShares &gt; 0) {
+      if (revokedAcceptedShares > 0) {
         issues.revokedAcceptedShares = revokedAcceptedShares;
       }
 
@@ -215,7 +214,7 @@ export class CollaborationHealthIndicator extends HealthIndicator {
         })
         .getCount();
       
-      if (invalidStatusAssignments &gt; 0) {
+      if (invalidStatusAssignments > 0) {
         issues.invalidStatusAssignments = invalidStatusAssignments;
       }
 

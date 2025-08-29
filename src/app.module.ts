@@ -31,6 +31,10 @@ import { ProductivityStatistic } from './productivity-tracking/entities/producti
 import { TimeEntry } from './productivity-tracking/entities/time-entry.entity';
 import { TrendData } from './productivity-tracking/entities/trend-data.entity';
 import { DashboardWidget } from './productivity-tracking/entities/dashboard-widget.entity';
+import { Goal } from './productivity-tracking/entities/goal.entity';
+import { Insight } from './productivity-tracking/entities/insight.entity';
+import { ReportTemplate } from './productivity-tracking/entities/report-template.entity';
+import { AnalyticsExport } from './productivity-tracking/entities/analytics-export.entity';
 // Settings Entities
 import { ThemePreference } from './settings/entities/theme-preference.entity';
 import { TimezonePreference } from './settings/entities/timezone-preference.entity';
@@ -50,8 +54,14 @@ import { ActivityLog } from './enterprise/entities/activity-log.entity';
 import { Workflow } from './enterprise/entities/workflow.entity';
 import { WorkflowInstance } from './enterprise/entities/workflow-instance.entity';
 import { AuditTrail } from './enterprise/entities/audit-trail.entity';
+// Collaboration Entities
+import { TaskShare } from './collaboration/task-sharing/entities/task-share.entity';
+import { TaskAssignment } from './collaboration/task-assignment/entities/task-assignment.entity';
+import { TaskComment } from './collaboration/comments/entities/task-comment.entity';
+import { UserAvailability } from './collaboration/availability/entities/user-availability.entity';
 // Enterprise Module
 import { EnterpriseModule } from './enterprise/enterprise.module';
+import { CollaborationModule } from './collaboration/collaboration.module';
 
 @Module({
   imports: [
@@ -79,6 +89,10 @@ import { EnterpriseModule } from './enterprise/enterprise.module';
         TimeEntry,
         TrendData,
         DashboardWidget,
+        Goal,
+        Insight,
+        ReportTemplate,
+        AnalyticsExport,
         // Settings Entities
         ThemePreference,
         TimezonePreference,
@@ -97,9 +111,14 @@ import { EnterpriseModule } from './enterprise/enterprise.module';
         ActivityLog,
         Workflow,
         WorkflowInstance,
-        AuditTrail
+        AuditTrail,
+        // Collaboration Entities
+        TaskShare,
+        TaskAssignment,
+        TaskComment,
+        UserAvailability,
       ],
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: false, // Disable synchronize to avoid issues with enum creation
     }),
     MulterModule.register({
       dest: './uploads',
@@ -116,6 +135,7 @@ import { EnterpriseModule } from './enterprise/enterprise.module';
     AISchedulingModule,
     OfflineModule,
     EnterpriseModule,
+    CollaborationModule,
   ],
   controllers: [AppController],
   providers: [

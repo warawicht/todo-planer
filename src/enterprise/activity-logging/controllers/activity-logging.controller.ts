@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ActivityLoggingService } from '../services/activity-logging.service';
 import { ActivityLog } from '../../entities/activity-log.entity';
 import { ActivityLogQueryDto } from '../dtos/activity-log-query.dto';

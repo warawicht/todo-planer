@@ -29,12 +29,13 @@ export class ProfilePreferenceService {
 
     if (!profilePreference) {
       // Create default profile preference if it doesn't exist
-      profilePreference = this.profilePreferenceRepository.create({
+      const preferenceData = {
         userId,
-        firstName: null,
-        lastName: null,
-        avatarUrl: null,
-      });
+        firstName: undefined,
+        lastName: undefined,
+        avatarUrl: undefined,
+      };
+      profilePreference = this.profilePreferenceRepository.create(preferenceData);
       profilePreference = await this.profilePreferenceRepository.save(profilePreference);
     }
 
@@ -54,11 +55,13 @@ export class ProfilePreferenceService {
 
     if (!profilePreference) {
       // Create new profile preference if it doesn't exist
-      profilePreference = this.profilePreferenceRepository.create({
+      const preferenceData = {
         userId,
-        ...profilePreferenceDto,
-        avatarUrl: null, // Avatar URL will be set separately
-      });
+        firstName: profilePreferenceDto.firstName,
+        lastName: profilePreferenceDto.lastName,
+        avatarUrl: undefined, // Avatar URL will be set separately
+      };
+      profilePreference = this.profilePreferenceRepository.create(preferenceData);
     } else {
       // Update existing profile preference
       Object.assign(profilePreference, profilePreferenceDto);
@@ -79,12 +82,13 @@ export class ProfilePreferenceService {
 
     if (!profilePreference) {
       // Create new profile preference if it doesn't exist
-      profilePreference = this.profilePreferenceRepository.create({
+      const preferenceData = {
         userId,
-        firstName: null,
-        lastName: null,
+        firstName: undefined,
+        lastName: undefined,
         avatarUrl,
-      });
+      };
+      profilePreference = this.profilePreferenceRepository.create(preferenceData);
     } else {
       // Update avatar URL
       profilePreference.avatarUrl = avatarUrl;

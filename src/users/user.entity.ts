@@ -17,6 +17,10 @@ import { TaskShare } from '../collaboration/task-sharing/entities/task-share.ent
 import { TaskAssignment } from '../collaboration/task-assignment/entities/task-assignment.entity';
 import { TaskComment } from '../collaboration/comments/entities/task-comment.entity';
 import { UserAvailability } from '../collaboration/availability/entities/user-availability.entity';
+import { Goal } from '../productivity-tracking/entities/goal.entity';
+import { Insight } from '../productivity-tracking/entities/insight.entity';
+import { ReportTemplate } from '../productivity-tracking/entities/report-template.entity';
+import { AnalyticsExport } from '../productivity-tracking/entities/analytics-export.entity';
 // Enterprise Feature Entities
 import { UserRole } from '../enterprise/entities/user-role.entity';
 import { ActivityLog } from '../enterprise/entities/activity-log.entity';
@@ -135,4 +139,17 @@ export class User {
 
   @OneToMany(() => AuditTrail, auditTrail => auditTrail.user)
   auditTrails: AuditTrail[];
+
+  // Additional Productivity Tracking Relationships
+  @OneToMany(() => Goal, goal => goal.user)
+  goals: Goal[];
+
+  @OneToMany(() => Insight, insight => insight.user)
+  insights: Insight[];
+
+  @OneToMany(() => ReportTemplate, reportTemplate => reportTemplate.user)
+  reportTemplates: ReportTemplate[];
+
+  @OneToMany(() => AnalyticsExport, (exportEntity) => exportEntity.user)
+  analyticsExports: AnalyticsExport[];
 }
