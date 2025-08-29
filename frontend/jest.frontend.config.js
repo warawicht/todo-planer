@@ -5,11 +5,14 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   testRegex: '.*\\.test\\.tsx?$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)sx?$': 'ts-jest',
   },
   collectCoverageFrom: [
-    '**/*.(t|j)s',
+    '**/*.(t|j)sx?',
   ],
   coverageDirectory: '../coverage',
   roots: ['<rootDir>'],
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
 };

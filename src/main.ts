@@ -8,7 +8,7 @@ async function bootstrap() {
   app.use(cookieParser());
   
   // Serve static files from the frontend build
-  app.useStaticAssets(join(__dirname, 'public'), {
+  app.useStaticAssets(join(__dirname, '..', 'frontend', 'dist'), {
     prefix: '/',
   });
   

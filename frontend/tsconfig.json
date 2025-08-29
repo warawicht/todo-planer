@@ -32,5 +32,6 @@
     "types": ["jest", "@testing-library/jest-dom", "node"]
   },
   "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": ["./vite.config.ts"],
   "references": [{ "path": "./tsconfig.vite.json" }]
 }
