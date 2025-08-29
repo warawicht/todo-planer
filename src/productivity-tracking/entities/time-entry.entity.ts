@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { IsBoolean, IsInt, IsDateString, IsUUID, IsOptional } from 'class-validator';
+import { IsBoolean, IsInt, IsDateString, IsUUID, IsOptional, IsNumber } from 'class-validator';
 import { User } from '../../users/user.entity';
 import { Task } from '../../tasks/entities/task.entity';
 
@@ -30,6 +30,11 @@ export class TimeEntry {
   @IsInt()
   @IsOptional()
   duration: number; // in seconds
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  billableRate: number; // hourly rate for billing calculations
 
   @Column({ default: false })
   @IsBoolean()
