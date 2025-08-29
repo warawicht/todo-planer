@@ -10,11 +10,21 @@ export class NetworkStatusService {
     // Check initial network status
     this.checkNetworkStatus();
     
-    // Set up event listeners for online/offline events
-    if (typeof window !== 'undefined') {
-      window.addEventListener('online', this.handleOnline.bind(this));
-      window.addEventListener('offline', this.handleOffline.bind(this));
+    // Set up event listeners for online/offline events only in browser environment
+    if (this.isBrowser()) {
+      this.setupEventListeners();
     }
+  }
+
+  // Check if we're in a browser environment
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof navigator !== 'undefined';
+  }
+
+  // Set up event listeners (only call in browser environment)
+  private setupEventListeners(): void {
+    window.addEventListener('online', this.handleOnline.bind(this));
+    window.addEventListener('offline', this.handleOffline.bind(this));
   }
 
   // Set the sync service (needed for dependency injection workaround)
@@ -24,7 +34,7 @@ export class NetworkStatusService {
 
   // Check current network status
   checkNetworkStatus(): boolean {
-    if (typeof navigator !== 'undefined') {
+    if (this.isBrowser()) {
       this.isOnlineStatus = navigator.onLine;
     }
     return this.isOnlineStatus;
@@ -32,7 +42,11 @@ export class NetworkStatusService {
 
   // Get current network status
   isOnline(): boolean {
-    return this.isOnlineStatus;
+    if (this.isBrowser()) {
+      return navigator.onLine;
+    }
+    // In server environment, assume online
+    return true;
   }
 
   // Handle online event

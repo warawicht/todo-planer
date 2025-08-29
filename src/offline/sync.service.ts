@@ -87,7 +87,12 @@ export class SyncService {
 
   // Check network connectivity
   isOnline(): boolean {
-    return navigator?.onLine ?? true;
+    // Check if we're in a browser environment
+    if (typeof navigator !== 'undefined') {
+      return navigator.onLine ?? true;
+    }
+    // In server environment, assume online
+    return true;
   }
 
   // Handle network status changes
