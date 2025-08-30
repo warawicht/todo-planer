@@ -4,7 +4,7 @@ export class CreateSettingsTables1756361929261 implements MigrationInterface {
     name = 'CreateSettingsTables1756361929261'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "task_attachments" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "fileName" character varying NOT NULL, "originalName" character varying NOT NULL, "mimeType" character varying NOT NULL, "fileSize" integer NOT NULL, "storagePath" character varying NOT NULL, "uploadedAt" TIMESTAMP NOT NULL DEFAULT now(), "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "taskId" uuid NOT NULL, "userId" uuid NOT NULL, CONSTRAINT "PK_34eb9e5133310a488eaba0be28a" PRIMARY KEY ("id"))`);
+        // Skip creating task_attachments table since it's already created in AddSubtasksAndAttachments migration
         await queryRunner.query(`CREATE TYPE "public"."reminders_timebefore_enum" AS ENUM('at_time', '5_min', '1_hour', '1_day')`);
         await queryRunner.query(`CREATE TABLE "reminders" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" uuid NOT NULL, "taskId" uuid NOT NULL, "timeBefore" "public"."reminders_timebefore_enum" NOT NULL, "enabled" boolean NOT NULL DEFAULT true, "lastSentAt" TIMESTAMP, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_38715fec7f634b72c6cf7ea4893" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "time_entries" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" uuid NOT NULL, "taskId" uuid, "startTime" TIMESTAMP NOT NULL, "endTime" TIMESTAMP, "duration" bigint, "isManual" boolean NOT NULL DEFAULT false, "description" text, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_b8bc5f10269ba2fe88708904aa0" PRIMARY KEY ("id"))`);
@@ -27,15 +27,47 @@ export class CreateSettingsTables1756361929261 implements MigrationInterface {
         await queryRunner.query(`CREATE TYPE "public"."data_exports_datatype_enum" AS ENUM('all', 'tasks', 'projects', 'time-blocks')`);
         await queryRunner.query(`CREATE TYPE "public"."data_exports_status_enum" AS ENUM('pending', 'processing', 'completed', 'failed')`);
         await queryRunner.query(`CREATE TABLE "data_exports" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" uuid NOT NULL, "format" "public"."data_exports_format_enum" NOT NULL DEFAULT 'json', "dataType" "public"."data_exports_datatype_enum" NOT NULL DEFAULT 'all', "fileName" character varying, "exportedAt" TIMESTAMP, "status" "public"."data_exports_status_enum" NOT NULL DEFAULT 'pending', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_3e8b8b297ef4446f30527695c10" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`ALTER TABLE "tasks" ADD "parentId" uuid`);
-        await queryRunner.query(`ALTER TABLE "tasks" ADD "position" integer`);
-        await queryRunner.query(`ALTER TABLE "task_attachments" ADD CONSTRAINT "FK_47d3c46e4edb30cdaf97ccdb8d8" FOREIGN KEY ("taskId") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "task_attachments" ADD CONSTRAINT "FK_2a0280fbafa7b94c89ce6744d87" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        
+        // Check if parentId column exists before adding it
+        const parentIdColumnExists = await queryRunner.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'tasks' AND column_name = 'parentId'
+        `);
+        
+        if (parentIdColumnExists.length === 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" ADD "parentId" uuid`);
+        }
+        
+        // Check if position column exists before adding it
+        const positionColumnExists = await queryRunner.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'tasks' AND column_name = 'position'
+        `);
+        
+        if (positionColumnExists.length === 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" ADD "position" integer`);
+        }
+        
+        // Skip creating foreign key constraints for task_attachments since they're already created
         await queryRunner.query(`ALTER TABLE "reminders" ADD CONSTRAINT "FK_f8e4bc520d9e692652afaf3308b" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "reminders" ADD CONSTRAINT "FK_fd166880b624ea8560667d43101" FOREIGN KEY ("taskId") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "time_entries" ADD CONSTRAINT "FK_d1b452d7f0d45863303b7d30000" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "time_entries" ADD CONSTRAINT "FK_8cfb57662e88d7c65010311661d" FOREIGN KEY ("taskId") REFERENCES "tasks"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "tasks" ADD CONSTRAINT "FK_1cbec65196d4cf86dd8ab464085" FOREIGN KEY ("parentId") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        
+        // Check if parentId foreign key exists before adding it
+        const parentIdFkExists = await queryRunner.query(`
+            SELECT tc.constraint_name 
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.table_name = 'tasks' AND tc.constraint_type = 'FOREIGN KEY' AND kcu.column_name = 'parentId'
+        `);
+        
+        if (parentIdFkExists.length === 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" ADD CONSTRAINT "FK_1cbec65196d4cf86dd8ab464085" FOREIGN KEY ("parentId") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        }
+        
         await queryRunner.query(`ALTER TABLE "calendar_view_preferences" ADD CONSTRAINT "FK_2dc2d738a274989548c726becff" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "notifications" ADD CONSTRAINT "FK_692a909ee0fa9383e7859f9b406" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "productivity_statistics" ADD CONSTRAINT "FK_db62fcfcc3f2d120e50e7b950d4" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -59,15 +91,47 @@ export class CreateSettingsTables1756361929261 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "productivity_statistics" DROP CONSTRAINT "FK_db62fcfcc3f2d120e50e7b950d4"`);
         await queryRunner.query(`ALTER TABLE "notifications" DROP CONSTRAINT "FK_692a909ee0fa9383e7859f9b406"`);
         await queryRunner.query(`ALTER TABLE "calendar_view_preferences" DROP CONSTRAINT "FK_2dc2d738a274989548c726becff"`);
-        await queryRunner.query(`ALTER TABLE "tasks" DROP CONSTRAINT "FK_1cbec65196d4cf86dd8ab464085"`);
+        
+        // Check if parentId foreign key exists before dropping it
+        const parentIdFkExists = await queryRunner.query(`
+            SELECT tc.constraint_name 
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.table_name = 'tasks' AND tc.constraint_type = 'FOREIGN KEY' AND kcu.column_name = 'parentId'
+        `);
+        
+        if (parentIdFkExists.length > 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" DROP CONSTRAINT "FK_1cbec65196d4cf86dd8ab464085"`);
+        }
+        
         await queryRunner.query(`ALTER TABLE "time_entries" DROP CONSTRAINT "FK_8cfb57662e88d7c65010311661d"`);
         await queryRunner.query(`ALTER TABLE "time_entries" DROP CONSTRAINT "FK_d1b452d7f0d45863303b7d30000"`);
         await queryRunner.query(`ALTER TABLE "reminders" DROP CONSTRAINT "FK_fd166880b624ea8560667d43101"`);
         await queryRunner.query(`ALTER TABLE "reminders" DROP CONSTRAINT "FK_f8e4bc520d9e692652afaf3308b"`);
-        await queryRunner.query(`ALTER TABLE "task_attachments" DROP CONSTRAINT "FK_2a0280fbafa7b94c89ce6744d87"`);
-        await queryRunner.query(`ALTER TABLE "task_attachments" DROP CONSTRAINT "FK_47d3c46e4edb30cdaf97ccdb8d8"`);
-        await queryRunner.query(`ALTER TABLE "tasks" DROP COLUMN "position"`);
-        await queryRunner.query(`ALTER TABLE "tasks" DROP COLUMN "parentId"`);
+        // Skip dropping task_attachments table and constraints since they're handled in AddSubtasksAndAttachments migration
+        
+        // Check if position column exists before dropping it
+        const positionColumnExists = await queryRunner.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'tasks' AND column_name = 'position'
+        `);
+        
+        if (positionColumnExists.length > 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" DROP COLUMN "position"`);
+        }
+        
+        // Check if parentId column exists before dropping it
+        const parentIdColumnExists = await queryRunner.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'tasks' AND column_name = 'parentId'
+        `);
+        
+        if (parentIdColumnExists.length > 0) {
+            await queryRunner.query(`ALTER TABLE "tasks" DROP COLUMN "parentId"`);
+        }
+        
         await queryRunner.query(`DROP TABLE "data_exports"`);
         await queryRunner.query(`DROP TYPE "public"."data_exports_status_enum"`);
         await queryRunner.query(`DROP TYPE "public"."data_exports_datatype_enum"`);
@@ -90,7 +154,7 @@ export class CreateSettingsTables1756361929261 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "time_entries"`);
         await queryRunner.query(`DROP TABLE "reminders"`);
         await queryRunner.query(`DROP TYPE "public"."reminders_timebefore_enum"`);
-        await queryRunner.query(`DROP TABLE "task_attachments"`);
+        // Skip dropping task_attachments table since it's handled in AddSubtasksAndAttachments migration
     }
 
 }
