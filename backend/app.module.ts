@@ -62,6 +62,7 @@ import { UserAvailability } from './collaboration/availability/entities/user-ava
 // Enterprise Module
 import { EnterpriseModule } from './enterprise/enterprise.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
+import { DemoDataModule } from './demo-data/demo-data.module';
 
 @Module({
   imports: [
@@ -71,7 +72,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
       port: parseInt(process.env.DB_PORT || '5432'),
       username: process.env.DB_USERNAME || 'todo_planner_user',
       password: process.env.DB_PASSWORD || 'todo_planner_password',
-      database: process.env.DB_NAME || 'todo_planer_dev',
+      database: process.env.DB_NAME || 'todo_planner_dev',
       entities: [
         User, 
         RefreshToken, 
@@ -136,6 +137,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
     
     EnterpriseModule,
     CollaborationModule,
+    DemoDataModule,
   ],
   controllers: [AppController],
   providers: [

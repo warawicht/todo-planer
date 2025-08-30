@@ -48,7 +48,7 @@ export const AppDataSource = new DataSource({
   port: parseInt(process.env.DATABASE_PORT || process.env.DB_PORT || '5432'),
   username: process.env.DATABASE_USERNAME || process.env.DB_USERNAME || 'todo_planner_user',
   password: process.env.DATABASE_PASSWORD || process.env.DB_PASSWORD || 'todo_planner_password',
-  database: process.env.DATABASE_NAME || process.env.DB_NAME || 'todo_planer_dev',
+  database: process.env.DATABASE_NAME || process.env.DB_NAME || 'todo_planner_dev',
   synchronize: false,
   logging: false,
   entities: [
