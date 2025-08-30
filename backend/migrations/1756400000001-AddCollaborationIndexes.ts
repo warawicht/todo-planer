@@ -77,23 +77,23 @@ export class AddCollaborationIndexes1756400000001 implements MigrationInterface 
             columnNames: ["createdAt"]
         }));
 
-        // Add indexes for user_availabilities table
-        await queryRunner.createIndex("user_availabilities", new TableIndex({
+        // Add indexes for user_availability table
+        await queryRunner.createIndex("user_availability", new TableIndex({
             name: "IDX_USER_AVAILABILITIES_USER_ID",
             columnNames: ["userId"]
         }));
 
-        await queryRunner.createIndex("user_availabilities", new TableIndex({
+        await queryRunner.createIndex("user_availability", new TableIndex({
             name: "IDX_USER_AVAILABILITIES_START_TIME",
             columnNames: ["startTime"]
         }));
 
-        await queryRunner.createIndex("user_availabilities", new TableIndex({
+        await queryRunner.createIndex("user_availability", new TableIndex({
             name: "IDX_USER_AVAILABILITIES_END_TIME",
             columnNames: ["endTime"]
         }));
 
-        await queryRunner.createIndex("user_availabilities", new TableIndex({
+        await queryRunner.createIndex("user_availability", new TableIndex({
             name: "IDX_USER_AVAILABILITIES_STATUS",
             columnNames: ["status"]
         }));
@@ -114,7 +114,7 @@ export class AddCollaborationIndexes1756400000001 implements MigrationInterface 
             columnNames: ["taskId", "createdAt"]
         }));
 
-        await queryRunner.createIndex("user_availabilities", new TableIndex({
+        await queryRunner.createIndex("user_availability", new TableIndex({
             name: "IDX_USER_AVAILABILITIES_USER_TIME",
             columnNames: ["userId", "startTime", "endTime"]
         }));
@@ -141,16 +141,16 @@ export class AddCollaborationIndexes1756400000001 implements MigrationInterface 
         await queryRunner.dropIndex("task_comments", "IDX_TASK_COMMENTS_PARENT_ID");
         await queryRunner.dropIndex("task_comments", "IDX_TASK_COMMENTS_CREATED_AT");
 
-        // Drop indexes for user_availabilities table
-        await queryRunner.dropIndex("user_availabilities", "IDX_USER_AVAILABILITIES_USER_ID");
-        await queryRunner.dropIndex("user_availabilities", "IDX_USER_AVAILABILITIES_START_TIME");
-        await queryRunner.dropIndex("user_availabilities", "IDX_USER_AVAILABILITIES_END_TIME");
-        await queryRunner.dropIndex("user_availabilities", "IDX_USER_AVAILABILITIES_STATUS");
+        // Drop indexes for user_availability table
+        await queryRunner.dropIndex("user_availability", "IDX_USER_AVAILABILITIES_USER_ID");
+        await queryRunner.dropIndex("user_availability", "IDX_USER_AVAILABILITIES_START_TIME");
+        await queryRunner.dropIndex("user_availability", "IDX_USER_AVAILABILITIES_END_TIME");
+        await queryRunner.dropIndex("user_availability", "IDX_USER_AVAILABILITIES_STATUS");
 
         // Drop composite indexes
         await queryRunner.dropIndex("task_shares", "IDX_TASK_SHARES_SHARED_WITH_STATUS");
         await queryRunner.dropIndex("task_assignments", "IDX_TASK_ASSIGNMENTS_ASSIGNED_TO_STATUS");
         await queryRunner.dropIndex("task_comments", "IDX_TASK_COMMENTS_TASK_CREATED");
-        await queryRunner.dropIndex("user_availabilities", "IDX_USER_AVAILABILITIES_USER_TIME");
+        await queryRunner.dropIndex("user_availability", "IDX_USER_AVAILABILITIES_USER_TIME");
     }
 }

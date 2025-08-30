@@ -44,11 +44,11 @@ import { AuditTrail } from '../enterprise/entities/audit-trail.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'todo_planner_user',
-  password: process.env.DB_PASSWORD || 'todo_planner_password',
-  database: process.env.DB_NAME || 'todo_planner_dev',
+  host: process.env.DATABASE_HOST || process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DATABASE_PORT || process.env.DB_PORT || '5432'),
+  username: process.env.DATABASE_USERNAME || process.env.DB_USERNAME || 'todo_planner_user',
+  password: process.env.DATABASE_PASSWORD || process.env.DB_PASSWORD || 'todo_planner_password',
+  database: process.env.DATABASE_NAME || process.env.DB_NAME || 'todo_planer_dev',
   synchronize: false,
   logging: false,
   entities: [

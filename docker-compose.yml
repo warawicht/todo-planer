@@ -52,6 +52,11 @@ services:
       - DATABASE_USERNAME=todo_planner_user
       - DATABASE_PASSWORD=todo_planner_password
       - DATABASE_NAME=todo_planner_dev
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=todo_planner_user
+      - DB_PASSWORD=todo_planner_password
+      - DB_NAME=todo_planner_dev
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=your-jwt-secret-key-change-in-production
@@ -76,7 +81,7 @@ services:
       dockerfile: Dockerfile
     container_name: todo-planner-migration
     restart: "no"
-    command: npm run typeorm migration:run
+    command: npm run migration:run
     environment:
       - NODE_ENV=development
       - DATABASE_HOST=postgres
@@ -84,6 +89,11 @@ services:
       - DATABASE_USERNAME=todo_planner_user
       - DATABASE_PASSWORD=todo_planner_password
       - DATABASE_NAME=todo_planner_dev
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=todo_planner_user
+      - DB_PASSWORD=todo_planner_password
+      - DB_NAME=todo_planner_dev
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,6 +113,11 @@ services:
       - DATABASE_USERNAME=todo_planner_user
       - DATABASE_PASSWORD=todo_planner_password
       - DATABASE_NAME=todo_planner_test
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=todo_planner_user
+      - DB_PASSWORD=todo_planner_password
+      - DB_NAME=todo_planner_test
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:

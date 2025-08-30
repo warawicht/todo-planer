@@ -69,9 +69,9 @@ import { CollaborationModule } from './collaboration/collaboration.module';
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'todo_planer',
+      username: process.env.DB_USERNAME || 'todo_planner_user',
+      password: process.env.DB_PASSWORD || 'todo_planner_password',
+      database: process.env.DB_NAME || 'todo_planer_dev',
       entities: [
         User, 
         RefreshToken, 
