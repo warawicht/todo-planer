@@ -1,0 +1,30 @@
+# Use Node.js 18 LTS as the base image
+FROM node:18-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy the entire application code
+COPY . .
+
+# Expose the port the frontend runs on
+EXPOSE 3001
+
+# Create a non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+# Change ownership of the app directory to the nestjs user
+RUN chown -R nestjs:nodejs /app
+
+# Switch to the non-root user
+USER nestjs
+
+# Define the command to run the frontend application
+CMD ["npm", "run", "frontend:dev", "--", "--host"]
